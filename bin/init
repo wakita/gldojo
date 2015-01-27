@@ -1,0 +1,12 @@
+#!/bin/sh
+
+export CMAKE_INCLUDE_PATH=/opt/brew/include
+export CMAKE_LIBRARY_PATH=/opt/brew/lib
+
+ROOT="$DROPBOX/work/opengl/glfw"
+BUILD=$HOME/projects/glfw
+
+# rm -rf $BUILD
+mkdir -p $BUILD/{logs,bin}
+cd $BUILD
+cmake -B. -H"$ROOT" -G "Unix Makefiles"
