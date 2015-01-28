@@ -31,7 +31,7 @@ OpenGL SuperBible第6版で現代的なOpenGLを学び始めました．本を�
 
 - [src/](src/): SuperBible に沿ったサンプルコード
 
-- [src/test](src/test): GLFWとGLEWの簡単なサンプルコードです．
+- [src/test](src/test): GLFW, GLM, GLEWの簡単なサンプルコードです．
 
 - 第二章: Our First OpenGL Program
 
