@@ -117,7 +117,6 @@ void vectorTypes() {
     glm::i32vec2( 1, -1),
     glm::i32vec2( 1,  1),
     glm::i32vec2(-1,  1) };
-
 }
 
 #include <glm/ext.hpp>
