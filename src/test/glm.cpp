@@ -120,8 +120,18 @@ void vectorTypes() {
 
 }
 
+#include <glm/ext.hpp>
+
+template <template <typename, glm::precision> class matType,
+          typename T,
+          glm::precision P>
+std::ostream & operator<<(std::ostream & out, const matType<T, P> & x) {
+  return out << glm::to_string(x);
+}
+
 int main() {
   glm::vec4 v1;
   glm::vec4 v2;
   test_length(v1); test_length(v2);
+  std::cout << "v1: " << v1 << ", v2: " << v2 << std::endl;
 }
