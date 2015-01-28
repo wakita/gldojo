@@ -19,7 +19,7 @@ OpenGL SuperBible第6版で現代的なOpenGLを学び始めました．本を�
 
         brew install glew
 
-- GLM[OpenGL Mathematics](http://glm.g-truc.net/0.9.6/index.html)のインストール
+- GLM ([OpenGL Mathematics](http://glm.g-truc.net/0.9.6/index.html))のインストール
 
         brew install glm
 
