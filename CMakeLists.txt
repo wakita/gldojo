@@ -34,7 +34,7 @@ endforeach(EXAMPLE)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/test)
 
-set(TESTS glm glm1 glfw glew)
+set(TESTS glew glfw glm glm_sample)
 
 foreach(TEST ${TESTS})
   add_executable(${TEST} src/test/${TEST}.cpp)
