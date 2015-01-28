@@ -130,8 +130,11 @@ std::ostream & operator<<(std::ostream & out, const matType<T, P> & x) {
 }
 
 int main() {
-  glm::vec4 v1;
-  glm::vec4 v2;
+  glm::vec4 v1(1.f, 2.f, 3.f, 4.f);
+  glm::vec4 v2(5.f, 6.f, 7.f, 8.f);
   test_length(v1); test_length(v2);
   std::cout << "v1: " << v1 << ", v2: " << v2 << std::endl;
+
+  glm::mat3x4 m = glm::mat3x4(v1, v2, v1);
+  std::cout << "m: " << m << std::endl;
 }
