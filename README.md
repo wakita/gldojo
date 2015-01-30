@@ -66,3 +66,9 @@ OpenGL SuperBible第6版で現代的なOpenGLを学び始めました．本を�
 - 第四章: Math for 3D Graphics
 
     - [chap04](src/chap04.cpp): この章は主に三次元グラフィックスに必要となる数学的基礎について紹介している．ベクトルと行列，四元数，各種変換，補間，Bezier曲線，スプライン曲線など．このソースコードでは主にGLMのAPIで関連するものをテストしている．SuperBibleではvmathパッケージで記述されていたものをGLMに翻訳した．
+
+- 第五章: Data
+
+    - [chap05a](src/chap05a.cpp): 複数のデータをシェーダーに送る方法．Vertex Array Object と Vector Buffer Objectを連携させる方法．例題としては，三角形の形状と色の情報をアプリケーション側から送るもの．
+
+    - [chap05b](src/chap05b.cpp): シェーダ側で複数の種類のデータに構造体でまとめあげた場合の，アプリケーション側からのデータを送る方法．できあがるのはchap05aと同じ例題．

@@ -26,6 +26,7 @@ set(EXAMPLES
   chap02a chap02b chap02c
   chap03a chap03b chap03c chap03d chap03d1 chap03e chap03f chap03g
   chap04
+  chap05a chap05b
   )
 
 foreach(EXAMPLE ${EXAMPLES})
