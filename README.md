@@ -72,3 +72,5 @@ OpenGL SuperBible第6版で現代的なOpenGLを学び始めました．本を�
     - [chap05a](src/chap05a.cpp): 複数のデータをシェーダーに送る方法．Vertex Array Object と Vector Buffer Objectを連携させる方法．例題としては，三角形の形状と色の情報をアプリケーション側から送るもの．
 
     - [chap05b](src/chap05b.cpp): シェーダ側で複数の種類のデータに構造体でまとめあげた場合の，アプリケーション側からのデータを送る方法．できあがるのはchap05aと同じ例題．
+
+    - [chap05c](src/chap05c.cpp): uniformを用いる方法．この例では，VSにuniformとして与えた時刻をFSが参照していないので，あまり面白くはないが，使い方はわかるだろう．uniformを送るときも，VAOの操作は必須なことに注意．
