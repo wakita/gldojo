@@ -1,145 +1,85 @@
+/**
+ * chap05b: 構造体の配列をシェーダに渡す例です．（未完）
+ *
+ * 本来は chap05a と同じものになるはずなのですが，どこかにバグがあるようでうまく
+ * 配列のデータがシェーダに渡っていないようです．青い背景が見えるだけでグラデーションの
+ * かかった三角形が表示されません．トホホ．
+ *
+ * この例では，データの構造体 (vertex_data) を宣言し，その配列によって三角形の各頂点の
+ * 座標と色のデータ (vdata) を用意し，それをシェーダにまとめて送ろうとしています．この
+ * ときに，受け取る vs 側は二つの変数 position と color で受け取ろうとしているので，
+ * 適宜，構造体の中身に分けてやらなくてはなりません．このために，構造体の表現を分析し
+ * それにしたがってデータを送るようにしています．
+ *
+ * 原因が不明なのですが，うまく動いていません．以前は動いていたような気がするのに．．．
+ **/
+
 #include <cmath>
-#include <cstdlib>
-#include <iostream>
+#include <vector>
+#define _DEBUG
+#include <sngl.hpp>
+#include <snshader.hpp>
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+namespace sn { namespace gl {
 
-static const GLchar *vs_source = R"VS(
-#version 410 core
+class Chapter05B : public Application {
 
-layout (location = 0) in vec4 position;
-layout (location = 1) in vec4 color;
-
-out vec4 vs_color;
-
-void main(void) {
-  gl_Position = position;
-  vs_color = color;
-}
-)VS";
-
-static const GLchar *fs_source = R"FS(
-#version 410 core
-
-in vec4 vs_color;
-out vec4 color;
-
-void main(void) {
-  // color = vec4(0.7, 1.0, 1.0, 0.5);
-  color = vs_color;
-}
-)FS";
-
-struct vertex_data {
-  float x, y, z;  // Position
-  float r, g, b;  // Color
-};
-
-void shaderInfoLog(GLuint shader) {
-# define INFO_LOG_LEN 255
-  GLchar infoLog[INFO_LOG_LEN];
-  int len;
-
-  glGetShaderInfoLog(shader, INFO_LOG_LEN, &len, infoLog);
-  if (len > 0) {
-    std::cout << infoLog << std::endl;
-    exit(EXIT_FAILURE);
-  }
-}
-
-void compile_and_link(GLuint program, GLenum shader_type, const GLchar *source) {
-  const GLchar *sources[] = { source };
-  GLuint shader = glCreateShader(shader_type);
-  glShaderSource(shader, 1, sources, NULL);
-  glCompileShader(shader);
-  shaderInfoLog(shader);
-  glAttachShader(program, shader);
-  glDeleteShader(shader);
-}
-
-GLuint compile_shaders(void) {
-  GLuint program = glCreateProgram();
-  compile_and_link(program, GL_VERTEX_SHADER,   vs_source);
-  compile_and_link(program, GL_FRAGMENT_SHADER, fs_source);
-  glLinkProgram(program);
-  return program;
-}
-
-void error_callback(int error, const char* description) {
-  std::cout << description << std::endl;
-}
-
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-  if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
-    glfwSetWindowShouldClose(window, GL_TRUE);
-  }
-}
-
-int main(void)
-{
-  if (!glfwInit()) return -1;
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  GLFWwindow* window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
-  if (!window) {
-    glfwTerminate();
-    exit(EXIT_FAILURE);
+  virtual void init() {
+    Application::init();
+    info.title = "構造体の配列をシェーダに渡す例です．でもバグってます．";
   }
 
-  glfwMakeContextCurrent(window);
-  glfwSwapInterval(1);
+  struct vertex_data {
+    float x, y, z;  // Position
+    float r, g, b;  // Color
+  };
 
-  glewExperimental = GL_TRUE;
-  glewInit();
+  enum { vaPosition, vaColor };
+  enum { bufVertex };
+  GLuint rendering_program, vao[2], buffers[1];
 
-  glfwSetKeyCallback(window, key_callback);
+  virtual void startup() {
+    rendering_program = program::link(
+        shader::load(
+          "/Users/wakita/Dropbox (smartnova)/work/opengl/glsb6/media/shaders/chap05b",
+          std::vector<std::string> { ".vs", ".fs" }),
+        true);
 
-  GLuint rendering_program = compile_shaders();
+    glGenVertexArrays(2, vao);
+    glBindVertexArray(vao[vaPosition]);
+    glBindVertexArray(vao[vaColor]);
 
-  GLuint vao[2];
-  glGenVertexArrays(2, vao);
-  glBindVertexArray(vao[0]);
-  glBindVertexArray(vao[1]);
+    const vertex_data vdata[3] = {
+      {  0.25, -0.25,  0.5,  1.0,  0.0,  0.0 },
+      { -0.25, -0.25,  0.5,  0.0,  1.0,  0.0 },
+      {  0.0,   0.25,  0.5,  0.0,  0.0,  1.0 } };
 
-  const vertex_data vdata[] = {
-    {  0.25, -0.25,  0.5,  1.0,  0.0,  0.0 },
-    { -0.25, -0.25,  0.5,  0.0,  1.0,  0.0 },
-    {  0.0,   0.25,  0.5,  0.0,  0.0,  1.0 } };
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[bufVertex]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vdata), vdata, GL_STATIC_DRAW);
 
-  GLuint buffers[1];
-  glGenBuffers(1, buffers);
+    glVertexAttribPointer(vaPosition,
+        3, GL_FLOAT, GL_FALSE, sizeof(vertex_data),
+        (void*)offsetof(vertex_data, x));
+    glEnableVertexAttribArray(vaPosition);
 
-  glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vdata), vdata, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_data), (void*)offsetof(vertex_data, x));
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_data), (void*)offsetof(vertex_data, r));
-  glEnableVertexAttribArray(1);
+    glVertexAttribPointer(vaColor,
+        3, GL_FLOAT, GL_FALSE, sizeof(vertex_data),
+        (void*)offsetof(vertex_data, r));
+    glEnableVertexAttribArray(vaColor);
+  }
 
-  GLfloat color[] = { .2, .2, .5, 1};
+  GLfloat bgcolor[4] = { .2, .2, 0, 1 };
 
-  while (!glfwWindowShouldClose(window)) {
-    double t = glfwGetTime();
-
-    color[2] = (float)(sin(t) * .5 + .5);
-    glClearBufferfv(GL_COLOR, 0, color);
+  virtual void render(double t) {
+    bgcolor[2] = (float)(sin(t) + 1) / 2;
+    glClearBufferfv(GL_COLOR, 0, bgcolor);
 
     glUseProgram(rendering_program);
+
     glDrawArrays(GL_TRIANGLES, 0, 3);
-
-    glfwSwapBuffers(window);
-    glfwPollEvents();
   }
+};
 
-  glDeleteProgram(rendering_program);
-  glDeleteBuffers(1, buffers);
+} } // namespace sn::gl
 
-  glfwDestroyWindow(window);
-  glfwTerminate();
-
-  exit(EXIT_SUCCESS);
-}
+DECLARE_MAIN(sn::gl::Chapter05B)

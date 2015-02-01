@@ -1,189 +1,57 @@
+/**
+ * chap03e: Geometry シェーダを追加しました．Geometryシェーダは，Tessallation シェーダ
+ * から与えられた図形を他の図形に変換する働きを持ちます．この例では，三角形をその頂点で
+ * 置き換えています．
+ **/
+
 #include <cmath>
-#include <cstdlib>
-#include <iostream>
+#include <vector>
+#define _DEBUG
+#include "sngl.hpp"
+#include "snshader.hpp"
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
-static const GLchar *vs_source = R"VS(
-#version 410 core
-
-layout (location = 0) in vec4 offset;
-layout (location = 1) in vec4 color;
-
-out vec4 vs_color;
-
-void main(void) {
-  const vec4 vertices[] = vec4[](
-      vec4( .25, -.25, .5, 1.0),
-      vec4(-.25, -.25, .5, 1.0),
-      vec4( .25,  .25, .5, 1.0));
-
-  gl_Position = vertices[gl_VertexID] + offset;
-
-  vs_color = color;
-}
-)VS";
-
-static const GLchar *tcs_source = R"TSC(
-#version 410 core
-
-layout (vertices = 3) out;
-
-void main(void) {
-  if (gl_InvocationID == 0) {
-    gl_TessLevelInner[0] = 5.0;
-
-    gl_TessLevelOuter[0] = 5.0;
-    gl_TessLevelOuter[1] = 5.0;
-    gl_TessLevelOuter[2] = 5.0;
-  }
-  gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
-}
-)TSC";
-
-static const GLchar *tes_source = R"TES(
-#version 410 core
-
-layout (triangles, equal_spacing, cw) in;
-
-void main(void) {
-  gl_Position = (
-      gl_TessCoord.x * gl_in[0].gl_Position +
-      gl_TessCoord.y * gl_in[1].gl_Position +
-      gl_TessCoord.z * gl_in[2].gl_Position);
-}
-)TES";
-
-static const GLchar *geom_source = R"GEOM(
-#version 410 core
-
-layout (triangles) in;
-layout (points, max_vertices = 3) out;
-
-void main(void) {
-  for (int i = 0; i < gl_in.length(); i++) {
-    gl_Position = gl_in[i].gl_Position;
-    EmitVertex();
-  }
-}
-)GEOM";
-
-static const GLchar *fs_source = R"FS(
-#version 410 core
-
-in vec4 vs_color;
-
-out vec4 color;
-
-void main(void) {
-  //color = vs_color;
-  color = vec4(1., 1., 1., 1.);
-}
-)FS";
-
-void shaderInfoLog(GLuint shader) {
-# define INFO_LOG_LEN 255
-  GLchar infoLog[INFO_LOG_LEN];
-  int len;
-
-  glGetShaderInfoLog(shader, INFO_LOG_LEN, &len, infoLog);
-  if (len > 0) {
-    std::cout << infoLog << std::endl;
-    exit(EXIT_FAILURE);
-  }
-}
-
-void compile_and_link(GLuint program, GLenum shader_type, const GLchar *source) {
-  const GLchar *sources[] = { source };
-  GLuint shader = glCreateShader(shader_type);
-  glShaderSource(shader, 1, sources, NULL);
-  glCompileShader(shader);
-  shaderInfoLog(shader);
-  glAttachShader(program, shader);
-  glDeleteShader(shader);
-}
-
-GLuint build_shaders(void) {
-  GLuint program = glCreateProgram();
-  compile_and_link(program, GL_VERTEX_SHADER,          vs_source);
-  compile_and_link(program, GL_TESS_CONTROL_SHADER,    tcs_source);
-  compile_and_link(program, GL_TESS_EVALUATION_SHADER, tes_source);
-  compile_and_link(program, GL_GEOMETRY_SHADER,        geom_source);
-  compile_and_link(program, GL_FRAGMENT_SHADER,        fs_source);
-  glLinkProgram(program);
-  return program;
-}
-
-void error_callback(int error, const char* description) {
-  std::cout << description << std::endl;
-}
-
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-  if ((key == GLFW_KEY_Q || key == GLFW_KEY_ESCAPE) && action == GLFW_PRESS) {
-    glfwSetWindowShouldClose(window, GL_TRUE);
-  }
-}
-
-int main(void)
-{
-  if (!glfwInit()) return -1;
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  GLFWwindow* window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
-  if (!window) {
-    glfwTerminate();
-    exit(EXIT_FAILURE);
+namespace sn { namespace gl {
+class Chapter03E : public Application {
+  virtual void init() {
+    Application::init();
+    info.title = "chap03e: Geometryシェーダを追加";
   }
 
-  glfwMakeContextCurrent(window);
-  glfwSwapInterval(1);
+  enum { vaOffset, vaColor };
+  GLuint rendering_program, vao[2];
 
-  glewExperimental = GL_TRUE;
-  glewInit();
+  virtual void startup() {
+    rendering_program = program::link(
+        shader::load(
+          "/Users/wakita/Dropbox (smartnova)/work/opengl/glsb6/media/shaders/chap03e",
+          std::vector<std::string> { ".vs", ".tcs", ".tes", ".geom", ".fs" }),
+        true);
+    glGenVertexArrays(2, vao);
+    glBindVertexArray(vao[vaOffset]);
+    glBindVertexArray(vao[vaColor]);
 
-  glfwSetKeyCallback(window, key_callback);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPointSize(5);
+  }
 
-  GLuint rendering_program = build_shaders();
+  GLfloat bgcolor[4] = { 0, 0, 0, 0 };
+  GLfloat offset[2];
 
-  GLuint vao;
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glPointSize(5);
-
-  GLfloat color[] = { 0, 0, 0, 0 };
-  GLfloat offset[] = { 0, 0, 0, 0 };
-  GLfloat tcolor[] = { 0, 0, .3f, 1.f };
-  while (!glfwWindowShouldClose(window)) {
-    double t = glfwGetTime();
+  virtual void render(double t) {
     double s = sin(t), c = cos(t);
-    color[0] = (float)(s * .4 + .4);
-    color[1] = (float)(c * .4 + .4);
-    glClearBufferfv(GL_COLOR, 0, color);
+    bgcolor[0] = s * .4 + .4;
+    bgcolor[1] = c * .4 + .4;
 
-    // offset
-    offset[0] = (float)(s * .5); offset[1] = (float)(c * .6);
-    glVertexAttrib4fv(0, offset);
-    // color
-     glVertexAttrib4fv(1, tcolor);
-
+    glClearBufferfv(GL_COLOR, 0, bgcolor);
     glUseProgram(rendering_program);
+
+    glVertexAttrib2f(vaOffset, s / 2, c / 2);
+    glVertexAttrib1f(vaColor, (s + 1) / 2);
+
     glDrawArrays(GL_PATCHES, 0, 3);
-
-    glfwSwapBuffers(window);
-    glfwPollEvents();
   }
+};
 
-  glDeleteVertexArrays(1, &vao);
-  glDeleteProgram(rendering_program);
+} } // namespace sn::gl
 
-  glfwDestroyWindow(window);
-  glfwTerminate();
-
-  exit(EXIT_SUCCESS);
-}
+DECLARE_MAIN(sn::gl::Chapter03E)

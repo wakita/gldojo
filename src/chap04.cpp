@@ -19,7 +19,6 @@ std::ostream & operator<<(std::ostream & out, const matType<T, P> & x) {
 
 #define PI ((float)(asin(1)*2))
 
-
 int main() {
   glm::vec3 vVerts[] = {
     glm::vec3(-.5f,  0.f,  0.f),

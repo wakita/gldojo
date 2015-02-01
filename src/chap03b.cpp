@@ -1,136 +1,58 @@
+/**
+ * chap03b: 複数のデータをシェーダに送る
+ *
+ * 三角形のアニメーション (chap03a) で色も変化させる．
+ *
+ * データを fs に直接，送ることはできない．そこで，まず vs にオフセットに加えて，
+ * 色のデータも送り，vs はその色を fs に転送する．
+ *
+ * ※ 送信するデータごとに vertex array object (VAO) を利用することに注意．
+ * ※ 配列渡しの glVertexAttrib*fv ではなく，値渡しの glVertexAttrib*f を用いている．
+ **/
+
 #include <cmath>
-#include <cstdlib>
-#include <iostream>
+#include <vector>
+#define _DEBUG
+#include "sngl.hpp"
+#include "snshader.hpp"
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+namespace sn { namespace gl {
 
-static const GLchar *vs_source = R"VS(
-#version 410 core
+class Chapter03B : public Application {
 
-layout (location = 0) in vec4 offset;
-layout (location = 1) in vec4 color;
-
-out vec4 vs_color;
-
-void main(void) {
-  const vec4 vertices[3] = vec4[3](
-      vec4( 0.25, -0.25, 0.5, 1.0),
-      vec4(-0.25, -0.25, 0.5, 1.0),
-      vec4( 0.25,  0.25, 0.5, 1.0));
-
-  gl_Position = vertices[gl_VertexID] + offset;
-
-  vs_color = color;
-}
-)VS";
-
-static const GLchar *fs_source = R"FS(
-#version 410 core
-
-in vec4 vs_color;
-out vec4 color;
-
-void main(void) {
-  color = vs_color;
-}
-)FS";
-
-
-void shaderInfoLog(GLuint shader) {
-# define INFO_LOG_LEN 255
-  GLchar infoLog[INFO_LOG_LEN];
-  int len;
-
-  glGetShaderInfoLog(shader, INFO_LOG_LEN, &len, infoLog);
-  if (len > 0) {
-    std::cout << infoLog << std::endl;
-    exit(EXIT_FAILURE);
-  }
-}
-
-void compile_and_link(GLuint program, GLenum shader_type, const GLchar *source) {
-  const GLchar *sources[] = { source };
-  GLuint shader = glCreateShader(shader_type);
-  glShaderSource(shader, 1, sources, NULL);
-  glCompileShader(shader);
-  shaderInfoLog(shader);
-  glAttachShader(program, shader);
-  glDeleteShader(shader);
-}
-
-GLuint compile_shaders(void) {
-  GLuint program = glCreateProgram();
-  compile_and_link(program, GL_VERTEX_SHADER,   vs_source);
-  compile_and_link(program, GL_FRAGMENT_SHADER, fs_source);
-  glLinkProgram(program);
-  return program;
-}
-
-void error_callback(int error, const char* description) {
-  std::cout << description << std::endl;
-}
-
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-  if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
-    glfwSetWindowShouldClose(window, GL_TRUE);
-  }
-}
-
-int main(void)
-{
-  if (!glfwInit()) return -1;
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  GLFWwindow* window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
-  if (!window) {
-    glfwTerminate();
-    exit(EXIT_FAILURE);
+  virtual void init() {
+    Application::init();
+    info.title = "chap03b: 複数の値をシェーダに送る";
   }
 
-  glfwMakeContextCurrent(window);
-  glfwSwapInterval(1);
+  GLuint rendering_program, vao[1];
+  enum { vaOffset, vaColor };
 
-  glewExperimental = GL_TRUE;
-  glewInit();
+  virtual void startup() {
+    rendering_program = program::link(
+        shader::load(
+          "/Users/wakita/Dropbox (smartnova)/work/opengl/glsb6/media/shaders/chap03b",
+          std::vector<std::string> { ".vs", ".fs" }),
+        true);
 
-  glfwSetKeyCallback(window, key_callback);
+    glGenVertexArrays(1, vao);
+    glBindVertexArray(vao[vaOffset]);
+  }
 
-  GLuint rendering_program = compile_shaders();
-  GLuint vertex_array_object;
-  glGenVertexArrays(1, &vertex_array_object);
-  glBindVertexArray(vertex_array_object);
+  GLfloat bgcolor[4] = { .2, .2, .2, 1 };
 
-  GLfloat color[] = { 0, 0, 0, 1 };
-  GLfloat tcolor[] = { 0, 0, 0.3, 1 };
-  while (!glfwWindowShouldClose(window)) {
-    double t = glfwGetTime();
-    color[0] = (float)(sin(t)/2 + 0.5);
-    color[1] = (float)(cos(t)/2 + 0.5);
-    glClearBufferfv(GL_COLOR, 0, color);
+  virtual void render(double t) {
+    glClearBufferfv(GL_COLOR, 0, bgcolor);
 
     glUseProgram(rendering_program);
 
-    GLfloat offset[] = { (float)(sin(t) * 0.5), (float)(cos(t) * 0.6), 0.0f, 0.0f };
-    glVertexAttrib4fv(0, offset);
-    tcolor[0] = (float)(sin(t*3)/4 + 0.75);
-    tcolor[0] = (float)(cos(t*3)/4 + 0.75);
-    glVertexAttrib4fv(1, tcolor);
+    glVertexAttrib2f(vaOffset, sin(t) / 2, cos(t) / 2);
+    glVertexAttrib4f(vaColor, (sin(t) + 1) / 2, (cos(t) + 1) / 2, 0, 1);
+
     glDrawArrays(GL_TRIANGLES, 0, 3);
-
-    glfwSwapBuffers(window);
-    glfwPollEvents();
   }
+};
 
-  glDeleteVertexArrays(1, &vertex_array_object);
-  glDeleteProgram(rendering_program);
-  glDeleteVertexArrays(1, &vertex_array_object);
+} }
 
-  glfwDestroyWindow(window);
-  glfwTerminate();
-
-  exit(EXIT_SUCCESS);
-}
+DECLARE_MAIN(sn::gl::Chapter03B)

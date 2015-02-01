@@ -1,128 +1,59 @@
+/**
+ * chap05c: uniformシェーダ変数を利用します．
+ *
+ * シェーダの uniform データについて確認してみます．uniform データはすべての
+ * シェーダで共通に見える仕掛けとなっています．
+ *
+ * このプログラムは，三角形が周回するデモですが，その大きさを周期的に変化させ，
+ * さらに時間の経過とともに黒かった三角形に色みが増すように工夫しています．
+ *
+ * 実装にあたっては開始からの経過時間を uniform として保存しています．この値を
+ * vs と fs が参照し，それぞれ三角形の大きさと色みの計算に利用しています．
+ **/
+
 #include <cmath>
-#include <cstdlib>
-#include <iostream>
+#define _DEBUG
+#include "sngl.hpp"
+#include "snshader.hpp"
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+namespace sn { namespace gl {
 
-static const GLchar *vs_source = R"VS(
-#version 410 core
-
-uniform float time;
-out vec3 vs_color;
-
-void main(void) {
-  const vec3 triangle_vertices[3] = vec3[3](
-    vec3(0.25,  -0.25,  0.5),
-    vec3(-0.25, -0.25,  0.5),
-    vec3(0.0,    0.25,  0.5));
-
-  float t = time;
-  gl_Position = vec4(triangle_vertices[gl_VertexID], 1) + vec4(cos(t), sin(t), 0, 1);
-
-  float PI = asin(1);
-  float deg= t + (PI * 2 / 3) * gl_VertexID;
-  vs_color = vec3((cos(deg) + 1) / 2, (sin(deg) + 1) / 1, .5);
-}
-)VS";
-
-static const GLchar *fs_source = R"FS(
-#version 410 core
-
-in vec3 vs_color;
-out vec4 color;
-
-void main(void) {
-  color = vec4(vs_color, .5);
-}
-)FS";
-
-void shaderInfoLog(GLuint shader, const GLchar *source) {
-# define INFO_LOG_LEN 255
-  GLchar infoLog[INFO_LOG_LEN];
-  int len;
-
-  glGetShaderInfoLog(shader, INFO_LOG_LEN, &len, infoLog);
-  if (len > 0) {
-    std::cout << infoLog << std::endl << source << std::endl;
-    exit(EXIT_FAILURE);
-  }
-}
-
-void compile_and_link(GLuint program, GLenum shader_type, const GLchar *source) {
-  const GLchar *sources[] = { source };
-  GLuint shader = glCreateShader(shader_type);
-  glShaderSource(shader, 1, sources, NULL);
-  glCompileShader(shader);
-  shaderInfoLog(shader, source);
-  glAttachShader(program, shader);
-  glDeleteShader(shader);
-}
-
-GLuint compile_shaders(void) {
-  GLuint program = glCreateProgram();
-  compile_and_link(program, GL_VERTEX_SHADER,   vs_source);
-  compile_and_link(program, GL_FRAGMENT_SHADER, fs_source);
-  glLinkProgram(program);
-  return program;
-}
-
-void error_callback(int error, const char* description) {
-  std::cout << description << std::endl;
-}
-
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-  if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
-    glfwSetWindowShouldClose(window, GL_TRUE);
-  }
-}
-
-int main(void)
-{
-  if (!glfwInit()) return -1;
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  GLFWwindow* window = glfwCreateWindow(640, 480, "", NULL, NULL);
-  if (!window) {
-    glfwTerminate();
-    exit(EXIT_FAILURE);
+class Chapter05C : public Application {
+  virtual void init() {
+    Application::init();
+    info.title = "chap05c: uniformシェーダ変数を利用します";
   }
 
-  glfwMakeContextCurrent(window);
-  glfwSetKeyCallback(window, key_callback);
-  glfwSwapInterval(1);
+  enum { vaTime };
+  GLuint rendering_program, vao[1];
+  GLuint time_loc;
 
-  glewExperimental = GL_TRUE;
-  glewInit();
+  virtual void startup() {
+    rendering_program = program::link(
+        shader::load(
+          "/Users/wakita/Dropbox (smartnova)/work/opengl/glsb6/media/shaders/chap05c",
+          std::vector<std::string> { ".vs", ".fs" }),
+        true);
 
-  GLuint rendering_program = compile_shaders();
+    glGenVertexArrays(1, vao);
+    glBindVertexArray(vao[vaTime]);
 
-  GLuint vao[1];
-  glGenVertexArrays(1, vao);
-  glBindVertexArray(vao[0]);
+    time_loc = glGetUniformLocation(rendering_program, "time");
+  }
 
-  GLint time_loc = glGetUniformLocation(rendering_program, "time");
+  GLfloat bgcolor[4] = { .2, .2, .2, 1 };
 
-  GLfloat background[] = { .6, .6, .6, 1 };
+  virtual void render(double t) {
+    glClearBufferfv(GL_COLOR, 0, bgcolor);
 
-  while (!glfwWindowShouldClose(window)) {
-    glClearBufferfv(GL_COLOR, 0, background);
     glUseProgram(rendering_program);
 
-    float t = (float)glfwGetTime();
     glUniform1f(time_loc, t);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
-
-    glfwSwapBuffers(window);
-    glfwPollEvents();
   }
+};
 
-  glfwDestroyWindow(window);
-  glfwTerminate();
+} } // namespace sn::gl
 
-  exit(EXIT_SUCCESS);
-}
+DECLARE_MAIN(sn::gl::Chapter05C)
