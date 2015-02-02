@@ -26,7 +26,7 @@ class Chapter03F : public Application {
     glBindVertexArray(vao[vaColor]);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glPointSize(5);
+    glPointSize(30);
   }
 
   GLfloat bgcolor[4] = { 0, 0, 0, 0 };
