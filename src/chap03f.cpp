@@ -17,8 +17,7 @@ class Chapter03F : public Application {
 
   virtual void startup() {
     rendering_program = program::link(
-        shader::load(
-          "/Users/wakita/Dropbox (smartnova)/work/opengl/glsb6/media/shaders/chap03f",
+        shader::load("chap03f",
           std::vector<std::string> { ".vs", ".tcs", ".tes", ".gs", ".fs" }),
         true);
 

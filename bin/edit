@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd "$DROPBOX/work/opengl/glsb6/src"
+mvim .

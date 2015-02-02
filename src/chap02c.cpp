@@ -29,9 +29,7 @@ class Chapter02C : public Application {
 
   virtual void startup() {
     rendering_program = program::link(
-        shader::load(
-          "/Users/wakita/Dropbox (smartnova)/work/opengl/glsb6/media/shaders/",
-          std::vector<std::string> { "chap02c.vs", "chap02c.fs" }),
+        shader::load("chap02c", std::vector<std::string> { ".vs", ".fs" }),
         true);
 
     GLuint vao[1];

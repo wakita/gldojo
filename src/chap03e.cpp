@@ -22,8 +22,7 @@ class Chapter03E : public Application {
 
   virtual void startup() {
     rendering_program = program::link(
-        shader::load(
-          "/Users/wakita/Dropbox (smartnova)/work/opengl/glsb6/media/shaders/chap03e",
+        shader::load("chap03e",
           std::vector<std::string> { ".vs", ".tcs", ".tes", ".geom", ".fs" }),
         true);
     glGenVertexArrays(2, vao);

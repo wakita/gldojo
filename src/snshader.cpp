@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -64,6 +65,9 @@ GLuint load(string base, string ext, GLenum shader_type, bool check_errors) {
 
 extern
 vector<GLuint> load(string base, vector<string> names, bool check_errors) {
+  const char* dir = std::getenv("GLSB6_SHADERS_DIR");
+  const string glsb6_shaders(dir ? dir : "");
+
   vector<GLuint> shaders {};
   for (const auto name : names) {
     vector<GLuint>::size_type pos = name.find_last_of('.');
@@ -75,7 +79,7 @@ vector<GLuint> load(string base, vector<string> names, bool check_errors) {
       ext == ".gs"  ? GL_GEOMETRY_SHADER :
       ext == ".fs"  ? GL_FRAGMENT_SHADER :
       /* defaults */  GL_COMPUTE_SHADER;
-    shaders.push_back(load(base + name, shader_type, check_errors));
+    shaders.push_back(load(glsb6_shaders + base + name, shader_type, check_errors));
   }
   return shaders;
 }

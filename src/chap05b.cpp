@@ -40,9 +40,7 @@ class Chapter05B : public Application {
 
   virtual void startup() {
     rendering_program = program::link(
-        shader::load(
-          "/Users/wakita/Dropbox (smartnova)/work/opengl/glsb6/media/shaders/chap05b",
-          std::vector<std::string> { ".vs", ".fs" }),
+        shader::load("chap05b", std::vector<std::string> { ".vs", ".fs" }),
         true);
 
     glGenVertexArrays(2, vao);

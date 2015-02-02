@@ -6,7 +6,6 @@
  * を利用します．
  *
  * ここでは，三角形の各頂点の座標と色を与えるために，それぞれにバッファを用意しています．
- * これまでずいぶんお世話になった VAO は今回は利用しませんでした．
  **/
 
 #include <cmath>
@@ -24,15 +23,19 @@ class Chapter05A : public Application {
     info.title = "chap05a: アプリから vs にデータを送り込む例です";
   }
 
+  enum { vaData };
   enum { bufPosition, bufColors };
-  GLuint rendering_program, buffers[2];
+  GLuint rendering_program, vao[1], buffers[2];
 
   virtual void startup() {
     rendering_program = program::link(
-        shader::load(
-          "/Users/wakita/Dropbox (smartnova)/work/opengl/glsb6/media/shaders/chap05a",
-          std::vector<std::string> { ".vs", ".fs" }),
+        shader::load("chap05a", std::vector<std::string> { ".vs", ".fs" }),
         true);
+
+    // MacBook Air では，VAOを初期化しなくても動いていたような気がしたけれど
+    // iMac5K では以下がないと動かない．
+    glGenVertexArrays(1, vao);
+    glBindVertexArray(vao[vaData]);
 
     glGenBuffers(2, buffers);
 

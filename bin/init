@@ -8,5 +8,6 @@ BUILD=$HOME/projects/glsb6
 
 # rm -rf $BUILD
 mkdir -p $BUILD/{bin,lib/logs}
+cp bin/{edit,setenv} $BUILD/bin
 cd $BUILD
 cmake -B. -H"$ROOT" -G "Unix Makefiles"
