@@ -39,9 +39,9 @@ OpenGL SuperBible第6版で現代的なOpenGLを学び始めました．本を�
 
 ## 第二章: Our First OpenGL Program
 
-     | chap02a | chap02b | chap02c |
------|:-------:|:-------:|:-------:|
- | ![chap02a](img/chap02a.png) | ![chap02b](img/chap02b.png) | ![chap02c](img/chap02c.png)
+ chap02a | chap02b | chap02c |
+:-------:|:-------:|:-------:|
+ ![chap02a](img/chap02a.png) | ![chap02b](img/chap02b.png) | ![chap02c](img/chap02c.png)
 
 - [chap02a](src/chap02a.cpp): ウィンドウを消去します．
 
@@ -51,11 +51,11 @@ OpenGL SuperBible第6版で現代的なOpenGLを学び始めました．本を�
 
 ## 第三章: Following the Pipeline
 
-|    | chap03a | chap03b | chap03c |
------|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|
-     | ![chap03a](img/chap03a.png) | ![chap03b](img/chap03b.png) | ![chap03c](img/chap03c.png)
-|    | chap03d | chap03e | chap03f |
-     | ![chap03d](img/chap03d.png) | ![chap03e](img/chap03e.png) | ![chap03f](img/chap03f.png)
+ chap03a | chap03b | chap03c |
+:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|
+ ![chap03a](img/chap03a.png) | ![chap03b](img/chap03b.png) | ![chap03c](img/chap03c.png)
+ chap03d | chap03e | chap03f |
+ ![chap03d](img/chap03d.png) | ![chap03e](img/chap03e.png) | ![chap03f](img/chap03f.png)
 
 - [chap03a](src/chap03a.cpp) ([VS](media/shaders/chap03a.vs), [FS](media/shaders/chap03a.fs)): Vertex shaderとFragment shaderを利用した例．背景色が変化するなか，白い三角形が弧を描きます．
 
