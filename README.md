@@ -77,9 +77,9 @@ OpenGL SuperBible第6版で現代的なOpenGLを学び始めました．本を�
 
 ## 第五章: Data
 
-     | chap05a | chap05c 
------|:-------:|:-------:
- |![chap05a](img/chap05a.png) | ![chap05c](img/chap05c.png)
+ chap05a | chap05c 
+:-------:|:-------:
+![chap05a](img/chap05a.png) | ![chap05c](img/chap05c.png)
 
 - [chap05a](src/chap05a.cpp) ([VS](media/shaders/chap05a.vs), [FS](media/shaders/chap05a.fs)): 複数のデータをシェーダーに送る方法．Vertex Array Object と Vector Buffer Objectを連携させる方法．例題としては，三角形の形状と色の情報をアプリケーション側から送っています．
 
