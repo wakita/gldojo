@@ -21,8 +21,13 @@ using std::string;
 class Application {
   public:
     Application() { app = this; }
+
     virtual ~Application() {}
+
     virtual void run() {
+      glfwSetErrorCallback([] (int error, const char* description) {
+            std::cerr << "Error: " << description << std::endl;
+          });
       if (!glfwInit()) {
         cerr << "Failed to initialize GLFW" << endl;
         return;
@@ -39,8 +44,10 @@ class Application {
       glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
       glfwWindowHint(GLFW_SAMPLES, info.samples);
       glfwWindowHint(GLFW_STEREO, info.flags.stereo ? GL_TRUE : GL_FALSE);
-      GLFWmonitor* monitor = glfwGetPrimaryMonitor();
       if (info.flags.fullscreen) {
+        int monitor_count;
+        GLFWmonitor** monitors = glfwGetMonitors(&monitor_count);
+        GLFWmonitor* monitor = monitors[0];
         if (info.windowWidth == 0 || info.windowHeight == 0) {
           const GLFWvidmode * videoMode = glfwGetVideoMode(monitor);
           info.windowWidth  = videoMode->width;
@@ -62,11 +69,33 @@ class Application {
       glewInit();
 
       glfwSetWindowTitle(window, info.title.c_str());
-      glfwSetWindowSizeCallback(window, glfw_SizeCallback);
-      glfwSetKeyCallback(window, glfw_KeyCallback);
-      glfwSetMouseButtonCallback(window, glfw_MouseButtonCallback);
-      glfwSetCursorPosCallback(window, glfw_CursorPosCallback);
-      glfwSetScrollCallback(window, glfw_ScrollCallback);
+
+      glfwSetWindowSizeCallback(window, [] (
+            GLFWwindow* win, int w, int h) {
+            app->onResize(w, h);
+          });
+
+      glfwSetKeyCallback(window, [] (
+            GLFWwindow* win, int key, int scancode, int action, int mods) {
+            app->onKey(win, key, scancode, action, mods);
+          });
+
+
+      glfwSetMouseButtonCallback(window, [] (
+            GLFWwindow* win, int button, int action, int mods) {
+            app->onMouseButton(win, button, action, mods);
+          });
+
+      glfwSetCursorPosCallback(window, [] (
+            GLFWwindow* win, double xpos, double ypos) {
+            app->onCursorPos(win, xpos, ypos);
+          });
+
+      glfwSetScrollCallback(window, [] (
+            GLFWwindow* win, double xoffset, double yoffset) {
+            app->onScroll(win, xoffset, yoffset);
+          });
+
       glfwSetInputMode(window, GLFW_CURSOR,
           info.flags.cursor ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
 
@@ -90,7 +119,6 @@ class Application {
       }
       */
 
-      glfwSetKeyCallback(window, glfw_KeyCallback);
       startup();
 
       while (!glfwWindowShouldClose(window)) {
@@ -176,38 +204,11 @@ class Application {
     static      Application * app;
     GLFWwindow* window;
 
-#   define GLFWCALL
-    static void GLFWCALL glfw_SizeCallback(
-        GLFWwindow* win, int w, int h) {
-      app->onResize(w, h);
-    }
-
-    static void GLFWCALL glfw_KeyCallback(
-        GLFWwindow* win, int key, int scancode, int action, int mods) {
-      app->onKey(win, key, scancode, action, mods);
-    }
-
-    static void GLFWCALL glfw_MouseButtonCallback(
-        GLFWwindow* win, int button, int action, int mods) {
-      app->onMouseButton(win, button, action, mods);
-    }
-
-    static void GLFWCALL glfw_CursorPosCallback(
-        GLFWwindow* win, double xpos, double ypos) {
-      app->onCursorPos(win, xpos, ypos);
-    }
-
-    static void GLFWCALL glfw_ScrollCallback(
-        GLFWwindow* win, double xoffset, double yoffset) {
-      app->onScroll(win, xoffset, yoffset);
-    }
-
     void setVsync(bool enable) {
       info.flags.vsync = enable ? 1 : 0;
       glfwSwapInterval((int)info.flags.vsync);
     }
 
-    /*
     static void APIENTRY debug_callback(GLenum source,
         GLenum type,
         GLuint id,
@@ -217,7 +218,6 @@ class Application {
         GLvoid* userParam) {
       reinterpret_cast<Application *>(userParam)->onDebugMessage(source, type, id, severity, length, message);
     }
-    */
   };
 
 }; };  // namespace sn::gl
