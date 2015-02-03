@@ -1,16 +1,13 @@
 #ifndef __SNGL_HPP__
 #define __SNGL_HPP__
 
-// #include "GL/gl3w.h"
+#include <iostream>
+
 #include <GL/glew.h>
 
 #define GLFW_NO_GLU 1
 // #define GLFW_INCLUDE_GLCOREARB 1
 #include "GLFW/glfw3.h"
-
-// #include "sb6ext.h"
-
-#include <iostream>
 
 namespace sn { namespace gl {
 
@@ -44,6 +41,7 @@ class Application {
       glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
       glfwWindowHint(GLFW_SAMPLES, info.samples);
       glfwWindowHint(GLFW_STEREO, info.flags.stereo ? GL_TRUE : GL_FALSE);
+
       if (info.flags.fullscreen) {
         int monitor_count;
         GLFWmonitor** monitors = glfwGetMonitors(&monitor_count);
@@ -154,6 +152,7 @@ class Application {
     virtual void startup() { }
     virtual void render(double currentTime) { }
     virtual void shutdown() { }
+
     virtual void onResize(int w, int h) {
       info.windowWidth = w;
       info.windowHeight = h;
@@ -164,6 +163,7 @@ class Application {
         glfwSetWindowShouldClose(window, GL_TRUE);
       }
     }
+
     virtual void onMouseButton(GLFWwindow *win, int button, int action, int mods) { }
     virtual void onCursorPos(GLFWwindow *win, double xpos, double ypos) { }
     virtual void onScroll(GLFWwindow *win, double xoffset, double yoffset) { }
