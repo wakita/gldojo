@@ -39,7 +39,6 @@ OpenGL SuperBible第6版で現代的なOpenGLを学び始めました．本を�
 
 ## 第二章: Our First OpenGL Program
 
-|    |         |         |         |
      | chap02a | chap02b | chap02c |
 -----|:-------:|:-------:|:-------:|
  | ![chap02a](img/chap02a.png) | ![chap02b](img/chap02b.png) | ![chap02c](img/chap02c.png)
@@ -78,7 +77,6 @@ OpenGL SuperBible第6版で現代的なOpenGLを学び始めました．本を�
 
 ## 第五章: Data
 
-|    |         |         |
      | chap05a | chap05c 
 -----|:-------:|:-------:
  |![chap05a](img/chap05a.png) | ![chap05c](img/chap05c.png)
