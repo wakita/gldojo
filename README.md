@@ -89,4 +89,4 @@ OpenGL SuperBible第6版で現代的なOpenGLを学び始めました．本を�
 
 - [chap05d](src/chap05d.cpp) ([VS](media/shaders/chap05d.vs), [FS](media/shaders/chap05d.fs)): chap05cと類似した例題です．この例では，uniform変数のかわりにuniformブロックを利用してデータをひとまとめにして書き換える例となっています．
 
-- [chap05e](src/chap05e.cpp) ([VS1](media/shaders/chap05e1.vs), [FS1](media/shaders/chap05e1.fs); [VS2](media/shaders/chap05e2.vs), [FS2](media/shaders/chap05e2.fs)): Uniformブロックのレイアウトに関する例題です．この例題はデータの保存形式について確認することが目的なので画面出力はありません．
+- [chap05e](src/chap05e.cpp) ([VS1](media/shaders/chap05e1.vs); [VS2](media/shaders/chap05e2.vs)): Uniformブロックのレイアウトに関する例題です．この例題はデータの保存形式について確認することが目的なので画面出力はありません．
