@@ -31,7 +31,7 @@ class Chapter05E : public Application {
   void setValuesToProgram(GLuint program) {
     glUseProgram(program);
 
-    static const GLchar * uniformNames[] = {
+    static const GLchar * uNames[] = {
       "TransformBlock.scale",
       "TransformBlock.translation",
       "TransformBlock.rotation",
@@ -42,7 +42,7 @@ class Chapter05E : public Application {
     // Uniform { Offsets, Array Strides, Matrix Strides }
     GLint  uOffset[N_UNAME], aStride[N_UNAME], mStride[N_UNAME];
 
-    glGetUniformIndices(program, N_UNAME, uniformNames, uIndices);
+    glGetUniformIndices(program, N_UNAME, uNames, uIndices);
     glGetActiveUniformsiv(program, N_UNAME, uIndices, GL_UNIFORM_OFFSET,
         (GLint *)uOffset);
     glGetActiveUniformsiv(program, N_UNAME, uIndices, GL_UNIFORM_ARRAY_STRIDE,
