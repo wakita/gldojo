@@ -86,3 +86,7 @@ OpenGL SuperBible第6版で現代的なOpenGLを学び始めました．本を�
 - [chap05b](src/chap05b.cpp) ([VS](media/shaders/chap05b.vs), [FS](media/shaders/chap05b.fs)): シェーダ側で複数の種類のデータに構造体でまとめあげた場合の，アプリケーション側からのデータを送る方法．できあがるのはchap05aと同じ例題のはずなんですが，vs-fs間に他のシェーダがあるときにデータの受け渡しがうまくいかなくなるようです．ただ，原因，究明中．
 
 - [chap05c](src/chap05c.cpp) ([VS](media/shaders/chap05c.vs), [FS](media/shaders/chap05c.fs)): uniformを用いる方法．この例では，VSとFSにアプリ開始からの経過時間をuniformとして与えて，三角形の大きさと色みを変化させています．
+
+- [chap05d](src/chap05d.cpp) ([VS](media/shaders/chap05d.vs), [FS](media/shaders/chap05d.fs)): chap05cと類似した例題です．この例では，uniform変数のかわりにuniformブロックを利用してデータをひとまとめにして書き換える例となっています．
+
+- [chap05e](src/chap05e.cpp) ([VS1](media/shaders/chap05e1.vs), [FS1](media/shaders/chap05e1.fs); [VS2](media/shaders/chap05e2.vs), [FS2](media/shaders/chap05e2.fs)): Uniformブロックのレイアウトに関する例題です．この例題はデータの保存形式について確認することが目的なので画面出力はありません．
