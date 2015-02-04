@@ -6,7 +6,7 @@ OpenGL SuperBible第6版で現代的なOpenGLを学び始めました．本を�
 
 以下ではHomebrewが利用できること，したがってXcodeとそのコマンド行インタフェイスもインストールされていることを仮定しています．
 
-有名な[GLUTによる「手抜き」OpenGL入門](http://www.wakayama-u.ac.jp/~tokoi/opengl/libglut.html)にしたがって[GLUT](https://www.opengl.org/resources/libraries/glut/)を使おうかと思ったのですが，Appleはあまり熱心にGLUTをサポートしなさそうな雰囲気なのでGLUTに替えてGLFW3を使っています．あまりわかっていないのですが，GLEW ([The OpenGL Extension Wrangler Library](http://glew.sourceforge.net))も利用しています．これらのほかにビルドシステムとしてCMakeを，行列を扱うための数学ライブラリとしてGLMを利用しています．いずれもHomebrewで簡単にインストールできます．
+有名な[GLUTによる「手抜き」OpenGL入門](http://www.wakayama-u.ac.jp/~tokoi/opengl/libglut.html)にしたがって[GLUT](https://www.opengl.org/resources/libraries/glut/)を使おうかと思ったのですが，Appleはあまり熱心にGLUTをサポートしなさそうな雰囲気なのでGLUTに替えてGLFW3を使っています．SuperBibleはGLFW2にもとづいているのですが，[基盤部をGLFW3に移植](https://www.evernote.com/l/AAJ-L3QOKsBJl4hyrwkC19tFfm3mFXHfcWU)しました．あまりわかっていないのですが，GLEW ([The OpenGL Extension Wrangler Library](http://glew.sourceforge.net))も利用しています．これらのほかにビルドシステムとしてCMakeを，行列を扱うための数学ライブラリとしてGLMを利用しています．いずれもHomebrewで簡単にインストールできます．
 
 - CMakeのインストール．システム非依存のビルドツールとしてCMakeを使っています．今回がCMakeの使い始めです．不慣れなので，おかしい点が多々あると思います．
 
@@ -87,6 +87,6 @@ OpenGL SuperBible第6版で現代的なOpenGLを学び始めました．本を�
 
 - [chap05c](src/chap05c.cpp) ([VS](media/shaders/chap05c.vs), [FS](media/shaders/chap05c.fs)): uniformを用いる方法．この例では，VSとFSにアプリ開始からの経過時間をuniformとして与えて，三角形の大きさと色みを変化させています．
 
-- [chap05d](src/chap05d.cpp) ([VS](media/shaders/chap05d.vs), [FS](media/shaders/chap05d.fs)): chap05cと類似した例題です．この例では，uniform変数のかわりにuniformブロックを利用してデータをひとまとめにして書き換える例となっています．
+- [chap05d](src/chap05d.cpp) ([VS](media/shaders/chap05d.vs), [FS](media/shaders/chap05d.fs)): chap05cと類似した例題です．この例では，uniform変数のかわりにuniformブロックを利用してデータをひとまとめにして書き換える例となっています．[chap05dについてのメモ](https://www.evernote.com/l/AAJ-ksv6ZeBGt5-Nkdy-gmA9REVYAKEAjgE)
 
-- [chap05e](src/chap05e.cpp) ([VS1](media/shaders/chap05e1.vs); [VS2](media/shaders/chap05e2.vs)): Uniformブロックのレイアウトに関する例題です．この例題はデータの保存形式について確認することが目的なので画面出力はありません．
+- [chap05e](src/chap05e.cpp) ([VS1](media/shaders/chap05e1.vs); [VS2](media/shaders/chap05e2.vs)): Uniformブロックのレイアウトに関する例題です．この例題はデータの保存形式について確認することが目的なので画面出力はありません．[chap05eについてのメモ](https://www.evernote.com/l/AAIg2cF646NCvZWxOeN_uEgvfvqUd5lvDVY)
