@@ -21,12 +21,12 @@ namespace sn { namespace gl {
 class Chapter05C : public Application {
   virtual void init() {
     Application::init();
-    info.title = "chap05c: uniformシェーダ変数を利用します";
+    info.title = "chap05c: uniform変数を利用してデータをシェーダに渡します．";
   }
 
   enum { vaTime };
   GLuint rendering_program, vao[1];
-  GLuint time_loc;
+  GLuint locTime;
 
   virtual void startup() {
     rendering_program = program::link(
@@ -36,7 +36,7 @@ class Chapter05C : public Application {
     glGenVertexArrays(1, vao);
     glBindVertexArray(vao[vaTime]);
 
-    time_loc = glGetUniformLocation(rendering_program, "time");
+    locTime = glGetUniformLocation(rendering_program, "time");
   }
 
   GLfloat bgcolor[4] = { .2, .2, .2, 1 };
@@ -46,7 +46,7 @@ class Chapter05C : public Application {
 
     glUseProgram(rendering_program);
 
-    glUniform1f(time_loc, t);
+    glUniform1f(locTime, t);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
   }
