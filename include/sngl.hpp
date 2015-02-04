@@ -5,7 +5,6 @@
 
 #include <GL/glew.h>
 
-#define GLFW_NO_GLU 1
 // #define GLFW_INCLUDE_GLCOREARB 1
 #include "GLFW/glfw3.h"
 
@@ -41,6 +40,7 @@ class Application {
       glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
       glfwWindowHint(GLFW_SAMPLES, info.samples);
       glfwWindowHint(GLFW_STEREO, info.flags.stereo ? GL_TRUE : GL_FALSE);
+      glfwWindowHint(GLFW_VISIBLE, info.flags.visible ? GL_TRUE : GL_FALSE);
 
       if (info.flags.fullscreen) {
         int monitor_count;
@@ -97,8 +97,6 @@ class Application {
       glfwSetInputMode(window, GLFW_CURSOR,
           info.flags.cursor ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
 
-      info.flags.stereo = (glfwGetWindowAttrib(window, GLFW_STEREO) ? 1 : 0);
-
 #ifdef _DEBUG
       cerr << "VENDOR:   " << glGetString(GL_VENDOR)   << endl;
       cerr << "VERSION:  " << glGetString(GL_VERSION)  << endl;
@@ -141,8 +139,9 @@ class Application {
 #else
       info.minorVersion = 3;
 #endif
-      info.samples = 0;
+      // info.samples = GLFW_DONT_CARE;
       info.flags.all = 0;
+      info.flags.visible = 1;
       info.flags.cursor = 1;
 #ifdef _DEBUG
       info.flags.debug = 1;
@@ -189,6 +188,7 @@ class Application {
       int samples;
       union {
         struct {
+          unsigned int    visible     : 1;
           unsigned int    fullscreen  : 1;
           unsigned int    vsync       : 1;
           unsigned int    cursor      : 1;
