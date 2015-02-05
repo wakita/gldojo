@@ -1,0 +1,188 @@
+<head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <title>OpenGL SuperBibleのサンプルコード (Yosemita版)</title>
+</head>
+<body>
+  <h1 id="opengl-superbible-yosemite---c11-glew-glfw3-glm">OpenGL SuperBibleサンプルコード (Yosemite版 - C++11, GLEW, GLFW3, GLM)</h1>
+
+<p>OpenGL SuperBible第6版で現代的なOpenGLを学び始めました．本を参考にMavericksでサンプルコードを作っています．ずぶの素人のやっていることなので，信頼性は？？？です．ちゃんと動いていないコードもあります．</p>
+
+<h1 id="section">準備</h1>
+
+<p>以下ではHomebrewが利用できること，したがってXcodeとそのコマンド行インタフェイスもインストールされていることを仮定しています．</p>
+
+<p>有名な<a href="http://www.wakayama-u.ac.jp/~tokoi/opengl/libglut.html">GLUTによる「手抜き」OpenGL入門</a>にしたがって<a href="https://www.opengl.org/resources/libraries/glut/">GLUT</a>を使おうかと思ったのですが，Appleはあまり熱心にGLUTをサポートしなさそうな雰囲気なのでGLUTに替えてGLFW3を使っています．SuperBibleはGLFW2にもとづいているのですが，<a href="https://www.evernote.com/l/AAJ-L3QOKsBJl4hyrwkC19tFfm3mFXHfcWU">基盤部をGLFW3に移植</a>しました．あまりわかっていないのですが，GLEW (<a href="http://glew.sourceforge.net">The OpenGL Extension Wrangler Library</a>)も利用しています．これらのほかにビルドシステムとしてCMakeを，行列を扱うための数学ライブラリとしてGLMを利用しています．いずれもHomebrewで簡単にインストールできます．</p>
+
+<ul>
+  <li>
+    <p>CMakeのインストール．システム非依存のビルドツールとしてCMakeを使っています．今回がCMakeの使い始めです．不慣れなので，おかしい点が多々あると思います．</p>
+  </li>
+  <li>
+    <p>GLFW3のインストール．Homebrewを通して，GLFW2とGLFW3という異なるバージョンをインストールすることができます．このような場合，homebrew/versions を tap してインストールします．</p>
+
+    <pre><code>  brew tap homebrew/versions
+  brew install glfw3
+</code></pre>
+  </li>
+  <li>
+    <p>GLEWのインストール</p>
+
+    <pre><code>  brew install glew
+</code></pre>
+  </li>
+  <li>
+    <p>GLM (<a href="http://glm.g-truc.net/0.9.6/index.html">OpenGL Mathematics</a>)のインストール</p>
+
+    <pre><code>  brew install glm
+</code></pre>
+  </li>
+</ul>
+
+<h1 id="section-1">ソースコード</h1>
+
+<ul>
+  <li>
+    <p>CMakeLists.txt: CMakeの設定</p>
+  </li>
+  <li>
+    <p><a href="bin/init">bin/init</a>: CMakeのプロジェクトを初期化するためのスクリプトです．私はこのGitプロジェクトはDropbox上に置き，CMakeのビルドはDropbox外のディレクトリ($HOME/projects/glfw)で行っているのですが，そのための設定です．</p>
+  </li>
+  <li>
+    <p><a href="src/">src/</a>: SuperBible に沿ったサンプルコード</p>
+  </li>
+  <li>
+    <p><a href="src/test">src/test</a>:
+<a href="src/test/glew.cpp">GLEW</a>,
+<a href="src/test/glfw.cpp">GLFW</a>,
+GLM (<a href="src/test/glm.cpp">glm.cpp</a>, <a href="src/test/glm_sample.cpp">glm_sample.cpp</a>)
+の簡単なサンプルコードです．</p>
+  </li>
+</ul>
+
+<h2 id="our-first-opengl-program">第二章: Our First OpenGL Program</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">chap02a</th>
+      <th style="text-align: center">chap02b</th>
+      <th style="text-align: center">chap02c</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><img src="img/chap02a.png" alt="chap02a" /></td>
+      <td style="text-align: center"><img src="img/chap02b.png" alt="chap02b" /></td>
+      <td style="text-align: center"><img src="img/chap02c.png" alt="chap02c" /></td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>
+    <p><a href="src/chap02a.cpp">chap02a</a>: ウィンドウを消去します．</p>
+  </li>
+  <li>
+    <p><a href="src/chap02b.cpp">chap02b</a>: ウィンドウの消去色を変化させた簡単なアニメーションです．</p>
+  </li>
+  <li>
+    <p><a href="src/chap02c.cpp">chap02c</a> (<a href="media/shaders/chap02c.vs">VS</a>, <a href="media/shaders/chap02c.fs">FS</a>): シェーダを用いて点を描画します．</p>
+  </li>
+</ul>
+
+<h2 id="following-the-pipeline">第三章: Following the Pipeline</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">chap03a</th>
+      <th style="text-align: center">chap03b</th>
+      <th style="text-align: center">chap03c</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><img src="img/chap03a.png" alt="chap03a" /></td>
+      <td style="text-align: center"><img src="img/chap03b.png" alt="chap03b" /></td>
+      <td style="text-align: center"><img src="img/chap03c.png" alt="chap03c" /></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">chap03d</td>
+      <td style="text-align: center">chap03e</td>
+      <td style="text-align: center">chap03f</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><img src="img/chap03d.png" alt="chap03d" /></td>
+      <td style="text-align: center"><img src="img/chap03e.png" alt="chap03e" /></td>
+      <td style="text-align: center"><img src="img/chap03f.png" alt="chap03f" /></td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>
+    <p><a href="src/chap03a.cpp">chap03a</a> (<a href="media/shaders/chap03a.vs">VS</a>, <a href="media/shaders/chap03a.fs">FS</a>): Vertex shaderとFragment shaderを利用した例．背景色が変化するなか，白い三角形が弧を描きます．</p>
+  </li>
+  <li>
+    <p><a href="src/chap03b.cpp">chap03b</a> (<a href="media/shaders/chap03b.vs">VS</a>, <a href="media/shaders/chap03b.fs">FS</a>): Vertex shaderを介してFragment shaderに三角形の色を与えることで色を変化させます．</p>
+  </li>
+  <li>
+    <p><a href="src/chap03c.cpp">chap03c</a> (<a href="media/shaders/chap03c.vs">VS</a>, <a href="media/shaders/chap03c.fs">FS</a>): Vertex shaderからFragment shaderへの値の伝達においてInterface Blockを利用しました．</p>
+  </li>
+  <li>
+    <p><a href="src/chap03d.cpp">chap03d</a> (<a href="media/shaders/chap03d.vs">VS</a>, <a href="media/shaders/chap03d.tcs">TCS</a>, <a href="media/shaders/chap03d.tes">TES</a>, <a href="media/shaders/chap03d.fs">FS</a>): Tessallation control shaderとTessallation evaluation shaderを追加し，三角形をワイヤーフレームで描画しています．</p>
+  </li>
+  <li>
+    <p><a href="src/chap03e.cpp">chap03e</a> (<a href="media/shaders/chap03e.vs">VS</a>, <a href="media/shaders/chap03e.tcs">TCS</a>, <a href="media/shaders/chap03e.tes">TES</a>, <a href="media/shaders/chap03e.fs">FS</a>): Geometry shaderを追加し，Tessell化した三角形の頂点を点描しています．</p>
+  </li>
+  <li>
+    <p><a href="src/chap03f.cpp">chap03f</a> (<a href="media/shaders/chap03f.vs">VS</a>, <a href="media/shaders/chap03f.tcs">TCS</a>, <a href="media/shaders/chap03f.tes">TES</a>, <a href="media/shaders/chap03f.fs">FS</a>): Fragment shaderでピクセルの位置に応じて色を決定することで三角形にグラデーションを与えます．</p>
+  </li>
+  <li>
+    <p><a href="src/chap03g.cpp">chap03g</a> (<a href="media/shaders/chap03g.vs">VS</a>, <a href="media/shaders/chap03g.tcs">TCS</a>, <a href="media/shaders/chap03g.tes">TES</a>, <a href="media/shaders/chap03g.fs">FS</a>): Fragment shaderへ与える色情報をVertex shaderを介してCPU側から与えようとした例だが，うまく動作しません．どうやらFragment ShaderにVertex shaderから与えているつもりの色情報が正しく届いていないようです．でも，原因は不明．</p>
+  </li>
+</ul>
+
+<h2 id="math-for-3d-graphics">第四章: Math for 3D Graphics</h2>
+
+<ul>
+  <li><a href="src/chap04.cpp">chap04</a>: この章は主に三次元グラフィックスに必要となる数学的基礎について紹介しています．ベクトルと行列，四元数，各種変換，補間，Bezier曲線，スプライン曲線など．このソースコードでは主にGLMのAPIで関連するものをテストしています．SuperBibleではvmathパッケージで記述されていたものをGLMに翻訳しました．</li>
+</ul>
+
+<h2 id="data">第五章: Data</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">chap05a</th>
+      <th style="text-align: center">chap05c</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><img src="img/chap05a.png" alt="chap05a" /></td>
+      <td style="text-align: center"><img src="img/chap05c.png" alt="chap05c" /></td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>
+    <p><a href="src/chap05a.cpp">chap05a</a> (<a href="media/shaders/chap05a.vs">VS</a>, <a href="media/shaders/chap05a.fs">FS</a>): 複数のデータをシェーダーに送る方法．Vertex Array Object と Vector Buffer Objectを連携させる方法．例題としては，三角形の形状と色の情報をアプリケーション側から送っています．</p>
+  </li>
+  <li>
+    <p><a href="src/chap05b.cpp">chap05b</a> (<a href="media/shaders/chap05b.vs">VS</a>, <a href="media/shaders/chap05b.fs">FS</a>): シェーダ側で複数の種類のデータに構造体でまとめあげた場合の，アプリケーション側からのデータを送る方法．できあがるのはchap05aと同じ例題のはずなんですが，vs-fs間に他のシェーダがあるときにデータの受け渡しがうまくいかなくなるようです．ただ，原因，究明中．</p>
+  </li>
+  <li>
+    <p><a href="src/chap05c.cpp">chap05c</a> (<a href="media/shaders/chap05c.vs">VS</a>, <a href="media/shaders/chap05c.fs">FS</a>): uniformを用いる方法．この例では，VSとFSにアプリ開始からの経過時間をuniformとして与えて，三角形の大きさと色みを変化させています．</p>
+  </li>
+  <li>
+    <p><a href="src/chap05d.cpp">chap05d</a> (<a href="media/shaders/chap05d.vs">VS</a>, <a href="media/shaders/chap05d.fs">FS</a>): chap05cと類似した例題です．この例では，uniform変数のかわりにuniformブロックを利用してデータをひとまとめにして書き換える例となっています．<a href="https://www.evernote.com/l/AAJ-ksv6ZeBGt5-Nkdy-gmA9REVYAKEAjgE">chap05dについてのメモ</a></p>
+  </li>
+  <li>
+    <p><a href="src/chap05e.cpp">chap05e</a> (<a href="media/shaders/chap05e1.vs">VS1</a>; <a href="media/shaders/chap05e2.vs">VS2</a>): Uniformブロックのレイアウトに関する例題です．この例題はデータの保存形式について確認することが目的なので画面出力はありません．<a href="https://www.evernote.com/l/AAIg2cF646NCvZWxOeN_uEgvfvqUd5lvDVY">chap05eについてのメモ</a></p>
+  </li>
+</ul>
+
+<hr/>
+</body>
