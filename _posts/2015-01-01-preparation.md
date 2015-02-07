@@ -13,7 +13,9 @@ category: chapter
 
 システム非依存のビルドツールとしてCMakeを使っています．
 
-    brew install cmake
+{% highlight sh %}
+brew install cmake
+{% endhighlight %}
 
 私は今回初めてCMakeの使っています．不慣れなので，おかしい点が多々あると思います．
 
@@ -21,13 +23,19 @@ category: chapter
 
 Homebrewを通して，GLFW2とGLFW3という異なるバージョンをインストールすることができます．このような場合，homebrew/versions を tap してインストールします．
 
-    brew tap homebrew/versions
-    brew install glfw3
+{% highlight sh %}
+brew tap homebrew/versions
+brew install glfw3
+{% endhighlight %}
 
 # GLEWのインストール
 
-    brew install glew
+{% highlight sh %}
+brew install glew
+{% endhighlight %}
 
 # GLM ([OpenGL Mathematics](http://glm.g-truc.net/0.9.6/index.html))のインストール
 
-    brew install glm
+{% highlight sh %}
+brew install glm
+{% endhighlight %}

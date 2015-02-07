@@ -1,5 +1,5 @@
 # Site settings
-title: OpenGL Superbook 道場
+title: OpenGL SuperBible 道場
 description: > # this means to ignore newlines until "baseurl:"
   OS Xを使っているみなさん，一緒に現代的な三次元グラフィックスの基礎を学びましょう！参考書は<a href="http://www.openglsuperbible.com">OpenGL SuperBible第6版</a>です．
 url: "wakita.github.io"
@@ -13,12 +13,24 @@ owner:
   facebook: k.wakita
   twitter_username: kwakita
   github_username:  wakita
+
 encoding: utf-8
 
+moruku:
+  use_tex: false
+  use_divs: false
+  png_engine: blahtex
+  png_dir: img/tex
+  png_url: /img/tex
+  fenced_code_blocks: true
 
 # Build settings
 github: [Repository metadata]
-pygments: true
 timezone: Japan/Tokyo
+
 markdown: kramdown
+#markdown: KramdownPygments
+highlighter: pygments
+# https://github.com/mvdbos/kramdown-with-pygments
+
 paginate: 5
