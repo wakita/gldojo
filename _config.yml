@@ -17,6 +17,7 @@ encoding: utf-8
 
 
 # Build settings
+github: [Repository metadata]
 pygments: true
 timezone: Japan/Tokyo
 markdown: kramdown
