@@ -1,9 +1,7 @@
 # Site settings
-title: OpenGL Superbook Dojo
+title: OpenGL Superbook 道場
 description: > # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+  OpenGLの初学者がOpenGL SuperBible第6版で現代的なOpenGLを学び初めました．本を参考にしながら，Yosemiteでサンプルコードを作っています．YosemiteでサポートしているOpenGLのバージョンが4.1なのに対して，SuperBible の想定しているバージョンが4.3だったりして，ときどきはまっています．でも，ちょっと工夫すると大体，動くようです．ずぶの素人のやっていることなので，信頼性は怪しいです．何か見つかったらお知らせ下さい．
 baseurl: "/opengl-sb6-samples" # the subpath of your site, e.g. /blog/
 url: "wakita.github.io"
 
