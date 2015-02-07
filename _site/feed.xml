@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title></title>
+    <description></description>
+    <link>/</link>
+    <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Sat, 07 Feb 2015 16:24:46 +0900</pubDate>
+    <lastBuildDate>Sat, 07 Feb 2015 16:24:46 +0900</lastBuildDate>
+    <generator>Jekyll v2.4.0</generator>
+    
+      <item>
+        <title>Welcome to Jekyll!</title>
+        <description>&lt;p&gt;You’ll find this post in your &lt;code&gt;_posts&lt;/code&gt; directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run &lt;code&gt;jekyll serve&lt;/code&gt;, which launches a web server and auto-regenerates your site when a file is updated.&lt;/p&gt;
+
+&lt;p&gt;To add new posts, simply add a file in the &lt;code&gt;_posts&lt;/code&gt; directory that follows the convention &lt;code&gt;YYYY-MM-DD-name-of-post.ext&lt;/code&gt; and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.&lt;/p&gt;
+
+&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Hi, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;Tom&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#=&amp;gt; prints &amp;#39;Hi, Tom&amp;#39; to STDOUT.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Check out the &lt;a href=&quot;http://jekyllrb.com&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://github.com/jekyll/jekyll-help&quot;&gt;Jekyll’s dedicated Help repository&lt;/a&gt;.&lt;/p&gt;
+
+</description>
+        <pubDate>Fri, 06 Feb 2015 19:35:11 +0900</pubDate>
+        <link>/jekyll/update/2015/02/06/welcome-to-jekyll.html</link>
+        <guid isPermaLink="true">/jekyll/update/2015/02/06/welcome-to-jekyll.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>Relink test</title>
+        <description>&lt;p&gt;ページのなかのリンクのうち Github を指しそうなパターンについては自動的に Github の URL を指定する仕掛けをJavaScriptで用意した．このため，記事のなかに Github の長い URL を書くかわりに&lt;code&gt;[chap02a.cpp]()&lt;/code&gt; のように書くだけでリンクが張られる．&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code&gt;[chap02a.hpp]()&lt;/code&gt;: &lt;a href=&quot;&quot;&gt;chap02a.hpp&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;[chap02a.cpp]()&lt;/code&gt;: &lt;a href=&quot;&quot;&gt;chap02a.cpp&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;[chap03c.vs]()&lt;/code&gt;: &lt;a href=&quot;&quot;&gt;chap03c.vs&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;[chap03c.tcs]()&lt;/code&gt;: &lt;a href=&quot;&quot;&gt;chap03c.tcs&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;[chap03c.tes]()&lt;/code&gt;: &lt;a href=&quot;&quot;&gt;chap03c.tes&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;[chap03c.gs]()&lt;/code&gt;: &lt;a href=&quot;&quot;&gt;chap03c.gs&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;[chap03c.fs]()&lt;/code&gt;: &lt;a href=&quot;&quot;&gt;chap03c.fs&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;上の例はファイル名の特徴から自動的にパスを推定する方法だった．上述のパターンに合致しないファイルで，bin, include, media, src のいずれかのサブディレクトリ以下に存在するファイルはフルパスで指定すれば確実にURLを指定できる．&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code&gt;/include/sngl.hpp&lt;/code&gt;: &lt;a href=&quot;&quot;&gt;/include/sngl.hpp&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;/src/sngl.cpp&lt;/code&gt;:&lt;a href=&quot;&quot;&gt;/src/sngl.cpp&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Fri, 06 Feb 2015 00:00:00 +0900</pubDate>
+        <link>/test/2015/02/06/relink.html</link>
+        <guid isPermaLink="true">/test/2015/02/06/relink.html</guid>
+        
+        
+        <category>test</category>
+        
+      </item>
+    
+  </channel>
+</rss>
