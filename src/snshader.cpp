@@ -23,10 +23,7 @@ GLuint load(string filename, GLenum shader_type, bool check_errors) {
     std::ifstream f(filename.c_str());
     string content((std::istreambuf_iterator<char>(f)),
         std::istreambuf_iterator<char>());
-    if (check_errors) {
-      std::cerr << filename << endl;
-      std::cerr << content << endl;
-    }
+
     const GLchar* source = content.c_str();
 
     shader = glCreateShader(shader_type);
@@ -42,7 +39,9 @@ GLuint load(string filename, GLenum shader_type, bool check_errors) {
       if (!status) {
         char info[4096];
         glGetShaderInfoLog(shader, 4096, NULL, info);
-        cerr << filename << endl << "info: " << info << endl;
+        cerr << filename << endl << "info: " << info << endl << endl;
+        std::cerr << "Shader: " << filename << endl;
+        std::cerr << content << endl;
         goto fail_compile_shader;
       }
     }
