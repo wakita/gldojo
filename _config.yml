@@ -16,13 +16,13 @@ owner:
 
 encoding: utf-8
 
-moruku:
-  use_tex: false
-  use_divs: false
-  png_engine: blahtex
-  png_dir: img/tex
-  png_url: /img/tex
-  fenced_code_blocks: true
+#moruku:
+#  use_tex: false
+#  use_divs: false
+#  png_engine: blahtex
+#  png_dir: img/tex
+#  png_url: /img/tex
+#  fenced_code_blocks: true
 
 # Build settings
 github: [Repository metadata]
