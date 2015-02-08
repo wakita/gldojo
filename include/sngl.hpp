@@ -8,7 +8,27 @@
 // #define GLFW_INCLUDE_GLCOREARB 1
 #include "GLFW/glfw3.h"
 
+#define GLM_MESSAGES
+#define GLM_FORCE_SIZE_FUNC
+#include <glm/fwd.hpp>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 namespace sn { namespace gl {
+
+using std::cout;
+using std::cerr;
+using std::endl;
+
+using glm::mat3;
+using glm::mat4;
+using glm::vec3;
+using glm::vec4;
+
+static const float PI = glm::pi<float>();
+static const vec3 X = vec3(1, 0, 0), Y = vec3(0, 1, 0), Z = vec3(0, 0, 1);
+static const mat4 I4 = mat4(1);
 
 #define Check check(__FILE__, __LINE__)
 
