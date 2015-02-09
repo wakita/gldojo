@@ -6,7 +6,7 @@
 
 namespace sn { namespace gl {
 
-class Chapter5F : public Application {
+class Chapter5F1 : public Application {
   enum { vaCube };
   enum { baData };
   GLuint program, vao[1], buf[1], locModelView, locProjection;
@@ -113,26 +113,30 @@ class Chapter5F : public Application {
       updateProjection = false;
     }
 
-    float t = (float)(time * PI * .1);
+    float t0 = (float)(time * PI * .1);
 
-    mat4 Translation =
-      glm::translate(I4, vec3(
-            sin(2.1 * t) / 2,
-            cos(1.7 * t) / 2,
-            sin(1.3 * t) * cos(1.5 * t) * 2));
+    for (float t = t0; t > 0; t -= 0.3) {
+      mat4 Translation =
+        glm::translate(I4, vec3(
+              sin(2.1 * t) / 2,
+              cos(1.7 * t) / 2,
+              sin(1.3 * t) * cos(1.5 * t) * 2));
 
-    mat4 Rotation = glm::rotate(3.f * t, Y) * glm::rotate(2.f * t, X);
+      mat4 Rotation = glm::rotate(3.f * t, Y) * glm::rotate(2.f * t, X);
 
-    mat4 ModelView = Camera * Translation * Rotation;
+      mat4 Scale = glm::scale(I4, vec3(.2));
 
-    glUniformMatrix4fv(locModelView,  1, GL_FALSE, glm::value_ptr(ModelView));
-    Check;
+      mat4 ModelView = Camera * Translation * Rotation * Scale;
 
-    glDrawArrays(GL_TRIANGLES, 0, 6 * 2 * 3);
-    Check;
+      glUniformMatrix4fv(locModelView,  1, GL_FALSE, glm::value_ptr(ModelView));
+      Check;
+
+      glDrawArrays(GL_TRIANGLES, 0, 6 * 2 * 3);
+      Check;
+    }
   }
 };
 
 } } // namespace sn::gl
 
-DECLARE_MAIN(sn::gl::Chapter5F)
+DECLARE_MAIN(sn::gl::Chapter5F1)
