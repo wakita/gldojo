@@ -1,7 +1,7 @@
-#include <vector>
-
 #ifndef __SN_SHADER_HPP__
 #define __SN_SHADER_HPP__
+
+#include <vector>
 
 namespace sn { namespace gl {
 
