@@ -2,7 +2,7 @@
 title: OpenGL SuperBible 道場
 description: > # this means to ignore newlines until "baseurl:"
   OS Xを使っているみなさん，一緒に現代的な三次元グラフィックスの基礎を学びましょう！参考書は<a href="http://www.openglsuperbible.com">OpenGL SuperBible第6版</a>です．
-url: "wakita.github.io"
+url: "http://wakita.github.io"
 baseurl: "/opengl-sb6-samples" # the subpath of your site, e.g. /blog/
 
 author: Ken Wakita

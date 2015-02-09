@@ -36,7 +36,7 @@
       });
 
       $('img[src=""]').attr('src', function (i, href) {
-        return '{{ site.baseurl }}/img/' + this.alt + '.png';
+        return '{{ site.baseurl }}/media/img/' + this.alt + '.png';
       });
 
       var re_master = /^\/(bin|include|media|src)/;
