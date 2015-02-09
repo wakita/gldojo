@@ -7,13 +7,6 @@
 
 namespace sn { namespace gl {
 
-template <template <typename, glm::precision> class matType,
-          typename T,
-          glm::precision P>
-std::ostream & operator<<(std::ostream & out, const matType<T, P> & x) {
-  return out << glm::to_string(x);
-}
-
 class Chapter5F : public Application {
   enum { vaCube };
   enum { baData };

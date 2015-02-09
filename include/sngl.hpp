@@ -26,6 +26,13 @@ using glm::mat4;
 using glm::vec3;
 using glm::vec4;
 
+template <template <typename, glm::precision> class matType,
+          typename T,
+          glm::precision P>
+std::ostream & operator<<(std::ostream & out, const matType<T, P> & x) {
+  return out << glm::to_string(x);
+}
+
 static const float PI = glm::pi<float>();
 static const vec3 X = vec3(1, 0, 0), Y = vec3(0, 1, 0), Z = vec3(0, 0, 1);
 static const mat4 I4 = mat4(1);
