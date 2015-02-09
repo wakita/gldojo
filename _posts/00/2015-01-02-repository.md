@@ -2,7 +2,7 @@
 title: Repositoryについて
 layout: default
 permalink: repository
-category: chapter
+categories: chapter, note
 ---
 
 # [CMakeLists.txt](/github/CMakeLists.txt)

@@ -12,6 +12,6 @@ OpenGLについてはずぶの素人の脇田がOpenGL SuperBible第6版で現�
 
 # 日々の話題
 
-{% for post in site.categories.note reversed %}
+{% for post in site.categories.note %}
 - [{{ post.title }}]({{ post.url | prepend: site.baseurl }}) --- {{ post.date | date: "%b %-d, %Y" }}
 {% endfor %}
