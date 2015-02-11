@@ -9,18 +9,22 @@ categories: sb, sb-note
 
 CMakeの設定
 
-# [init](/bin/init)
+# [start](/tools/start)
 
 CMakeのプロジェクトを初期化するためのスクリプトです．私はこのGitプロジェクトはDropbox上に置き，CMakeのビルドはDropbox外のディレクトリ($HOME/projects/glfw)で行っているのですが，そのための設定です．
 
-# [shaders](/media/shaders)
+# [shaders](/shaders/sb)
 
 いろいろなプロジェクトで使用するシェーダプログラムを保存してあります．
 
-# [src](/src/)
+# [sb](/sb/)
 
 SuperBible に沿ったサンプルコード
 
-# [test](/src/test)
+# [sn](/sn/)
 
-[GLEW](/src/test/glew.cpp), [GLFW3](/src/test/glfw.cpp), GLM ([gml.cpp](/src/test/glm.cpp), [glm_sample](/src/test/glm_sample.cpp)) の簡単なサンプルコードです．
+OpenGLプログラミングのために個人的に作成したライブラリ．
+
+# [test](/sn/test)
+
+[GLEW](/sb/test/glew.cpp), [GLFW3](/sb/test/glfw.cpp), GLM ([gml.cpp](/sb/test/glm.cpp), [glm_sample](/sb/test/glm_sample.cpp)) の簡単なサンプルコードです．
