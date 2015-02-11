@@ -1,5 +1,5 @@
 # Site settings
-title: OpenGL SuperBible 道場
+title: OpenGL 道場
 description: > # this means to ignore newlines until "baseurl:"
   OS Xを使っているみなさん，一緒に現代的な三次元グラフィックスの基礎を学びましょう！
 url: "http://wakita.github.io"
