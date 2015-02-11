@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 find_package(OpenGL)
 
 find_package(PkgConfig REQUIRED)
-pkg_search_module(GLFW REQUIRED glm)
+# pkg_search_module(GLFW REQUIRED glm)
 pkg_search_module(GLFW REQUIRED glfw3)
 pkg_search_module(GLEW REQUIRED glew)
 
@@ -15,40 +15,38 @@ include_directories(
   ${GLM_INCLUDE_DIRS}
   ${GLFW_INCLUDE_DIRS}
   ${GLEW_INCLUDE_DIRS}
-  include)
+  sn)
+
+# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+add_library(sn sn/sngl.cpp sn/snshader.cpp)
 
 set(COMMON_LIBS
+  sn
   ${OPENGL_LIBRARIES}
   ${GLFW_LDFLAGS}
   ${GLEW_LDFLAGS})
 
-# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-add_library(sn src/sngl.cpp src/snshader.cpp)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/sb)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-set(EXAMPLES
-  chap02a chap02b chap02c
-  chap03a chap03b chap03c chap03d chap03d1 chap03e chap03f chap03g
-  chap04
-  chap05a chap05b chap05c chap05d chap05e chap05f chap05f1 chap05g
+set(SBSRC
+  sb02a sb02b sb02c
+  sb03a sb03b sb03c sb03d sb03d1 sb03e sb03f sb03g
+  sb04
+  sb05a sb05b sb05c sb05d sb05e sb05f sb05f1 sb05g
   )
 
-foreach(EXAMPLE ${EXAMPLES})
-  add_executable(${EXAMPLE} src/${EXAMPLE}.cpp)
-  target_link_libraries(${EXAMPLE} sn ${COMMON_LIBS})
-endforeach(EXAMPLE)
+foreach(X ${SBSRC})
+  add_executable(${X} sb/${X}.cpp)
+  target_link_libraries(${X} ${COMMON_LIBS})
+endforeach(X)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/test)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/sn/test)
 
-set(TESTS glew glfw glm glm_sample)
+set(SNTS glew glfw glm glm_sample app)
 
-foreach(TEST ${TESTS})
-  add_executable(${TEST} src/test/${TEST}.cpp)
-  target_link_libraries(${TEST} ${COMMON_LIBS})
-endforeach(TEST)
+foreach(X ${SNTS})
+  add_executable(${X} sn/test/${X}.cpp)
+  target_link_libraries(${X} ${COMMON_LIBS})
+endforeach(X)
 
-foreach (TEST app)
-  add_executable(${TEST} src/test/${TEST}.cpp)
-  target_link_libraries(${TEST} sn ${COMMON_LIBS})
-endforeach(TEST)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/cb)

@@ -37,7 +37,11 @@ static const float PI = glm::pi<float>();
 static const vec3 X = vec3(1, 0, 0), Y = vec3(0, 1, 0), Z = vec3(0, 0, 1);
 static const mat4 I4 = mat4(1);
 
-#define Check check(__FILE__, __LINE__)
+#ifdef _DEBUG
+#  define Check check(__FILE__, __LINE__)
+#else
+#  define Check
+#endif
 void check(std::string file, int line);
 
 using std::cerr;
@@ -92,9 +96,11 @@ class Application {
 
       glfwMakeContextCurrent(window);
       glfwSwapInterval(1);
+      Check;
 
       glewExperimental = GL_TRUE;
       glewInit();
+      Check;
 
       glfwSetWindowTitle(window, info.title.c_str());
 
@@ -128,9 +134,17 @@ class Application {
           info.flags.cursor ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
 
 #ifdef _DEBUG
+      Check;
       cerr << "VENDOR:   " << glGetString(GL_VENDOR)   << endl;
-      cerr << "VERSION:  " << glGetString(GL_VERSION)  << endl;
+      Check;
       cerr << "RENDERER: " << glGetString(GL_RENDERER) << endl << endl;
+      Check;
+      cerr << "VERSION:  " << glGetString(GL_VERSION)  << endl;
+      Check;
+      cerr << "GLSL:     " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
+      Check;
+      //cerr << "EXTENSION " << glGetString(GL_EXTENSIONS) << endl;
+      Check;
 #endif
 
       /*

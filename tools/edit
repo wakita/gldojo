@@ -1,0 +1,3 @@
+edit() {
+  (cd "$GLDOJO_ROOT"; mvim ./$*)
+}

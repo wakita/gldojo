@@ -64,7 +64,7 @@ GLuint load(string base, string ext, GLenum shader_type, bool check_errors) {
 
 extern
 vector<GLuint> load(string base, vector<string> names, bool check_errors) {
-  const char* dir = std::getenv("GLSB6_SHADERS_DIR");
+  const char* dir = std::getenv("GLSBOOKS_SHADERS_DIR");
   const string glsb6_shaders(dir ? dir : "");
 
   vector<GLuint> shaders {};

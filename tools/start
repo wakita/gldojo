@@ -1,0 +1,25 @@
+#!/opt/brew/bin/zsh
+
+export GLDOJO_ROOT="$DROPBOX"/work/opengl/dojo
+export SHADERS_DIR="$GLDOJO_ROOT"/shaders
+
+export GLDOJO_BUILD=$HOME/.build/glbooks
+export BUILD_LOG="$GLDOJO_BUILD"/logs/make.log
+
+export CMAKE_INCLUDE_PATH=/opt/brew/include
+export CMAKE_LIBRARY_PATH=/opt/brew/lib
+
+if [ ! -d "$GLDOJO_BUILD" ]; then
+  mkdir -p "$BUILD_LOG"
+  cmake -B"$GLDOJO_BUILD" -H"$GLDOJO_ROOT" -G "Unix Makefiles"
+fi
+
+path[1,0]="$GLDOJO_BUILD/bin/sb"
+path[1,0]="$GLDOJO_BUILD/bin/cb"
+
+cd "$GLDOJO_BUILD"
+
+fpath[1,0]="$GLDOJO_ROOT/tools"
+autoload root
+autoload build
+autoload edit
