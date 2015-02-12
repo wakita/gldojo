@@ -10,6 +10,14 @@ OpenGLについてはずぶの素人の脇田が[OpenGL SuperBible第6版](http:
 
 -----
 
+# OpenGL道場の主な内容
+
+- [SuperBibleの巻]({{site.baseurl}}/glsb6) --- OpenGL SuperBible第6版
+
+- [GLSL Cookbookの巻]({{site.baseurl}}/slcb2) --- OpenGL 4 Shading Language Cookbook, Second Edition
+
+-----
+
 # 日々の話題
 
 {% for post in site.categories.note %}
