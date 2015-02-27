@@ -267,8 +267,7 @@ class Application {
 }; };  // namespace sn::gl
 
 #define DECLARE_MAIN(APP)                           \
-int main(int argc, const char ** argv)              \
-{                                                   \
+int main(int argc, const char ** argv) {            \
     APP *app = new APP;                             \
     app->run();                                     \
     delete app;                                     \

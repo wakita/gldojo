@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <vector>
 #include <GL/glew.h>
@@ -61,6 +62,11 @@ GLuint load(string base, string ext, GLenum shader_type, bool check_errors) {
   string path = base + "." + ext + ".glsl";
   return load(path, shader_type, check_errors);
 }
+
+auto shader_type_from_ext = std::map<std::string, GLenum>({
+    { ".vs", GL_VERTEX_SHADER }, { ".tcs", GL_TESS_CONTROL_SHADER },
+    { ".tes", GL_TESS_EVALUATION_SHADER }, { ".gs", GL_GEOMETRY_SHADER },
+    { ".fs", GL_FRAGMENT_SHADER }, { ".cs", GL_COMPUTE_SHADER } });
 
 extern
 vector<GLuint> load(string base, vector<string> names, bool check_errors) {
