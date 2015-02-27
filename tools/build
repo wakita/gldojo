@@ -1,5 +1,0 @@
-build() {
-  cd "$GLDOJO_BUILD"/$*;
-# mkdir -p "logs"
-# make VERBOSE=1 > "$BUILD_LOG" & tail -f "$BUILD_LOG"
-}

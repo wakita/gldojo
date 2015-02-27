@@ -1,36 +1,25 @@
-#include <iostream>
 #include <stdlib.h>
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "Program.hpp"
 
-int main(void)
-{
-  if (!glfwInit()) return -1;
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+using namespace smartnova::gl;
 
-  GLFWwindow* window = glfwCreateWindow(640, 480, "glew sample", NULL, NULL);
-  if (!window) {
-    glfwTerminate();
-    exit(EXIT_FAILURE);
+class GlewTest : public Application {
+  virtual void init() {
+    info.flags.visible = 0;
+    Application::init(string("OpenGL GLEW Test"));
   }
 
-  glfwMakeContextCurrent(window);
-  glfwSwapInterval(1);
+  virtual void startup() {
+    const GLubyte* renderer = glGetString(GL_RENDERER);
+    const GLubyte* version = glGetString(GL_VERSION);
+    std::cout << "Renderer: " << renderer << std::endl;
+    std::cout << "OpenGL version supported: " << version << std::endl;
+  }
 
-  glewExperimental = GL_TRUE;
-  glewInit();
+  virtual void render(double t) {
+    exit(EXIT_SUCCESS);
+  }
+};
 
-  const GLubyte* renderer = glGetString(GL_RENDERER);
-  const GLubyte* version = glGetString(GL_VERSION);
-  std::cout << "Renderer: " << renderer << std::endl;
-  std::cout << "OpenGL version supported: " << version << std::endl;
-
-  glfwDestroyWindow(window);
-  glfwTerminate();
-
-  exit(EXIT_SUCCESS);
-}
+DECLARE_MAIN(GlewTest)
