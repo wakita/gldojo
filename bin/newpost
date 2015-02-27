@@ -1,0 +1,34 @@
+#!/bin/sh
+
+if [ $# != 1 ]; then
+  echo "Please specify the page ID"
+  exit 1
+else
+  pageid=$1
+fi
+
+cwd=`pwd`
+
+fname=`date +%Y-%m-%d-$pageid.md`
+layout="post"
+category=`basename "$cwd"`
+permalink="/$category/$pageid"
+
+read -r -d '' content << EoD
+---
+title: Recipe $pageid ---
+layout: $layout
+category: $category
+permalink: $permalink
+---
+EoD
+
+echo "$content" > $fname
+
+# 2015-02-08-e.md
+#---
+#title: 例題5E --- UniformブロックデータのGPUにおける配置について
+#layout: default
+#permalink: sb5/e
+#category: sb5
+#---

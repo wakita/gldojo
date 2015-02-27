@@ -13,3 +13,8 @@ layout: default
   </article>
 
 </div>
+
+<hr/>
+{% if page.previous and page.previous.category == page.category %}<a href="{{ site.baseurl }}{{ page.previous.url }}">前節へ</a>　　{% endif %}
+<a href="..">章へ</a>
+{% if page.next and page.next.category == page.category %}　　 <a href="{{ site.baseurl }}{{ page.next.url }}">次節へ</a>{% endif %}
