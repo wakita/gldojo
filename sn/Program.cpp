@@ -163,20 +163,43 @@ static Shader::Type Shader::typeOf(const fs::path &path) {
   return typeOfExt.find(path.extension())->second;
 }
 
-void Program::throwOnProgramError(GLenum pname, const string &message) {
+void Shader::throwOnShaderError(GLuint shader, GLenum pname, const string &message) {
   int result;
-  glGetShaderiv(handle, pname, &result);
+  glGetShaderiv(shader, pname, &result);
   if (result == GL_FALSE) {
     int length = 0;
-    glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &length);
+    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
     string log;
     if (length > 0) {
       char *_log = new char[length];
       int written = 0;
-      glGetShaderInfoLog(handle, length, &written, _log);
+      glGetShaderInfoLog(shader, length, &written, _log);
+      log = _log;
+      delete[] _log;
+    } else {
+      log = "No further error information available, sorry.";
+    }
+    throw ShaderException(message + "\n" + log);
+  }
+}
+
+void Program::throwOnProgramError(GLenum pname, const string &message) {
+  int result;
+  glGetProgramiv(handle, pname, &result);
+  if (result == GL_FALSE) {
+    int length = 0;
+    glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &length);
+    string log;
+    if (length > 0) {
+      char *_log = new char[length];
+      int written = 0;
+      glGetProgramInfoLog(handle, length, &written, _log);
       log = _log;
       delete [] _log;
+    } else {
+      log = "No further error information available, sorry.";
     }
+    cerr << endl;
     throw ProgramException(message + "\n" + log);
   }
 }
@@ -202,22 +225,26 @@ Program::~Program() {
 }
 
 void Program::compile(const string &source, Shader::Type type, const fs::path &path)
-  throw(ProgramException) {
+  throw (ProgramException) {
     if (handle <= 0) {
       handle = glCreateProgram();
       if (handle == 0) throw ProgramException(path, "Unable to create shader program.");
     }
 
     GLuint shader = glCreateShader(type);
+    Check;
     const char *c_code = source.c_str();
     glShaderSource(shader, 1, &c_code, nullptr);
+    Check;
     glCompileShader(shader);
-    throwOnProgramError(GL_COMPILE_STATUS, "Shader compilation failed.");
+    Check;
+    Shader::throwOnShaderError(shader, GL_COMPILE_STATUS,
+        string("Shader compilation failed for \"") + path.filename().native() + "\"");
     glAttachShader(handle, shader);
   }
 
 void Program::compile(const fs::path &path, Shader::Type type)
-  throw(ProgramException) {
+  throw (ProgramException) {
     if (!exists(path)) throw ProgramException(path, "Shader: not found.");
 
     fs::ifstream f(path);
@@ -228,7 +255,7 @@ void Program::compile(const fs::path &path, Shader::Type type)
   }
 
 void Program::compile(const fs::path &path)
-  throw(ProgramException) {
+  throw (ProgramException) {
     compile(path, Shader::typeOf(path));
   }
 
@@ -241,7 +268,7 @@ void Program::load(const string &stem, vector<string> exts)
   Program::link();
 }
 
-void Program::link() throw(ProgramException) {
+void Program::link() throw (ProgramException) {
   if (linked) return;
   if (handle <= 0) throw ProgramException("Program has not been created.");
 
@@ -251,7 +278,7 @@ void Program::link() throw(ProgramException) {
   linked = true;
 }
 
-void Program::use() throw(ProgramException) {
+void Program::use() throw (ProgramException) {
   if (handle <= 0 || (!linked)) throw ProgramException("Shader has not been linked");
 
   glUseProgram(handle);
@@ -269,7 +296,7 @@ void Program::bindFragDataLocation(GLuint location, const char *name) {
 }
 
 void Program::setUniform(const char *name, const vec2 &v) {
-  glUniform2f(getUniformLocation(name), v.x, v.y);
+  glUniform2f(uniformLocation(name), v.x, v.y);
 }
 
 void Program::setUniform(const char *name, const vec3 &v) {
@@ -277,12 +304,12 @@ void Program::setUniform(const char *name, const vec3 &v) {
 }
 
 void Program::setUniform(const char *name, float x, float y, float z) {
-  glUniform3f(getUniformLocation(name), x, y, z);
+  glUniform3f(uniformLocation(name), x, y, z);
 }
 
 #define SET_UNIFORM_M(suffix, T) \
   void Program::setUniform(const char *name, const T &m) { \
-    glUniformMatrix##suffix(getUniformLocation(name), 1, GL_FALSE, &m[0][0]); \
+    glUniformMatrix##suffix(uniformLocation(name), 1, GL_FALSE, &m[0][0]); \
   }
 
 SET_UNIFORM_M(3fv, mat3)
@@ -290,7 +317,7 @@ SET_UNIFORM_M(4fv, mat4)
 
 #define SET_UNIFORM(suffix, T) \
 void Program::setUniform(const char *name, const T x) { \
-  glUniform##suffix(getUniformLocation(name), x); \
+  glUniform##suffix(uniformLocation(name), x); \
 }
 
 SET_UNIFORM(1f,  float)
@@ -372,12 +399,12 @@ void Program::printActiveAttribs() {
   }
 }
 
-void Program::validate() throw(ProgramException) {
+void Program::validate() throw (ProgramException) {
   if (! isLinked()) throw ProgramException("Program is not linked");
   throwOnProgramError(GL_VALIDATE_STATUS, "Program failed to validate.");
 }
 
-int Program::getUniformLocation(const char *name) {
+int Program::uniformLocation(const char *name) {
   if (uniformLocations.find(name) == uniformLocations.end())
     uniformLocations[name] = glGetUniformLocation(handle, name);
   return uniformLocations[name];

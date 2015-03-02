@@ -49,11 +49,18 @@ namespace smartnova { namespace gl {
 void GLErrorCheck(string file, int line);
 
 // ToDo: should be replaced with fs::filesystem_error
+class ShaderException : public runtime_error {
+  public:
+    ShaderException(const string & msg) : runtime_error(msg) {}
+    ShaderException(const fs::path & path, const string & msg) :
+      runtime_error("\"" + path.filename().native() + "\": " + msg) {}
+};
+
 class ProgramException : public runtime_error {
   public:
     ProgramException(const string & msg) : runtime_error(msg) {}
     ProgramException(const fs::path & path, const string & msg) :
-      runtime_error(path.native() + ": " + msg) {}
+      runtime_error("\"" + path.filename().native() + "\": " + msg) {}
 };
 
 struct SNGL_APP_INFO {
@@ -123,9 +130,13 @@ namespace Shader {
 
   static map<fs::path, Type> typeOfExt = map<fs::path, Type>({
       { fs::path(".vs"), VS }, { fs::path(".tcs"), TCS }, { fs::path(".tes"), TES },
-      { fs::path(".gs"), GS }, { fs::path(".fs"),  FS  }, { fs::path(".cs"),  CS  } });
+      { fs:: path(".geom"), GS }, { fs::path(".gs"), GS }, { fs::path(".fs"),  FS  },
+      { fs::path(".comp"), CS }, { fs::path(".cs"),  CS  } });
 
   static Type typeOf(const fs::path & path);
+
+  void throwOnShaderError(GLuint shader, GLenum pname, const string &message);
+  void throwOnShaderError(GLuint shader, GLenum pname, const fs::path &path, const string & message);
 }
 
 static map<GLenum, const char *> _type2Name =
@@ -143,8 +154,6 @@ class Program {
 
     void throwOnProgramError(GLenum pname, const string & message);
     void throwOnProgramError(GLenum pname, const fs::path & path, const string & message);
-
-    GLint getUniformLocation(const char* name);
 
     Program(const Program & other) {}
     Program & operator=(const Program &other) { return *this; }
@@ -168,6 +177,8 @@ class Program {
 
     void bindAttribLocation(GLuint location, const char * name);
     void bindFragDataLocation(GLuint location, const char * name);
+
+    GLint uniformLocation(const char* name);
 
     void setUniform(const char * name, float x, float y, float z);
     void setUniform(const char * name, const vec2 & v);

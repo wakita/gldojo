@@ -1,6 +1,7 @@
 #version 410 core
 
 layout (location = 0) in vec2 offset;
+
 out vec4 vs_color;
 
 void main(void) {
