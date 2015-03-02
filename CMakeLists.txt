@@ -44,7 +44,10 @@ foreach(X ${SBSRC})
   target_link_libraries(${X} sn ${COMMON_LIBS})
 endforeach(X)
 
-foreach(X sb02ax sb02bx sb02cx sb03ax sb03bx sb03cx sb03dx)
+foreach(X
+    sb02ax sb02bx sb02cx
+    sb03ax sb03bx sb03cx sb03dx sb03ex sb03fx sb03gx
+    sb05ax sb05bx sb05cx sb05dx sb05ex sb05fx)
   add_executable(${X} sb/${X}.cpp)
   target_link_libraries(${X} smartnova ${COMMON_LIBS})
 endforeach(X)
