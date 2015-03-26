@@ -9,10 +9,6 @@ categories: sb, sb-note
 
 CMakeの設定
 
-# [start](/tools/start)
-
-CMakeのプロジェクトを初期化するためのスクリプトです．私はこのGitプロジェクトはDropbox上に置き，CMakeのビルドはDropbox外のディレクトリ($HOME/projects/glfw)で行っているのですが，そのための設定です．
-
 # [shaders](/shaders)
 
 いろいろなプロジェクトで使用するシェーダプログラムを保存してあります．
