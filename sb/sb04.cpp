@@ -1,7 +1,6 @@
 #include <iostream>
 #include <cmath>
 
-#define GLM_MESSAGES
 #define GLM_FORCE_SIZE_FUNC // vec4.length() => vec4.size()
 
 #define _DEBUG

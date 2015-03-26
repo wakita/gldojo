@@ -5,11 +5,12 @@
 
 using namespace smartnova::gl;
 
-class Chapter5F : public Application {
+class Chapter05F : public Application {
+  Program program;
+
   enum { vaCube };
   enum { baData };
   GLuint vao[1], buf[1], locModelView, locProjection;
-  Program program;
 
   const int vxCube[24] = { // 立方体の頂点
     0, 0, 0,
@@ -48,8 +49,13 @@ class Chapter5F : public Application {
     }
   }
 
+  virtual void init() {
+    Application::init("chap05f: 立方体が螺旋を描く");
+  }
+
   virtual void startup() {
     program.load("sb05f", vector<string> { "vs", "fs" });
+
     locModelView = program.uniformLocation("ModelView");
     Check;
     locProjection = program.uniformLocation("Projection");
@@ -133,4 +139,4 @@ class Chapter5F : public Application {
   }
 };
 
-DECLARE_MAIN(Chapter5F)
+DECLARE_MAIN(Chapter05F)

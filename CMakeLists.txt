@@ -30,6 +30,18 @@ set(COMMON_LIBS
   ${GLFW_LDFLAGS}
   ${GLEW_LDFLAGS})
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/sn/test)
+
+foreach(X glm glm_sample)
+  add_executable(${X} sn/test/${X}.cpp)
+  target_link_libraries(${X} sn ${COMMON_LIBS})
+endforeach(X)
+
+foreach(X app glew glfw)
+  add_executable(${X} sn/test/${X}.cpp)
+  target_link_libraries(${X} smartnova ${COMMON_LIBS})
+endforeach(X)
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/sb)
 
 set(SBSRC
@@ -47,23 +59,16 @@ endforeach(X)
 foreach(X
     sb02ax sb02bx sb02cx
     sb03ax sb03bx sb03cx sb03dx sb03ex sb03fx sb03gx
-    sb05ax sb05bx sb05cx sb05dx sb05ex sb05fx)
+    sb05ax sb05bx sb05cx sb05dx sb05ex sb05fx sb05fx1 sb05gx)
   add_executable(${X} sb/${X}.cpp)
   target_link_libraries(${X} smartnova ${COMMON_LIBS})
 endforeach(X)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/sn/test)
+# add_subdirectory(cb)
 
-set(SNTS glm glm_sample)
-
-foreach(X ${SNTS})
-  add_executable(${X} sn/test/${X}.cpp)
-  target_link_libraries(${X} sn ${COMMON_LIBS})
-endforeach(X)
-
-foreach(X app glew glfw)
-  add_executable(${X} sn/test/${X}.cpp)
-  target_link_libraries(${X} smartnova ${COMMON_LIBS})
-endforeach(X)
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/cb)
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/cb)
+#
+#foreach(X cb02a)
+#  add_executable(${X} cb/cb02/${X}.cpp)
+#  target_link_libraries(${X} smartnova ${COMMON_LIBS})
+#endforeach(X)

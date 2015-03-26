@@ -8,7 +8,7 @@
 // #define GLFW_INCLUDE_GLCOREARB 1
 #include "GLFW/glfw3.h"
 
-#define GLM_MESSAGES
+//#define GLM_MESSAGES
 #define GLM_FORCE_SIZE_FUNC
 #include <glm/fwd.hpp>
 #include <glm/glm.hpp>
