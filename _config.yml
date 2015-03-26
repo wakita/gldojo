@@ -33,4 +33,5 @@ markdown: kramdown
 highlighter: pygments
 # https://github.com/mvdbos/kramdown-with-pygments
 
-paginate: 5
+#paginate: 5
+#pagenate_path: "posts/:num"

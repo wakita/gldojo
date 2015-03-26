@@ -13,7 +13,7 @@ CMakeの設定
 
 CMakeのプロジェクトを初期化するためのスクリプトです．私はこのGitプロジェクトはDropbox上に置き，CMakeのビルドはDropbox外のディレクトリ($HOME/projects/glfw)で行っているのですが，そのための設定です．
 
-# [shaders](/shaders/sb)
+# [shaders](/shaders)
 
 いろいろなプロジェクトで使用するシェーダプログラムを保存してあります．
 
@@ -27,4 +27,4 @@ OpenGLプログラミングのために個人的に作成したライブラリ�
 
 # [test](/sn/test)
 
-[GLEW](/sb/test/glew.cpp), [GLFW3](/sb/test/glfw.cpp), GLM ([gml.cpp](/sb/test/glm.cpp), [glm_sample](/sb/test/glm_sample.cpp)) の簡単なサンプルコードです．
+[GLEW](/sn/test/glew.cpp), [GLFW3](/sn/test/glfw.cpp), GLM ([gml.cpp](/sn/test/glm.cpp), [glm_sample](/sn/test/glm_sample.cpp)) の簡単なサンプルコードです．
