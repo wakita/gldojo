@@ -28,7 +28,7 @@
           exts.reverse().forEach(function (ext, i) {
             if (i > 0) $em.after(', ');
             $em.after(
-              $('<a>').attr('href', '/media/shaders/' + name + '.' + ext)
+              $('<a>').attr('href', '/shaders/' + name + '.' + ext)
               .text(ext.toUpperCase()));
           });
         } else return;
@@ -40,7 +40,7 @@
         return '{{ site.baseurl }}/media/img/' + this.alt + '.png';
       });
 
-      var re_master = /^\/(bin|include|media|src)/;
+      var re_master = /^\/(bin|cb|include|media|sb|shaders|sn)/;
       var re_github = /^\/github(.*)/;
 
       $("a[href^='/']").attr('href', function (i, href) {
