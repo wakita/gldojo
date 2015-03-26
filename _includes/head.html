@@ -12,7 +12,8 @@
   <script src="{{ site.baseurl }}/js/jquery-2.1.3.min.js"></script>
   <script type="text/javascript">
     var master = 'https://github.com/wakita/gldojo/tree/master';
-    var re_src = /^chap.*\.[ch]pp$/;
+    var re_sb = /^sb.*\.[ch]pp$/;
+    var re_sn = /^sn.*\.[ch]pp$/;
     var re_shader = /^(.*)\.((?:vs|tcs|tes|gs|fs)(?:,(?:vs|tcs|tes|gs|fs))*)$/;
 
     $(function () {
@@ -21,8 +22,10 @@
         var text = $em.text();
         var m;
 
-        if (re_src.exec(text)) {
-          $em.after($('<a>').attr('href', '/src/' + text).text(text));
+        if (re_sb.exec(text)) {
+          $em.after($('<a>').attr('href', '/sb/' + text).text(text));
+        } else if (re_sn.exec(text)) {
+          $em.after($('<a>').attr('href', '/sn/' + text).text(text));
         } else if (m = re_shader.exec(text)) {
           var name = m[1], exts = m[2].split(',');
           exts.reverse().forEach(function (ext, i) {
@@ -44,6 +47,7 @@
       var re_github = /^\/github(.*)/;
 
       $("a[href^='/']").attr('href', function (i, href) {
+        console.log(href);
         if (re_master.exec(href)) return master + href;
         else if (m = re_github.exec(href)) return master + m[1];
       });
