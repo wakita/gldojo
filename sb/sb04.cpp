@@ -1,12 +1,10 @@
 #include <iostream>
 #include <cmath>
 
-#define GLM_FORCE_SIZE_FUNC // vec4.length() => vec4.size()
-
 #define _DEBUG
-#include "sngl.hpp"
+#include "Program.hpp"
 
-namespace sn { namespace gl {
+using namespace smartnova::gl;
 
 void f() {
   vec3 vVerts[] = {
@@ -115,6 +113,4 @@ void f() {
   // ortho(left, right, bottom, top)
 }
 
-} } // namespace sn::gl
-
-int main() { sn::gl::f(); }
+int main() { f(); }

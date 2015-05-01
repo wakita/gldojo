@@ -15,18 +15,15 @@
  **/
 
 #include <cmath>
-#include <vector>
 #define _DEBUG
-#include <sngl.hpp>
-#include <snshader.hpp>
+#include <Program.hpp>
 
-namespace sn { namespace gl {
+using namespace smartnova::gl;
 
 class Chapter05B : public Application {
 
   virtual void init() {
-    Application::init();
-    info.title = "構造体の配列をシェーダに渡す例です．でもバグってます．";
+    Application::init("構造体の配列をシェーダに渡す例です．でもバグってます．");
   }
 
   struct vertex_data {
@@ -36,12 +33,11 @@ class Chapter05B : public Application {
 
   enum { vaPosition, vaColor };
   enum { bufVertex };
-  GLuint rendering_program, vao[2], buffers[1];
+  GLuint vao[2], buffers[1];
+  Program program;
 
   virtual void startup() {
-    rendering_program = program::link(
-        shader::load("chap05b", std::vector<std::string> { ".vs", ".fs" }),
-        true);
+    program.load("sb05b", vector<string> { "vs", "fs" });
 
     glGenVertexArrays(2, vao);
     glBindVertexArray(vao[vaPosition]);
@@ -72,12 +68,10 @@ class Chapter05B : public Application {
     bgcolor[2] = (float)(sin(t) + 1) / 2;
     glClearBufferfv(GL_COLOR, 0, bgcolor);
 
-    glUseProgram(rendering_program);
+    program.use();
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
   }
 };
 
-} } // namespace sn::gl
-
-DECLARE_MAIN(sn::gl::Chapter05B)
+DECLARE_MAIN(Chapter05B)

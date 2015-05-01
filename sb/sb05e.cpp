@@ -7,8 +7,7 @@
 #include <cstdlib>
 #include <iostream>
 #define _DEBUG
-#include "sngl.hpp"
-#include "snshader.hpp"
+#include "Program.hpp"
 
 #define UCPARAM(param) { \
   GLint v; \
@@ -16,20 +15,18 @@
   cout << "  " << #param << ": " << v << endl; \
 }
 
-namespace sn { namespace gl {
-
-using std::cout;
-using std::endl;
+using namespace smartnova::gl;
 
 class Chapter05E : public Application {
 
   virtual void init() {
-    Application::init();
     info.flags.visible = 0;
+    Application::init("Chapter05E");
   }
 
-  void setValuesToProgram(GLuint program) {
-    glUseProgram(program);
+  void setValuesToProgram(Program &program) {
+    program.use();
+    GLuint _program = program.getHandle();
 
     static const GLchar * uNames[] = {
       "TransformBlock.scale",
@@ -42,12 +39,12 @@ class Chapter05E : public Application {
     // Uniform { Offsets, Array Strides, Matrix Strides }
     GLint  uOffset[N_UNAME], aStride[N_UNAME], mStride[N_UNAME];
 
-    glGetUniformIndices(program, N_UNAME, uNames, uIndices);
-    glGetActiveUniformsiv(program, N_UNAME, uIndices, GL_UNIFORM_OFFSET,
+    glGetUniformIndices(_program, N_UNAME, uNames, uIndices);
+    glGetActiveUniformsiv(_program, N_UNAME, uIndices, GL_UNIFORM_OFFSET,
         (GLint *)uOffset);
-    glGetActiveUniformsiv(program, N_UNAME, uIndices, GL_UNIFORM_ARRAY_STRIDE,
+    glGetActiveUniformsiv(_program, N_UNAME, uIndices, GL_UNIFORM_ARRAY_STRIDE,
         (GLint *)aStride);
-    glGetActiveUniformsiv(program, N_UNAME, uIndices, GL_UNIFORM_MATRIX_STRIDE,
+    glGetActiveUniformsiv(_program, N_UNAME, uIndices, GL_UNIFORM_MATRIX_STRIDE,
         (GLint *)mStride);
 
     cout << "float scale: offset = "      << uOffset[0] << endl;
@@ -97,7 +94,7 @@ class Chapter05E : public Application {
       << (bProjection - IF(buffer, uProjection)) * sizeof(float) << endl << endl;
   }
 
-  GLuint program1, program2;
+  Program program1, program2;
 
   virtual void startup() {
     cout << "MAX_**_UNIFORM_COMPONENTS" << endl;
@@ -108,10 +105,8 @@ class Chapter05E : public Application {
     UCPARAM(FRAGMENT);
     cout << endl;
 
-    program1 = program::link(shader::load("chap05e1",
-          std::vector<string> { ".vs" }), true);
-    program2 = program::link(shader::load("chap05e2",
-          std::vector<string> { ".vs" }), true);
+    program1.load("sb05e1", vector<string> { "vs" });
+    program2.load("sb05e2", vector<string> { "vs" });
 
     cout << "Analyzing uniform block structure in [std140] layout" << endl;
     setValuesToProgram(program1);
@@ -121,8 +116,8 @@ class Chapter05E : public Application {
 
     exit(0);
   }
+
+  virtual void render(double t) {}
 };
 
-} } // namespace sn::gl
-
-DECLARE_MAIN(sn::gl::Chapter05E)
+DECLARE_MAIN(Chapter05E)

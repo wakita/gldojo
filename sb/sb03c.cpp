@@ -9,26 +9,23 @@
  **/
 
 #include <cmath>
-#include <vector>
+
 #define _DEBUG
-#include "sngl.hpp"
-#include "snshader.hpp"
+#include "Program.hpp"
 
-namespace sn { namespace gl {
+using namespace smartnova::gl;
 
-class Chapter03C : public Application {
+class Chapter03CX : public Application {
   virtual void init() {
-    Application::init();
-    info.title = "chap03c: Interface Block の利用";
+    Application::init("chap03c: Interface Block の利用");
   }
 
   enum { vaOffset, vaColor };
-  GLuint rendering_program, vao[2];
+  GLuint vao[2];
+  Program program;
 
   virtual void startup() {
-    rendering_program = program::link(
-        shader::load("chap03c", std::vector<std::string> { ".vs", ".fs" }),
-        true);
+    program.load("sb03c", vector<string>{ "vs", "fs" });
 
     glGenVertexArrays(2, vao);
     glBindVertexArray(vao[vaOffset]);
@@ -40,7 +37,7 @@ class Chapter03C : public Application {
   virtual void render(double t) {
     glClearBufferfv(GL_COLOR, 0, bgcolor);
 
-    glUseProgram(rendering_program);
+    program.use();
 
     glVertexAttrib2f(vaOffset, sin(t) / 2, cos(t) / 2);
     glVertexAttrib4f(vaColor, (sin(t) + 1) / 2, (cos(t) + 1) / 2, 0, 1);
@@ -49,6 +46,4 @@ class Chapter03C : public Application {
   }
 };
 
-} }
-
-DECLARE_MAIN(sn::gl::Chapter03C)
+DECLARE_MAIN(Chapter03CX)

@@ -1,30 +1,25 @@
-#include <cmath>
-
 #define _DEBUG
-#include "sngl.hpp"
-#include "snshader.hpp"
+#include "Program.hpp"
 
-using namespace sn::gl;
+using namespace smartnova::gl;
 
 class Chapter5G : public Application {
   virtual void init() {
-    Application::init();
-    info.title = "chap05g: Shader storage block の利用";
+    Application::init("chap05g: Shader storage block の利用");
   }
 
-  GLuint program;
+  Program program;
 
   virtual void startup() {
     glGetError();
-    program = program::link(shader::load("chap05g",
-          std::vector<std::string> { ".vs" }), true);
+    program.load("sb05g", vector<string>{ "vs" });
   }
 
   GLfloat bgcolor[4] = { .2, .2, .2, 1 };
   virtual void render(double t) {
     glClearBufferfv(GL_COLOR, 0, bgcolor);
 
-    glUseProgram(program);
+    program.use();
   }
 };
 

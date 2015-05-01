@@ -7,21 +7,19 @@
 #include <cmath>
 #include <cstdlib>
 #define _DEBUG
-#include "sngl.hpp"
-#include "snshader.hpp"
+#include "Program.hpp"
 
-namespace sn { namespace gl {
+using namespace smartnova::gl;
 
 class Chapter05D : public Application {
 
-  GLuint program;
+  Program program;
 
   enum { vaParameter };
   GLuint vao[1], locTime;
 
   virtual void init() {
-    Application::init();
-    info.title = "chap05d: uniformブロックを利用してデータをシェーダに渡します．";
+    Application::init("chap05d: uniformブロックを利用してデータをシェーダに渡します．");
   }
 
   GLuint bindingPoint = 0, uBuffer, uIndex;
@@ -30,13 +28,13 @@ class Chapter05D : public Application {
   struct Parameter params = { 0, 0 };
 
   virtual void startup() {
-    program = program::link(shader::load("chap05d",
-          std::vector<string> { ".vs", ".fs" }), true);
+    program.load("sb05d", vector<string> { "vs", "fs" });
     glGenVertexArrays(1, vao);
     glBindVertexArray(vao[vaParameter]);
 
-    uIndex = glGetUniformBlockIndex(program, "Parameter");
-    glUniformBlockBinding(program, uIndex, bindingPoint);
+    GLuint _program = program.getHandle();
+    uIndex = glGetUniformBlockIndex(_program, "Parameter");
+    glUniformBlockBinding(_program, uIndex, bindingPoint);
 
     glGenBuffers(1, &uBuffer);
     glBindBuffer(GL_UNIFORM_BUFFER, uBuffer);
@@ -48,7 +46,7 @@ class Chapter05D : public Application {
 
   virtual void render(double t) {
     glClearBufferfv(GL_COLOR, 0, bgcolor);
-    glUseProgram(program);
+    program.use();
 
     // Uniform block に設定するデータをバッファに保存
     params.time = t; params.alpha = (sin(t) + 1) / 2;
@@ -60,6 +58,4 @@ class Chapter05D : public Application {
   }
 };
 
-} } // namespace sn::gl
-
-DECLARE_MAIN(sn::gl::Chapter05D)
+DECLARE_MAIN(Chapter05D)

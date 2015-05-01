@@ -10,29 +10,25 @@
  **/
 
 #include <cmath>
-#include <vector>
 
 #define _DEBUG
-#include "sngl.hpp"
-#include "snshader.hpp"
+#include "Program.hpp"
 
-namespace sn { namespace gl {
+using namespace smartnova::gl;
 
-class Chapter03A : public Application {
+class Chapter03AX : public Application {
 
   virtual void init() {
-    Application::init();
-    info.title = "chap03a: シェーダーへのデータの送信";
+    Application::init("chap03a: シェーダーへのデータの送信");
   }
 
   enum { vaOffset = 0 };
-  GLuint rendering_program, vao[1];
+  GLuint vao[1];
+  Program program;
 
   virtual void startup() {
-    rendering_program =
-      program::link(
-          shader::load("chap03a", std::vector<std::string> { ".vs", ".fs" }),
-          true);
+    auto exts = vector<string>{ "vs", "fs" };
+    program.load("sb03a", exts);
 
     glGenVertexArrays(1, vao);
     glBindVertexArray(vao[vaOffset]);
@@ -44,7 +40,7 @@ class Chapter03A : public Application {
   virtual void render(double t) {
     glClearBufferfv(GL_COLOR, 0, bgcolor);
 
-    glUseProgram(rendering_program);
+    program.use();
 
     offset[0] = (float)(sin(t) * 0.5);
     offset[1] = (float)(cos(t) * 0.5);
@@ -54,6 +50,4 @@ class Chapter03A : public Application {
   }
 };
 
-} }
-
-DECLARE_MAIN(sn::gl::Chapter03A)
+DECLARE_MAIN(Chapter03AX)

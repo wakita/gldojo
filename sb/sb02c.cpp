@@ -11,26 +11,23 @@
  **/
 
 #include <cmath>
-#include <vector>
 
 #define _DEBUG
-#include "sngl.hpp"
-#include "snshader.hpp"
+#include "Program.hpp"
 
-namespace sn { namespace gl {
+using namespace smartnova::gl;
 
-class Chapter02C : public Application {
+class Chapter02CX : public Application {
   virtual void init() {
-    Application::init();
-    info.title = "chap02c: 初めてのシェーダ";
+    Application::init(string("chap02c: 初めてのシェーダ"));
   }
 
-  GLuint rendering_program;
+  Program program;
 
   virtual void startup() {
-    rendering_program = program::link(
-        shader::load("chap02c", std::vector<std::string> { ".vs", ".fs" }),
-        true);
+    using namespace Shader;
+    auto exts = vector<string>{ "vs", "fs" };
+    program.load("sb02c", exts);
 
     GLuint vao[1];
     glGenVertexArrays(1, vao);
@@ -44,11 +41,10 @@ class Chapter02C : public Application {
     color[1] = (float)(cos(t)/2 + 0.5);
     glClearBufferfv(GL_COLOR, 0, color);
 
-    glUseProgram(rendering_program);
+    program.use();
     glPointSize(40.f);
     glDrawArrays(GL_POINTS, 0, 1);
   }
 };
-} } // namespace sn::gl
 
-DECLARE_MAIN(sn::gl::Chapter02C)
+DECLARE_MAIN(Chapter02CX)

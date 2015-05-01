@@ -2,23 +2,22 @@
  * ウィンドウを表示し中を赤で消去する例．
  **/
 
-#include "sngl.hpp"
+#include "Program.hpp"
 
-namespace sn { namespace gl {
-using sn::gl::Application;
+using namespace smartnova::gl;
 
-class Chapter02A : public Application {
+class Chapter02AX : public Application {
   virtual void init() {
-    Application::init();
-    info.title = "chap02a: ウィンドウを赤で消去";
+    Application::init(string("chap02a: ウィンドウを赤で消去"));
   }
 
+  virtual void startup() {}
+
+  GLfloat bgcolor[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+
   virtual void render(double t) {
-    static const GLfloat red[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-    glClearBufferfv(GL_COLOR, 0, red);
+    glClearBufferfv(GL_COLOR, 0, bgcolor);
   }
 };
 
-} }
-
-DECLARE_MAIN(sn::gl::Chapter02A)
+DECLARE_MAIN(Chapter02AX)

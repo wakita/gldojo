@@ -9,28 +9,24 @@
  **/
 
 #include <cmath>
-#include <vector>
 #define _DEBUG
-#include "sngl.hpp"
-#include "snshader.hpp"
+#include <Program.hpp>
 
-namespace sn { namespace gl {
+using namespace smartnova::gl;
 
 class Chapter05A : public Application {
 
   virtual void init() {
-    Application::init();
-    info.title = "chap05a: アプリから vs にデータを送り込む例です";
+    Application::init("chap05a: アプリから vs にデータを送り込む例です");
   }
 
   enum { vaData };
   enum { bufPosition, bufColors };
-  GLuint rendering_program, vao[1], buffers[2];
+  GLuint vao[1], buffers[2];
+  Program program;
 
   virtual void startup() {
-    rendering_program = program::link(
-        shader::load("chap05a", std::vector<std::string> { ".vs", ".fs" }),
-        true);
+    program.load("sb05a", vector<string>{ "vs", "fs" });
 
     // MacBook Air では，VAOを初期化しなくても動いていたような気がしたけれど
     // iMac5K では以下がないと動かない．
@@ -68,11 +64,9 @@ class Chapter05A : public Application {
     bgcolor[0] = bgcolor[1] = bgcolor[2] = (float)(sin(t) * .5 + .5);
     glClearBufferfv(GL_COLOR, 0, bgcolor);
 
-    glUseProgram(rendering_program);
+    program.use();
     glDrawArrays(GL_TRIANGLES, 0, 3);
   }
 };
 
-} } // namespace sn::gl
-
-DECLARE_MAIN(sn::gl::Chapter05A)
+DECLARE_MAIN(Chapter05A)

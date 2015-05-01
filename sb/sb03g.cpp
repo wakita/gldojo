@@ -11,25 +11,21 @@
 
 #include <cmath>
 #define _DEBUG
-#include "sngl.hpp"
-#include "snshader.hpp"
+#include "Program.hpp"
 
-namespace sn { namespace gl {
+using namespace smartnova::gl;
 
 class Chapter03G : public Application {
   virtual void init() {
-    Application::init();
-    info.title = "chap03g: （バグ）vs-fs 間に別のシェーダが挟まるとデータを送れない．．．";
+    Application::init("chap03g: （バグ）vs-fs 間に別のシェーダが挟まるとデータを送れない．．．");
   }
 
   enum { vaOffset };
-  GLuint rendering_program, vao[1];
+  GLuint vao[1];
+  Program program;
 
   virtual void startup() {
-    rendering_program = program::link(
-        shader::load("chap03g",
-          std::vector<std::string> { ".vs", ".tcs", ".tes", ".fs" }),
-        true);
+    program.load("sb03g", vector<string>{ "vs", "tcs", "tes", "geom", "fs" });
     
     glGenVertexArrays(2, vao);
     glBindVertexArray(vao[vaOffset]);
@@ -49,11 +45,9 @@ class Chapter03G : public Application {
 
     glVertexAttrib2f(vaOffset, (float)(s * .5), (float)(c * .6));
 
-    glUseProgram(rendering_program);
+    program.use();
     glDrawArrays(GL_PATCHES, 0, 3);
   }
 };
 
-} } // namespace sn::gl
-
-DECLARE_MAIN(sn::gl::Chapter03G)
+DECLARE_MAIN(Chapter03G)

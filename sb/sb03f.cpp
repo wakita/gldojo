@@ -1,25 +1,21 @@
 #include <cmath>
 #define _DEBUG
-#include "sngl.hpp"
-#include "snshader.hpp"
+#include "Program.hpp"
 
-namespace sn { namespace gl {
+using namespace smartnova::gl;
 
 class Chapter03F : public Application {
 
   virtual void init() {
-    Application::init();
-    info.title = "Fragmentシェーダを用いて位置に依存した彩色をします．";
+    Application::init("Fragmentシェーダを用いて位置に依存した彩色をします．");
   }
 
   enum { vaOffset, vaColor };
-  GLuint rendering_program, vao[2];
+  GLuint vao[2];
+  Program program;
 
   virtual void startup() {
-    rendering_program = program::link(
-        shader::load("chap03f",
-          std::vector<std::string> { ".vs", ".tcs", ".tes", ".gs", ".fs" }),
-        true);
+    program.load("sb03f", vector<string>{ "vs", "tcs", "tes", "geom", "fs" });
 
     glGenVertexArrays(2, vao);
     glBindVertexArray(vao[vaOffset]);
@@ -40,11 +36,9 @@ class Chapter03F : public Application {
     glVertexAttrib2f(vaOffset, (float)s / 2, (float)c / 2);
     glVertexAttrib4f(vaColor, bgcolor[1], bgcolor[0], .3f, 1.f);
 
-    glUseProgram(rendering_program);
+    program.use();
     glDrawArrays(GL_PATCHES, 0, 3);
   }
 };
 
-} } // namespace sn::gl
-
-DECLARE_MAIN(sn::gl::Chapter03F)
+DECLARE_MAIN(Chapter03F)

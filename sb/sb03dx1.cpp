@@ -25,7 +25,7 @@ class Chapter03DX : public Application {
   Program program;
 
   virtual void startup() {
-    program.load("sb03d", vector<string>{ "vs", "tcs", "tes", "fs" });
+    program.load("sb03d1", vector<string>{ "vs", "tcs", "tes", "fs" });
 
     glGenVertexArrays(2, vao);
     glBindVertexArray(vao[vaOffset]);

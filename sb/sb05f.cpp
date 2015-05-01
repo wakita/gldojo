@@ -1,15 +1,16 @@
 #include <cmath>
 
 #define _DEBUG
-#include "sngl.hpp"
-#include "snshader.hpp"
+#include "Program.hpp"
 
-namespace sn { namespace gl {
+using namespace smartnova::gl;
 
-class Chapter5F : public Application {
+class Chapter05F : public Application {
+  Program program;
+
   enum { vaCube };
   enum { baData };
-  GLuint program, vao[1], buf[1], locModelView, locProjection;
+  GLuint vao[1], buf[1], locModelView, locProjection;
 
   const int vxCube[24] = { // 立方体の頂点
     0, 0, 0,
@@ -48,15 +49,20 @@ class Chapter5F : public Application {
     }
   }
 
+  virtual void init() {
+    Application::init("chap05f: 立方体が螺旋を描く");
+  }
+
   virtual void startup() {
-    glGetError();
-    program = program::link(shader::load("chap05f",
-          std::vector<std::string> { ".vs", ".fs" }), true);
-    locModelView = glGetUniformLocation(program, "ModelView");
-    locProjection = glGetUniformLocation(program, "Projection");
+    program.load("sb05f", vector<string> { "vs", "fs" });
+
+    locModelView = program.uniformLocation("ModelView");
+    Check;
+    locProjection = program.uniformLocation("Projection");
     Check;
 
     glGenVertexArrays(1, vao);
+    Check;
     glBindVertexArray(vao[vaCube]);
     Check;
 
@@ -79,13 +85,13 @@ class Chapter5F : public Application {
     glDepthFunc(GL_LEQUAL);
     Check;
 
-    onResize(info.windowWidth, info.windowHeight);
+    onResize(window, info.winWidth, info.winHeight);
   }
 
   mat4 Projection = I4;
 
-  virtual void onResize(int w, int h) {
-    Application::onResize(w, h);
+  virtual void onResize(GLFWwindow *win, int w, int h) {
+    Application::onResize(win, w, h);
     Projection = glm::perspective(50.f, (float)w / h, 0.1f, 1000.f);
     updateProjection = true;
   }
@@ -105,8 +111,7 @@ class Chapter5F : public Application {
     glClearBufferfv(GL_COLOR, 0, bgcolor);
     glClearBufferfv(GL_DEPTH, 0, &CleanDepth);
 
-    glUseProgram(program);
-    Check;
+    program.use();
 
     if (updateProjection) {
       glUniformMatrix4fv(locProjection, 1, GL_FALSE, glm::value_ptr(Projection));
@@ -134,6 +139,4 @@ class Chapter5F : public Application {
   }
 };
 
-} } // namespace sn::gl
-
-DECLARE_MAIN(sn::gl::Chapter5F)
+DECLARE_MAIN(Chapter05F)

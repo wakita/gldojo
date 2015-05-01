@@ -5,26 +5,23 @@
  **/
 
 #include <cmath>
-#include <vector>
 #define _DEBUG
-#include "sngl.hpp"
-#include "snshader.hpp"
+#include "Program.hpp"
 
-namespace sn { namespace gl {
-class Chapter03E : public Application {
+using namespace smartnova::gl;
+
+class Chapter03EX : public Application {
   virtual void init() {
-    Application::init();
-    info.title = "chap03e: Geometryシェーダを追加";
+    Application::init("chap03e: Geometryシェーダを追加");
   }
 
   enum { vaOffset, vaColor };
-  GLuint rendering_program, vao[2];
+  GLuint vao[2];
+  Program program;
 
   virtual void startup() {
-    rendering_program = program::link(
-        shader::load("chap03e",
-          std::vector<std::string> { ".vs", ".tcs", ".tes", ".geom", ".fs" }),
-        true);
+    program.load("sb03e", vector<string>{ "vs", "tcs", "tes", "geom", "fs" });
+
     glGenVertexArrays(2, vao);
     glBindVertexArray(vao[vaOffset]);
     glBindVertexArray(vao[vaColor]);
@@ -42,7 +39,7 @@ class Chapter03E : public Application {
     bgcolor[1] = c * .4 + .4;
 
     glClearBufferfv(GL_COLOR, 0, bgcolor);
-    glUseProgram(rendering_program);
+    program.use();
 
     glVertexAttrib2f(vaOffset, s / 2, c / 2);
     glVertexAttrib1f(vaColor, (s + 1) / 2);
@@ -51,6 +48,4 @@ class Chapter03E : public Application {
   }
 };
 
-} } // namespace sn::gl
-
-DECLARE_MAIN(sn::gl::Chapter03E)
+DECLARE_MAIN(Chapter03EX)

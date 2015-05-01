@@ -2,24 +2,24 @@
  * ウィンドウの背景色を時間とともに変化させる例
  **/
 
-#include <cmath>
-#include "sngl.hpp"
+#include "Program.hpp"
 
-namespace sn { namespace gl {
-class Chapter02B : public Application {
+using namespace smartnova::gl;
+
+class Chapter02BX : public Application {
   virtual void init() {
-    Application::init();
-    info.title = "chap02b: 背景色を変化させる";
+    Application::init(string("chap02b: 背景色を変化させる"));
   }
+
+  virtual void startup() {}
 
   GLfloat c[4] = { 0, 0, 0, 1 };
 
-  void render(double t) {
+  virtual void render(double t) {
     c[0] = (float)(sin(t)/2 + 0.5);
     c[1] = (float)(cos(t)/2 + 0.5);
     glClearBufferfv(GL_COLOR, 0, c);
   }
 };
-} }
 
-DECLARE_MAIN(sn::gl::Chapter02B)
+DECLARE_MAIN(Chapter02BX)

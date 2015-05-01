@@ -13,30 +13,28 @@
 
 #include <cmath>
 #define _DEBUG
-#include "sngl.hpp"
-#include "snshader.hpp"
+#include "Program.hpp"
 
-namespace sn { namespace gl {
+using namespace smartnova::gl;
 
 class Chapter05C : public Application {
   virtual void init() {
-    Application::init();
-    info.title = "chap05c: uniform変数を利用してデータをシェーダに渡します．";
+    Application::init("chap05c: uniform変数を利用してデータをシェーダに渡します．");
   }
 
   enum { vaTime };
-  GLuint rendering_program, vao[1];
+  GLuint vao[1];
   GLuint locTime;
+  Program program;
 
   virtual void startup() {
-    rendering_program = program::link(
-        shader::load("chap05c", std::vector<std::string> { ".vs", ".fs" }),
-        true);
+    program.load("sb05c", vector<string> { "vs", "fs" });
 
     glGenVertexArrays(1, vao);
     glBindVertexArray(vao[vaTime]);
 
-    locTime = glGetUniformLocation(rendering_program, "time");
+    //locTime = glGetUniformLocation(rendering_program, "time");
+    locTime = program.uniformLocation("time");
   }
 
   GLfloat bgcolor[4] = { .2, .2, .2, 1 };
@@ -44,7 +42,7 @@ class Chapter05C : public Application {
   virtual void render(double t) {
     glClearBufferfv(GL_COLOR, 0, bgcolor);
 
-    glUseProgram(rendering_program);
+    program.use();
 
     glUniform1f(locTime, t);
 
@@ -52,6 +50,4 @@ class Chapter05C : public Application {
   }
 };
 
-} } // namespace sn::gl
-
-DECLARE_MAIN(sn::gl::Chapter05C)
+DECLARE_MAIN(Chapter05C)
