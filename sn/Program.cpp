@@ -1,4 +1,5 @@
-#include <boost/filesystem/fstream.hpp>
+#include <iostream>
+#include <fstream>
 
 #define _DEBUG
 #include "Program.hpp"
@@ -39,7 +40,7 @@ void Application::init(const string & title) {
   info.title = title;
 
   glfwSetErrorCallback([] (int error, const char* description) {
-      cerr << "GLFW Error: " << description << std::endl; });
+      cerr << "GLFW Error: " << description << endl; });
 
   if (!glfwInit()) {
     cerr << "Failed to initialize GLFW" << endl;
@@ -159,8 +160,10 @@ void Application::getCursorPos(GLFWwindow *window, double &xpos, double &ypos) {
 
 void Application::onDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar &message) {}
 
-static Shader::Type Shader::typeOf(const fs::path &path) {
-  return typeOfExt.find(path.extension())->second;
+// Bug: Extract the extension!
+static Shader::Type Shader::typeOf(const string &path) {
+  const string::size_type i = path.rfind('.');
+  return typeOfExt.find(path.substr(i))->second;
 }
 
 void Shader::throwOnShaderError(GLuint shader, GLenum pname, const string &message) {
@@ -204,8 +207,8 @@ void Program::throwOnProgramError(GLenum pname, const string &message) {
   }
 }
 
-void Program::throwOnProgramError(GLenum pname, const fs::path &path, const string &message) {
-  throwOnProgramError(pname, path.native() + ": " + message);
+void Program::throwOnProgramError(GLenum pname, const string &path, const string &message) {
+  throwOnProgramError(pname, path + ": " + message);
 }
 
 Program::Program() : handle(0), linked(false) {}
@@ -224,7 +227,7 @@ Program::~Program() {
   delete[] shaderNames;
 }
 
-void Program::compile(const string &source, Shader::Type type, const fs::path &path)
+void Program::compile(const string &source, Shader::Type type, const string &path)
   throw (ProgramException) {
     if (handle <= 0) {
       handle = glCreateProgram();
@@ -239,22 +242,20 @@ void Program::compile(const string &source, Shader::Type type, const fs::path &p
     glCompileShader(shader);
     Check;
     Shader::throwOnShaderError(shader, GL_COMPILE_STATUS,
-        string("Shader compilation failed for \"") + path.filename().native() + "\"");
+        string("Shader compilation failed for \"") + path + "\"");
     glAttachShader(handle, shader);
   }
 
-void Program::compile(const fs::path &path, Shader::Type type)
+void Program::compile(const string &path, Shader::Type type)
   throw (ProgramException) {
-    if (!exists(path)) throw ProgramException(path, "Shader: not found.");
-
-    fs::ifstream f(path);
-    if (!f) throw ProgramException(path, "Unable to open");
+    ifstream f(path.c_str());
+    if (!f) throw ProgramException(path, "Unable to open a shader (" + path + ")");
     string code((istreambuf_iterator<char>(f)), istreambuf_iterator<char>());
 
     compile(code, type, path);
   }
 
-void Program::compile(const fs::path &path)
+void Program::compile(const string &path)
   throw (ProgramException) {
     compile(path, Shader::typeOf(path));
   }
@@ -262,9 +263,9 @@ void Program::compile(const fs::path &path)
 void Program::load(const string &stem, vector<string> exts)
   throw (ProgramException) {
   const char *dir = getenv("SHADERS_DIR");
-  const fs::path base = fs::path(dir ? dir : "");
+  const string base(dir ? dir : "");
   for (const auto ext : exts)
-    Program::compile(base / (stem + "." + ext));
+    Program::compile(base + "/" + stem + "." + ext);
   Program::link();
 }
 

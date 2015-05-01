@@ -1,6 +1,5 @@
 #include <iostream>
 
-#define GLM_MESSAGES
 #define GLM_FORCE_SIZE_FUNC // vec4.length() => vec4.size()
 
 #include <glm/fwd.hpp>

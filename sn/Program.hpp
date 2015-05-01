@@ -1,5 +1,5 @@
-#ifndef SMARTNOVA_GL_PROGRAM_HPP
-#define SMARTNOVA_GL_PROGRAM_HPP
+# ifndef SMARTNOVA_GL_PROGRAM_HPP
+# define SMARTNOVA_GL_PROGRAM_HPP
 
 #include <exception>
 #include <iostream>
@@ -10,13 +10,14 @@
 
 using namespace std;
 
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
-
-#include <GL/glew.h>
+# if defined(OS_Darwin)
+#   include <glew.h>
+# endif
 
 #include <GLFW/glfw3.h>
 
+#define GLM_EXT_INCLUDED
+#define GLM_FORCE_SIZE_FUNC // vec4.length() => vec4.size()
 #include <glm/glm.hpp>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
@@ -38,29 +39,28 @@ static const float PI = glm::pi<float>();
 static const vec3 X = vec3(1, 0, 0), Y = vec3(0, 1, 0), Z = vec3(0, 0, 1);
 static const mat4 I4 = mat4(1);
 
-#ifdef _DEBUG
-#  define Check smartnova::gl::GLErrorCheck(__FILE__, __LINE__)
-#else
-#  define Check
-#endif
+# ifdef _DEBUG
+#   define Check smartnova::gl::GLErrorCheck(__FILE__, __LINE__)
+# else
+#   define Check
+# endif
 
 namespace smartnova { namespace gl {
 
 void GLErrorCheck(string file, int line);
 
-// ToDo: should be replaced with fs::filesystem_error
 class ShaderException : public runtime_error {
   public:
     ShaderException(const string & msg) : runtime_error(msg) {}
-    ShaderException(const fs::path & path, const string & msg) :
-      runtime_error("\"" + path.filename().native() + "\": " + msg) {}
+    ShaderException(const string & path, const string & msg) :
+      runtime_error("\"" + path + "\": " + msg) {}
 };
 
 class ProgramException : public runtime_error {
   public:
     ProgramException(const string & msg) : runtime_error(msg) {}
-    ProgramException(const fs::path & path, const string & msg) :
-      runtime_error("\"" + path.filename().native() + "\": " + msg) {}
+    ProgramException(const string & path, const string & msg) :
+      runtime_error("\"" + path + "\": " + msg) {}
 };
 
 struct SNGL_APP_INFO {
@@ -128,15 +128,15 @@ namespace Shader {
     FS = GL_FRAGMENT_SHADER,
     CS = GL_COMPUTE_SHADER };
 
-  static map<fs::path, Type> typeOfExt = map<fs::path, Type>({
-      { fs::path(".vs"), VS }, { fs::path(".tcs"), TCS }, { fs::path(".tes"), TES },
-      { fs:: path(".geom"), GS }, { fs::path(".gs"), GS }, { fs::path(".fs"),  FS  },
-      { fs::path(".comp"), CS }, { fs::path(".cs"),  CS  } });
+  static map<string, Type> typeOfExt = map<string, Type>({
+      { string(".vs"),   VS }, { string(".tcs"), TCS }, { string(".tes"), TES },
+      { string(".geom"), GS }, { string(".gs"),  GS },  { string(".fs"),  FS  },
+      { string(".comp"), CS }, { string(".cs"),  CS  } });
 
-  static Type typeOf(const fs::path & path);
+  static Type typeOf(const string & path);
 
   void throwOnShaderError(GLuint shader, GLenum pname, const string &message);
-  void throwOnShaderError(GLuint shader, GLenum pname, const fs::path &path, const string & message);
+  void throwOnShaderError(GLuint shader, GLenum pname, const string &path, const string & message);
 }
 
 static map<GLenum, const char *> _type2Name =
@@ -153,7 +153,7 @@ class Program {
     map<string, GLint> uniformLocations;
 
     void throwOnProgramError(GLenum pname, const string & message);
-    void throwOnProgramError(GLenum pname, const fs::path & path, const string & message);
+    void throwOnProgramError(GLenum pname, const string & path, const string & message);
 
     Program(const Program & other) {}
     Program & operator=(const Program &other) { return *this; }
@@ -162,9 +162,9 @@ class Program {
     Program();
     ~Program();
 
-    void compile(const fs::path & path) throw (ProgramException);
-    void compile(const fs::path & path, Shader::Type type) throw (ProgramException);
-    void compile(const string & source, Shader::Type type, const fs::path & path)
+    void compile(const string & path) throw (ProgramException);
+    void compile(const string & path, Shader::Type type) throw (ProgramException);
+    void compile(const string & source, Shader::Type type, const string & path)
       throw (ProgramException);
     void load(const string &stem, vector<string> exts) throw (ProgramException);
 
