@@ -24,12 +24,7 @@ add_library(smartnova sn/Program.cpp)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/test)
 
-# foreach(X glm glm_sample)
-#   add_executable(${X} sn/test/${X}.cpp)
-#   target_link_libraries(${X} smartnova ${COMMON_LIBS})
-# endforeach(X)
-
-foreach(X app glm glew glfw)
+foreach(X app glm glm_sample glew glfw)
   add_executable(${X} sn/test/${X}.cpp)
   target_link_libraries(${X} smartnova ${COMMON_LIBS})
 endforeach(X)

@@ -1,3 +1,4 @@
+#define GLM_EXT_INCLUDED
 #include <glm/detail/dummy.cpp>
 
 // このファイルは，GLMと一緒に配布されているサンプルコードを読み込んでビルドできることを確認しています．
