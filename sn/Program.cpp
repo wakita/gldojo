@@ -1,10 +1,31 @@
 #include <iostream>
 #include <fstream>
 
-#define _DEBUG
+//#define _DEBUG
 #include "Program.hpp"
 
 namespace smartnova { namespace gl {
+
+void traceAPICalls() {
+  setCallbackMask(CallbackMask::Unresolved | CallbackMask::BeforeAndAfter | CallbackMask::ParametersAndReturnValue);
+
+  setUnresolvedCallback([](const AbstractFunction & f) {
+        cerr << "Unresolved API (" << f.name() << ") was called" << endl;
+      });
+
+  setBeforeCallback([](const FunctionCall & call) {
+        cerr << ">>> " << call.function->name();
+      });
+
+  setAfterCallback([](const FunctionCall & call) {
+      cerr << "(";
+      for (unsigned i = 0; i < call.parameters.size(); ++i) {
+        cerr << call.parameters[i]->asString();
+        if (i < call.parameters.size() - 1) cerr << ", ";
+      }
+      cerr << ")" << endl;
+      });
+}
 
 void GLErrorCheck(string file, int line) {
   GLenum err = glGetError();
@@ -39,23 +60,30 @@ void Application::init(const string & title) {
   app        = this;
   info.title = title;
 
-  glfwSetErrorCallback([] (int error, const char* description) {
-      cerr << "GLFW Error: " << description << endl; });
+  cerr << "Application::init [" << title << "]" << endl;
 
   if (!glfwInit()) {
     cerr << "Failed to initialize GLFW" << endl;
     exit(EXIT_FAILURE);
   }
+  cerr << "glfwInit() done!" << endl;
 
+  glfwSetErrorCallback([] (int error, const char* description) {
+      cerr << "GLFW Error (" << error << "): " << description << endl; });
+
+  glfwDefaultWindowHints();
+# if defined(Darwin)
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, info.majorVersion);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, info.minorVersion);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
   glfwWindowHint(GLFW_OPENGL_PROFILE,        GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_SAMPLES,               info.samples);
-  glfwWindowHint(GLFW_STEREO,                info.flags.stereo ? GL_TRUE : GL_FALSE);
-  glfwWindowHint(GLFW_VISIBLE,               info.flags.visible ? GL_TRUE : GL_FALSE);
+  glfwWindowHint(GLFW_STEREO,                info.flags.stereo);
+  glfwWindowHint(GLFW_VISIBLE,               info.flags.visible);
+# endif
+  cerr << "glfwWindowHints done!" << endl;
 
-  GLFWmonitor*monitor = NULL;
+  GLFWmonitor *monitor = nullptr;
   int swapInterval = 1;
   if (info.flags.fullscreen) {
     int monitor_count;
@@ -69,30 +97,31 @@ void Application::init(const string & title) {
     swapInterval = info.flags.vsync;
   }
 
+  cerr << "Trying to create a GLFW window...";
   if (!(window = glfwCreateWindow(
           info.winWidth, info.winHeight,
           info.title.c_str(),
-          monitor, NULL))) {
+          monitor, nullptr))) {
     cerr << "Failed to open window" << endl;
     glfwTerminate();
     exit(EXIT_FAILURE);
   }
+  cerr << "  done." << endl;
 
+  Binding::addContextSwitchCallback([](ContextHandle handle) {
+      cerr << "Activating context " << handle << endl;
+      });
+
+  cerr << "Initializing GLFW context...";
   glfwMakeContextCurrent(window);
-  glfwSwapInterval(swapInterval);
-  Check;
+  cerr << "  done." << endl;
+  // glfwSwapInterval(swapInterval);
 
-  /* Load the OpenGL functions.
-     if (ogl_LoadFunctions() == ogl_LOAD_FAILED) {
-     glfwTerminate();
-     exit(EXIT_FAILURE);
-     }
-     */
-  glewExperimental = GL_TRUE;
-  glewInit();
-  glGetError();
-
+  cerr << "Registering callbacks...";
   // Register various callbacks
+  glfwSetFramebufferSizeCallback(window,
+      [] (GLFWwindow *win, int w, int h) {
+      app->onFramebufferSize(win, w, h); });
   glfwSetWindowSizeCallback(window,
       [] (GLFWwindow *win, int w, int h) {
       app->onResize(win, w, h); });
@@ -108,20 +137,45 @@ void Application::init(const string & title) {
   glfwSetScrollCallback(window,
       [] (GLFWwindow *win, double xoffset, double yoffset) {
       app->onScroll(win, xoffset, yoffset); });
-  Check;
+  cerr << "  done." << endl;
 
   glfwSetInputMode(window, GLFW_CURSOR,
       info.flags.cursor ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
-  Check;
 
-#ifdef _DEBUG
-  cerr << "VENDOR:   " << glGetString(GL_VENDOR)   << endl;
-  cerr << "RENDERER: " << glGetString(GL_RENDERER) << endl;
-  cerr << "VERSION:  " << glGetString(GL_VERSION)  << endl;
-  cerr << "GLSL:     " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl << endl;
-  //cerr << "EXTENSION " << glGetString(GL_EXTENSIONS) << endl;
+  glbinding::Binding::initialize();
+# if defined(_DEBUG)
+  cerr <<
+    "OpenGL Version:  " << ContextInfo::version()  << endl <<
+    "OpenGL Vendor:   " << ContextInfo::vendor()   << endl <<
+    "OpenGL Renderer: " << ContextInfo::renderer() << endl <<
+    "OpenGL Revision: " << Meta::glRevision() << " (gl.xml)" << endl <<
+    "GLSL Version:    " << glGetString(GL_SHADING_LANGUAGE_VERSION) <<
+    endl << endl;
+  // cerr << "Extention: " << glGetString(GL_EXTENSIONS) << endl;
   Check;
-#endif
+# endif // _DEBUG
+
+# if defined(_DEBUG)
+  setCallbackMask(CallbackMask::Unresolved | CallbackMask::BeforeAndAfter | CallbackMask::ParametersAndReturnValue);
+  cerr << "Setting callbacks for unresolved API calls...  ";
+  setUnresolvedCallback([](const AbstractFunction & f) {
+      cerr << "Unresolved API (" << f.name() << ") was called" << endl;
+      });
+  cerr << "Setting before&after callbacks for API calls...  ";
+  setBeforeCallback([](const FunctionCall & call) {
+      cerr << ">>> " << call.function->name();
+      });
+  setAfterCallback([](const FunctionCall & call) {
+      cerr << "(";
+      for (unsigned i = 0; i < call.parameters.size(); ++i) {
+        cerr << call.parameters[i]->asString();
+        if (i < call.parameters.size() - 1) cerr << ", ";
+      }
+      cerr << ")" << endl;
+      });
+  cerr << "done." << endl;
+  Check;
+# endif
 }
 
 void Application::shutdown() {
@@ -133,13 +187,18 @@ void Application::shutdown() {
 void Application::run() {
   init();
   startup();
+
   while (!glfwWindowShouldClose(window)) {
+    glfwPollEvents();
     render(glfwGetTime());
     glfwSwapBuffers(window);
-    glfwPollEvents();
   }
   shutdown();
   exit(EXIT_SUCCESS);
+}
+
+void Application::onFramebufferSize(GLFWwindow *win, int w, int h) {
+  onResize(win, w, h);
 }
 
 void Application::onResize(GLFWwindow *win, int w, int h) {
@@ -148,7 +207,7 @@ void Application::onResize(GLFWwindow *win, int w, int h) {
 
 void Application::onKey(GLFWwindow *win, int key, int scancode, int action, int mods) {
   if ((key == GLFW_KEY_Q || key == GLFW_KEY_ESCAPE) && action == GLFW_PRESS) {
-    glfwSetWindowShouldClose(window, GL_TRUE);
+    glfwSetWindowShouldClose(window, true);
   }
 }
 
@@ -161,7 +220,7 @@ void Application::getCursorPos(GLFWwindow *window, double &xpos, double &ypos) {
 void Application::onDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar &message) {}
 
 // Bug: Extract the extension!
-static Shader::Type Shader::typeOf(const string &path) {
+static GLenum Shader::typeOf(const string &path) {
   const string::size_type i = path.rfind('.');
   return typeOfExt.find(path.substr(i))->second;
 }
@@ -169,7 +228,7 @@ static Shader::Type Shader::typeOf(const string &path) {
 void Shader::throwOnShaderError(GLuint shader, GLenum pname, const string &message) {
   int result;
   glGetShaderiv(shader, pname, &result);
-  if (result == GL_FALSE) {
+  if (result == false) {
     int length = 0;
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
     string log;
@@ -189,7 +248,7 @@ void Shader::throwOnShaderError(GLuint shader, GLenum pname, const string &messa
 void Program::throwOnProgramError(GLenum pname, const string &message) {
   int result;
   glGetProgramiv(handle, pname, &result);
-  if (result == GL_FALSE) {
+  if (result == false) {
     int length = 0;
     glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &length);
     string log;
@@ -227,7 +286,7 @@ Program::~Program() {
   delete[] shaderNames;
 }
 
-void Program::compile(const string &source, Shader::Type type, const string &path)
+void Program::compile(const string &source, GLenum type, const string &path)
   throw (ProgramException) {
     if (handle <= 0) {
       handle = glCreateProgram();
@@ -246,7 +305,7 @@ void Program::compile(const string &source, Shader::Type type, const string &pat
     glAttachShader(handle, shader);
   }
 
-void Program::compile(const string &path, Shader::Type type)
+void Program::compile(const string &path, GLenum type)
   throw (ProgramException) {
     ifstream f(path.c_str());
     if (!f) throw ProgramException(path, "Unable to open a shader (" + path + ")");
@@ -263,7 +322,7 @@ void Program::compile(const string &path)
 void Program::load(const string &stem, vector<string> exts)
   throw (ProgramException) {
   const char *dir = getenv("SHADERS_DIR");
-  const string base(dir ? dir : "");
+  const string base(dir ? dir : "shaders");
   for (const auto ext : exts)
     Program::compile(base + "/" + stem + "." + ext);
   Program::link();
@@ -411,10 +470,9 @@ int Program::uniformLocation(const char *name) {
   return uniformLocations[name];
 }
 
-const char *getTypeString(GLenum type) {
-  // There are many more types than are covered here, but
+const char *getTypeString(GLint type) { // There are many more types than are covered here, but
   // these are the most common in these examples.
-  switch(type) {
+  switch ((GLenum)type) {
     case GL_FLOAT:
       return "float";
     case GL_FLOAT_VEC2:

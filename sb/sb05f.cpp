@@ -71,7 +71,8 @@ class Chapter05F : public Application {
     glGenBuffers(1, buf);
     glBindBuffer(GL_ARRAY_BUFFER, buf[baData]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Cube), Cube, GL_STATIC_DRAW);
-    glVertexAttribPointer(vaCube, 3, GL_FLOAT, GL_FALSE, 0, GL_FALSE);
+    //glVertexAttribPointer(vaCube, 3, GL_FLOAT, GL_FALSE, 0, GL_FALSE);
+    glVertexAttribPointer(vaCube, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
     glEnableVertexAttribArray(vaCube);
     Check;
 

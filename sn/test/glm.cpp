@@ -63,7 +63,8 @@ glm::vec3 computeNormal2(
   return glm::fastNormalize(glm::cross(c - a, b -  a));
 }
 
-#include <OpenGL/gl.h>
+#include <glbinding/gl/gl.h>
+#include <glbinding/Binding.h>
 #include <glm/gtc/type_ptr.hpp>
 
 void setUniformMVP(

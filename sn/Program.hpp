@@ -1,3 +1,5 @@
+#pragma once
+
 # ifndef SMARTNOVA_GL_PROGRAM_HPP
 # define SMARTNOVA_GL_PROGRAM_HPP
 
@@ -12,13 +14,23 @@ using namespace std;
 
 # if defined(OS_Darwin)
 #   include <glew.h>
+#   include <GLFW/glfw3.h>
+# elif defined(OS_Windows)
+#   define GLFW_INCLUDE_NONE
+#   include <GLFW/glfw3.h>
+#   include <glbinding/ContextInfo.h>
+#   include <glbinding/Version.h>
+#   include <glbinding/callbacks.h>
+#   include <glbinding/Meta.h>
+#   include <glbinding/Binding.h>
+#   include <glbinding/gl/types.h>
+#   include <glbinding/gl43/gl.h>
+using namespace gl43;
+using namespace glbinding;
 # endif
-
-#include <GLFW/glfw3.h>
 
 #define GLM_EXT_INCLUDED
 #define GLM_FORCE_SIZE_FUNC // vec4.length() => vec4.size()
-#include <glm/glm.hpp>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -48,6 +60,8 @@ static const mat4 I4 = mat4(1);
 namespace smartnova { namespace gl {
 
 void GLErrorCheck(string file, int line);
+
+void traceAPICalls();
 
 class ShaderException : public runtime_error {
   public:
@@ -90,6 +104,7 @@ class Application {
     virtual void shutdown();
     virtual void run();
 
+    virtual void onFramebufferSize(GLFWwindow *win, int w, int h);
     virtual void onResize      (GLFWwindow *win, int w, int h);
     virtual void onKey         (GLFWwindow *win, int key, int scancode, int action, int mods);
     virtual void onMouseButton (GLFWwindow *win, int button, int action, int mods);
@@ -120,6 +135,8 @@ int main(int argc, const char ** argv) {          \
 }
 
 namespace Shader {
+  /*
+  const GLenum VS = GL_VERTEX_SHADER;
   enum Type {
     VS = GL_VERTEX_SHADER,
     TCS = GL_TESS_CONTROL_SHADER,
@@ -127,13 +144,19 @@ namespace Shader {
     GS = GL_GEOMETRY_SHADER,
     FS = GL_FRAGMENT_SHADER,
     CS = GL_COMPUTE_SHADER };
+    */
 
-  static map<string, Type> typeOfExt = map<string, Type>({
-      { string(".vs"),   VS }, { string(".tcs"), TCS }, { string(".tes"), TES },
-      { string(".geom"), GS }, { string(".gs"),  GS },  { string(".fs"),  FS  },
-      { string(".comp"), CS }, { string(".cs"),  CS  } });
+  static map<string, GLenum> typeOfExt = map<string, GLenum>({
+      { string(".vs"),   GL_VERTEX_SHADER },
+      { string(".tcs"),  GL_TESS_CONTROL_SHADER },
+      { string(".tes"),  GL_TESS_EVALUATION_SHADER },
+      { string(".geom"), GL_GEOMETRY_SHADER },
+      { string(".gs"),   GL_GEOMETRY_SHADER },
+      { string(".fs"),   GL_FRAGMENT_SHADER  },
+      { string(".comp"), GL_COMPUTE_SHADER },
+      { string(".cs"),   GL_COMPUTE_SHADER  } });
 
-  static Type typeOf(const string & path);
+  static GLenum typeOf(const string & path);
 
   void throwOnShaderError(GLuint shader, GLenum pname, const string &message);
   void throwOnShaderError(GLuint shader, GLenum pname, const string &path, const string & message);
@@ -163,8 +186,8 @@ class Program {
     ~Program();
 
     void compile(const string & path) throw (ProgramException);
-    void compile(const string & path, Shader::Type type) throw (ProgramException);
-    void compile(const string & source, Shader::Type type, const string & path)
+    void compile(const string & path, GLenum type) throw (ProgramException);
+    void compile(const string & source, GLenum type, const string & path)
       throw (ProgramException);
     void load(const string &stem, vector<string> exts) throw (ProgramException);
 
@@ -196,7 +219,7 @@ class Program {
     void printActiveAttribs();
 };
 
-const char * getTypeString(GLenum type);
+const char * getTypeString(GLint type);
 } } // namespace smartnova::gl
 
 #endif

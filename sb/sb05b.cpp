@@ -39,6 +39,8 @@ class Chapter05B : public Application {
   virtual void startup() {
     program.load("sb05b", vector<string> { "vs", "fs" });
 
+    traceAPICalls();
+
     glGenVertexArrays(2, vao);
     glBindVertexArray(vao[vaPosition]);
     glBindVertexArray(vao[vaColor]);
@@ -53,12 +55,14 @@ class Chapter05B : public Application {
 
     glVertexAttribPointer(vaPosition,
         3, GL_FLOAT, GL_FALSE, sizeof(vertex_data),
-        (void*)offsetof(vertex_data, x));
+        (GLfloat *)offsetof(vertex_data, x));
     glEnableVertexAttribArray(vaPosition);
+
+    cout << "r: " << offsetof(vertex_data, r) << ", sizeof(float): " << sizeof(float) << endl << flush;
 
     glVertexAttribPointer(vaColor,
         3, GL_FLOAT, GL_FALSE, sizeof(vertex_data),
-        (void*)offsetof(vertex_data, r));
+        (GLfloat *)offsetof(vertex_data, r));
     glEnableVertexAttribArray(vaColor);
   }
 
