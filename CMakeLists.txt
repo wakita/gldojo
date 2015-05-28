@@ -1,37 +1,70 @@
 cmake_minimum_required(VERSION 3.1)
 
+set(META_PROJECT_NAME        "gldojo")
+set(META_PROJECT_DESCRIPTION "A C++ sample code of modern-style OpenGL programming")
+set(META_VERSION_MAJOR       "0")
+set(META_VERSION_MINOR       "1")
+set(META_VERSION_PATCH       "0")
+set(META_VERSION             "${META_VERSION_MAJOR}.${META_VERSION_MINOR}.${META_VERSION_PATCH}")
+set(META_AUTHOR_ORGANIZATION "smartnova group")
+set(META_AUTHOR_DOMAIN       "https://github.com/wakita/gldojo")
+set(META_AUTHOR_MAINTAINER   "wakita@is.titech.ac.jp")
+
+string(TOUPPER ${META_PROJECT_NAME} META_PROJECT_NAME_UPPER)
+
+if (OPTION_BUILD_STATIC)
+  set(BUILD_SHARED_LIBS OFF)
+  message("Note: ${META_PROJECT_NAME_UPPER}_STATIC needs to be defined for static linking.")
+  add_definitions("-DGLBINDING_STATIC")
+else()
+  set(BUILD_SHARED_LIBS ON)
+endif()
+
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "-std=c++11 -DOS_${CMAKE_SYSTEM_NAME} -DSYSTEM_NAME=\\\"${CMAKE_SYSTEM_NAME}\\\"")
+add_definitions(-std=c++11)
+add_definitions("-DOS_${CMAKE_SYSTEM_NAME}")
+add_definitions("-DSYSTEM_NAME=\"${CMAKE_SYSTEM_NAME}\"")
+
+if (${BREW_INCLUDE_PATH})
+  include_directories(SYSTEM ${BREW_INCLUDE_PATH})
+endif()
 
 find_package(OpenGL)
-find_package(PkgConfig REQUIRED)
-pkg_search_module(GLFW REQUIRED glfw3)
+find_package(glfw3)
+#find_package(PkgConfig REQUIRED)
+#pkg_search_module(GLFW REQUIRED glfw3)
+include_directories(${GLFW3_INCLUDE_DIR})
+set(gllibs ${GLFW3_LIBRARY} ${OPENGL_LIBRARIES})
 
-include_directories(${OPENGL_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS} sn)
+find_package(glbinding REQUIRED)
+include_directories(${GLBINDING_INCLUDES})
+list(APPEND gllibs ${GLBINDING_LIBRARIES} ${OPENGL_LIBRARIES})
 
-set(COMMON_LIBS ${OPENGL_LIBRARIES} ${GLFW_LDFLAGS})
+message(STATUS "Includes:")
+message(STATUS "  GLFW:      ${GLFW3_INCLUDE_DIR}")
+message(STATUS "  glbinding: ${GLBINDING_INCLUDES}\n")
 
-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  pkg_search_module(GLEW REQUIRED glew)
-  include_directories(${GLEW_INCLUDE_DIRS} $ENV{BREW_INCLUDE_PATH})
-  list(APPEND COMMON_LIBS ${GLEW_LDFLAGS})
-elseif (${MSYS})
-elseif (${UNIX})
-endif  ()
+message(STATUS "Libraries:")
+message(STATUS "  OpenGL:    ${OPENGL_LIBRARIES}")
+message(STATUS "  GLFW:      ${GLFW3_LIBRARY}")
+message(STATUS "  glbinding: ${GLBINDING_LIBRARIES}")
 
 ######################################################################
 add_library(smartnova sn/Program.cpp)
+target_link_libraries(smartnova ${gllibs})
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/test)
+message(STATUS "GLFW_LIBRARIES =   ${GLFW_LIBRARY}")
+message(STATUS "OPENGL_LIBRARIES = ${OPENGL_LIBRARIES}")
 
-foreach(X app glm glm_sample glew glfw)
+include_directories(sn)
+list(APPEND gllibs smartnova)
+
+foreach(X app glfw)
   add_executable(${X} sn/test/${X}.cpp)
-  target_link_libraries(${X} smartnova ${COMMON_LIBS})
+  target_link_libraries(${X} ${gllibs})
 endforeach(X)
 
 ######################################################################
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
 set(SBSRC
     sb02a sb02b sb02c
     sb03a sb03b sb03c sb03d sb03e sb03f sb03g

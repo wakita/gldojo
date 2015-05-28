@@ -72,7 +72,8 @@ void Application::init(const string & title) {
       cerr << "GLFW Error (" << error << "): " << description << endl; });
 
   glfwDefaultWindowHints();
-# if defined(Darwin)
+# if defined(OS_Darwin)
+  cerr << "Darwin" << endl;
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, info.majorVersion);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, info.minorVersion);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);

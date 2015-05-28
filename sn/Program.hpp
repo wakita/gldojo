@@ -12,22 +12,17 @@
 
 using namespace std;
 
-# if defined(OS_Darwin)
-#   include <glew.h>
-#   include <GLFW/glfw3.h>
-# elif defined(OS_Windows)
-#   define GLFW_INCLUDE_NONE
-#   include <GLFW/glfw3.h>
-#   include <glbinding/ContextInfo.h>
-#   include <glbinding/Version.h>
-#   include <glbinding/callbacks.h>
-#   include <glbinding/Meta.h>
-#   include <glbinding/Binding.h>
-#   include <glbinding/gl/types.h>
-#   include <glbinding/gl43/gl.h>
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+#include <glbinding/ContextInfo.h>
+#include <glbinding/Version.h>
+#include <glbinding/callbacks.h>
+#include <glbinding/Meta.h>
+#include <glbinding/Binding.h>
+#include <glbinding/gl/types.h>
+#include <glbinding/gl43/gl.h>
 using namespace gl43;
 using namespace glbinding;
-# endif
 
 #define GLM_EXT_INCLUDED
 #define GLM_FORCE_SIZE_FUNC // vec4.length() => vec4.size()
