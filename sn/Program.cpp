@@ -59,17 +59,17 @@ void Application::initGLFW() {
     swapInterval = info.flags.vsync;
   }
 
-  if (!(window = glfwCreateWindow(
-          info.winWidth, info.winHeight,
+  if (!(window = glfwCreateWindow(info.winWidth, info.winHeight,
           info.title.c_str(),
           monitor, nullptr))) {
     cerr << "Failed to open window" << endl;
     glfwTerminate();
     exit(EXIT_FAILURE);
   }
+  glfwGetWindowSize(window, &info.winWidth, &info.winHeight);
 
 # if defined(_DEBUG)
-  Binding::addContextSwitchCallback([](ContextHandle handle) {
+  glbinding::Binding::addContextSwitchCallback([](glbinding::ContextHandle handle) {
       cerr << "OpenGL.Marker[Notify](0): Activating context (" << handle << ")" << endl;
       });
 # endif
@@ -80,22 +80,22 @@ void Application::initGLFW() {
   // Callbacks
   glfwSetFramebufferSizeCallback(window,
       [] (GLFWwindow *win, int w, int h) {
-      app->onFramebufferSize(win, w, h); });
+        app->onFramebufferSize(win, w, h); });
   glfwSetWindowSizeCallback(window,
       [] (GLFWwindow *win, int w, int h) {
-      app->onResize(win, w, h); });
+        app->onResize(win, w, h); });
   glfwSetKeyCallback(window,
       [] (GLFWwindow *win, int key, int scancode, int action, int mods) {
-      app->onKey(win, key, scancode, action, mods); });
+        app->onKey(win, key, scancode, action, mods); });
   glfwSetMouseButtonCallback(window,
       [] (GLFWwindow *win, int button, int action, int mods) {
-      app->onMouseButton(win, button, action, mods); });
+        app->onMouseButton(win, button, action, mods); });
   glfwSetCursorPosCallback(window,
       [] (GLFWwindow *win, double xpos, double ypos) {
-      app->onCursorPos(win, xpos, ypos); });
+        app->onCursorPos(win, xpos, ypos); });
   glfwSetScrollCallback(window,
       [] (GLFWwindow *win, double xoffset, double yoffset) {
-      app->onScroll(win, xoffset, yoffset); });
+        app->onScroll(win, xoffset, yoffset); });
 
   glfwSetInputMode(window, GLFW_CURSOR,
       info.flags.cursor ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
@@ -142,11 +142,12 @@ void Application::notify(const string & message) {
 }
 
 void Application::initDebugging() {
+  using glbinding::ContextInfo;
   cerr <<
     "OpenGL Version:  " << ContextInfo::version()  << endl <<
     "OpenGL Vendor:   " << ContextInfo::vendor()   << endl <<
     "OpenGL Renderer: " << ContextInfo::renderer() << endl <<
-    "OpenGL Revision: " << Meta::glRevision() << " (gl.xml)" << endl <<
+    "OpenGL Revision: " << glbinding::Meta::glRevision() << " (gl.xml)" << endl <<
     "GLSL Version:    " << glGetString(GL_SHADING_LANGUAGE_VERSION) <<
     endl << endl;
   Check;
@@ -189,7 +190,9 @@ void Application::initDebugging() {
   glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0, 
       GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Start debugging");
 
-  setCallbackMaskExcept(
+  using glbinding::CallbackMask;
+
+  glbinding::setCallbackMaskExcept(
       CallbackMask::Unresolved |
       CallbackMask::After |
       CallbackMask::ParametersAndReturnValue,
@@ -198,11 +201,11 @@ void Application::initDebugging() {
   glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0, 
       GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Setting debugging related callbacks");
 
-  setUnresolvedCallback([](const AbstractFunction & f) {
+  glbinding::setUnresolvedCallback([](const glbinding::AbstractFunction & f) {
         cerr << "Unresolved API (" << f.name() << ") was called" << endl;
       });
 
-  setAfterCallback([this](const FunctionCall & call) {
+  glbinding::setAfterCallback([this](const glbinding::FunctionCall & call) {
         GLErrorCheck();
         if (this->traceP) {
           ostringstream s;
@@ -234,6 +237,7 @@ void Application::init(const string & title) {
 # if defined(_DEBUG)
   cerr << "App.Marker[Notify](0): Initialization of GLFW completed" << endl;
 # endif
+
   glbinding::Binding::initialize();
 # if defined(_DEBUG)
   cerr << "App.Marker[Notify](0): OpenGL API binding completed" << endl;
@@ -433,6 +437,14 @@ void Program::setUniform(const char *name, const vec3 &v) {
 
 void Program::setUniform(const char *name, float x, float y, float z) {
   glUniform3f(uniformLocation(name), x, y, z);
+}
+
+void Program::setUniform(const char *name, double x, double y, double z) {
+  glUniform3f(uniformLocation(name), (float)x, (float)y, (float)z);
+}
+
+void Program::setUniform(const char *name, const vec4 &v) {
+  glUniform4f(uniformLocation(name), v.x, v.y, v.z, v.w);
 }
 
 #define SET_UNIFORM_M(suffix, T) \

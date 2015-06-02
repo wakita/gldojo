@@ -21,9 +21,9 @@ using namespace std;
 #include <glbinding/Binding.h>
 #include <glbinding/gl43/gl.h>
 using namespace gl43;
-using namespace glbinding;
 
 #define GLM_EXT_INCLUDED
+#define GLM_FORCE_RADIANS
 #define GLM_FORCE_SIZE_FUNC // vec4.length() => vec4.size()
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
@@ -195,6 +195,7 @@ class Program {
     GLint uniformLocation(const char* name);
 
     void setUniform(const char * name, float x, float y, float z);
+    void setUniform(const char * name, double x, double y, double z);
     void setUniform(const char * name, const vec2 & v);
     void setUniform(const char * name, const vec3 & v);
     void setUniform(const char * name, const vec4 & v);
