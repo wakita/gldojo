@@ -52,40 +52,58 @@ message(STATUS "  GLFW:      ${GLFW3_LIBRARY}")
 message(STATUS "  glbinding: ${GLBINDING_LIBRARIES}")
 
 ######################################################################
+# The "smartnova" library
+
 add_library(smartnova sn/Program.cpp)
 target_link_libraries(smartnova ${gllibs})
 
-message(STATUS "GLFW_LIBRARIES =   ${GLFW_LIBRARY}")
-message(STATUS "OPENGL_LIBRARIES = ${OPENGL_LIBRARIES}")
-
-include_directories(sn)
-list(APPEND gllibs smartnova)
-
-foreach(X app glfw)
-  add_executable(${X} sn/test/${X}.cpp)
-  target_link_libraries(${X} ${gllibs})
-endforeach(X)
-
-######################################################################
 set(sblibs ${gllibs})
-foreach(N 02 03 04 05)
-  add_subdirectory(sb${N})
-endforeach(N)
+list(APPEND sblibs smartnova)
 
 ######################################################################
-include_directories(cb)
-set(glcblibs ${gllibs})
-list(APPEND glcblibs cb)
+# Utility
+
+set(ingredients ${gllibs})
 
 function(cook)
   foreach(X ${ARGV})
     add_executable(${chapter}${X} ${chapter}${X}.cpp)
-    target_link_libraries(${chapter}${X} ${glcblibs})
+    target_link_libraries(${chapter}${X} ${ingredients})
   endforeach(X)
 endfunction(cook)
 
-add_subdirectory(cb)
-forEach(N 01 02)
-  set(chapter cb${N})
-  add_subdirectory(cb${N})
-endForEach(N)
+function (cookall)
+  foreach(X ${ARGV})
+    set(chapter ${booktitle}${X})
+    add_subdirectory(${chapter})
+  endforeach(X)
+endfunction(cookall)
+
+######################################################################
+# Simple tests
+
+include_directories(sn)
+set(ingredients ${sblibs})
+
+foreach(X app glfw)
+  add_executable(${X} sn/test/${X}.cpp)
+  target_link_libraries(${X} ${ingredients})
+endforeach(X)
+
+######################################################################
+# OpenGL Superbible
+
+set(booktitle sb)
+set(ingredients ${sblibs})
+cookall(02 03 04 05)
+
+######################################################################
+# OpenGL Shader programming cookbook
+
+include_directories(cb00)
+set(glcblibs ${sblibs})
+list(APPEND glcblibs cb)
+
+set(booktitle cb)
+set(ingredients ${glcblibs})
+cookall(00 01 02)
