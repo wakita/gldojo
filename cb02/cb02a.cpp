@@ -11,7 +11,7 @@ using namespace smartnova::gl;
 
 class CB02A : public Application {
   virtual void init() {
-    Application::init("cb02a: Phon's ADS shading (Ambient, Diffuse, and Specular shading");
+    Application::init("cb02a: Phong's ADS shading (Ambient, Diffuse, and Specular shading");
   }
 
   Program program;
