@@ -19,7 +19,6 @@ using namespace std;
 #include <glbinding/callbacks.h>
 #include <glbinding/Meta.h>
 #include <glbinding/Binding.h>
-#include <glbinding/gl/types.h>
 #include <glbinding/gl43/gl.h>
 using namespace gl43;
 using namespace glbinding;
@@ -92,7 +91,6 @@ struct SNGL_APP_INFO {
 
 class Application {
   public:
-    virtual void init(const string & title);
     virtual void init() {}
     virtual void startup() = 0;
     virtual void render(double currentTime) = 0;
@@ -108,13 +106,20 @@ class Application {
 
     virtual void getCursorPos  (GLFWwindow *win, double & xpos, double & ypos);
 
-    virtual void onDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar &message);
-
   protected:
-    Application();
     SNGL_APP_INFO info;
     static Application *app;
     GLFWwindow *window = nullptr;
+
+    Application();
+    virtual void init(const string & title);
+    void notify(const string & message);
+    void setTrace(bool);
+
+  private:
+    void initGLFW();
+    void initDebugging();
+    bool traceP = false;
 };
 
 #define DECLARE_MAIN(APP)                         \
@@ -130,17 +135,6 @@ int main(int argc, const char ** argv) {          \
 }
 
 namespace Shader {
-  /*
-  const GLenum VS = GL_VERTEX_SHADER;
-  enum Type {
-    VS = GL_VERTEX_SHADER,
-    TCS = GL_TESS_CONTROL_SHADER,
-    TES = GL_TESS_EVALUATION_SHADER,
-    GS = GL_GEOMETRY_SHADER,
-    FS = GL_FRAGMENT_SHADER,
-    CS = GL_COMPUTE_SHADER };
-    */
-
   static map<string, GLenum> typeOfExt = map<string, GLenum>({
       { string(".vs"),   GL_VERTEX_SHADER },
       { string(".tcs"),  GL_TESS_CONTROL_SHADER },
@@ -157,12 +151,14 @@ namespace Shader {
   void throwOnShaderError(GLuint shader, GLenum pname, const string &path, const string & message);
 }
 
+/* glbinding が enum->char* の機能を提供しているので不要になった
 static map<GLenum, const char *> _type2Name =
 map<GLenum, const char *>({
     { GL_FLOAT, "float" }, { GL_FLOAT_VEC2, "vec2" }, { GL_FLOAT_VEC3, "vec3" },
     { GL_FLOAT_VEC4, "vec4" }, { GL_DOUBLE, "double" }, { GL_INT, "int" },
     { GL_UNSIGNED_INT, "unsigned int" }, { GL_BOOL, "bool" }, { GL_FLOAT_MAT2, "mat2" },
     { GL_FLOAT_MAT3, "mat3" }, { GL_FLOAT_MAT4, "mat4" } });
+*/
 
 class Program {
   private:

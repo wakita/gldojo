@@ -1,45 +1,13 @@
+#include <iomanip>
 #include <iostream>
 #include <fstream>
+#include <map>
+#include <sstream>
 
-//#define _DEBUG
+#define _DEBUG
 #include "Program.hpp"
 
 namespace smartnova { namespace gl {
-
-void traceAPICalls() {
-  setCallbackMask(CallbackMask::Unresolved | CallbackMask::BeforeAndAfter | CallbackMask::ParametersAndReturnValue);
-
-  setUnresolvedCallback([](const AbstractFunction & f) {
-        cerr << "Unresolved API (" << f.name() << ") was called" << endl;
-      });
-
-  setBeforeCallback([](const FunctionCall & call) {
-        cerr << ">>> " << call.function->name();
-      });
-
-  setAfterCallback([](const FunctionCall & call) {
-      cerr << "(";
-      for (unsigned i = 0; i < call.parameters.size(); ++i) {
-        cerr << call.parameters[i]->asString();
-        if (i < call.parameters.size() - 1) cerr << ", ";
-      }
-      cerr << ")" << endl;
-      });
-}
-
-void GLErrorCheck(string file, int line) {
-  GLenum err = glGetError();
-  if (err == GL_NO_ERROR) return;
-  cerr << "Error at line " << line << " in file " << file << ": " <<
-    (err == GL_INVALID_ENUM ? "Invalid enum value" :
-     err == GL_INVALID_VALUE ? "Invalid value" :
-     err == GL_INVALID_OPERATION ? "Invalid operation" :
-     err == GL_INVALID_FRAMEBUFFER_OPERATION ? "Invalid framebuffer operation" :
-     err == GL_OUT_OF_MEMORY ? "Out of memory" :
-     err == GL_STACK_UNDERFLOW ? "Stack underflow" :
-     err == GL_STACK_OVERFLOW ? "Stack overflow" :
-     "Unknown error") << endl;
-}
 
 Application *Application::app;
 
@@ -56,17 +24,11 @@ Application::Application() {
   info.flags.debug   = 1;
 }
 
-void Application::init(const string & title) {
-  app        = this;
-  info.title = title;
-
-  cerr << "Application::init [" << title << "]" << endl;
-
+void Application::initGLFW() {
   if (!glfwInit()) {
     cerr << "Failed to initialize GLFW" << endl;
     exit(EXIT_FAILURE);
   }
-  cerr << "glfwInit() done!" << endl;
 
   glfwSetErrorCallback([] (int error, const char* description) {
       cerr << "GLFW Error (" << error << "): " << description << endl; });
@@ -82,7 +44,6 @@ void Application::init(const string & title) {
   glfwWindowHint(GLFW_STEREO,                info.flags.stereo);
   glfwWindowHint(GLFW_VISIBLE,               info.flags.visible);
 # endif
-  cerr << "glfwWindowHints done!" << endl;
 
   GLFWmonitor *monitor = nullptr;
   int swapInterval = 1;
@@ -98,7 +59,6 @@ void Application::init(const string & title) {
     swapInterval = info.flags.vsync;
   }
 
-  cerr << "Trying to create a GLFW window...";
   if (!(window = glfwCreateWindow(
           info.winWidth, info.winHeight,
           info.title.c_str(),
@@ -107,19 +67,17 @@ void Application::init(const string & title) {
     glfwTerminate();
     exit(EXIT_FAILURE);
   }
-  cerr << "  done." << endl;
 
+# if defined(_DEBUG)
   Binding::addContextSwitchCallback([](ContextHandle handle) {
-      cerr << "Activating context " << handle << endl;
+      cerr << "OpenGL.Marker[Notify](0): Activating context (" << handle << ")" << endl;
       });
+# endif
 
-  cerr << "Initializing GLFW context...";
   glfwMakeContextCurrent(window);
-  cerr << "  done." << endl;
   // glfwSwapInterval(swapInterval);
 
-  cerr << "Registering callbacks...";
-  // Register various callbacks
+  // Callbacks
   glfwSetFramebufferSizeCallback(window,
       [] (GLFWwindow *win, int w, int h) {
       app->onFramebufferSize(win, w, h); });
@@ -138,13 +96,52 @@ void Application::init(const string & title) {
   glfwSetScrollCallback(window,
       [] (GLFWwindow *win, double xoffset, double yoffset) {
       app->onScroll(win, xoffset, yoffset); });
-  cerr << "  done." << endl;
 
   glfwSetInputMode(window, GLFW_CURSOR,
       info.flags.cursor ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+}
 
-  glbinding::Binding::initialize();
-# if defined(_DEBUG)
+void GLErrorCheck() {
+  GLenum err = glGetError();
+  if (err == GL_NO_ERROR) return;
+  cerr << "Error: " <<
+    (err == GL_INVALID_ENUM ? "Invalid enum value" :
+     err == GL_INVALID_VALUE ? "Invalid value" :
+     err == GL_INVALID_OPERATION ? "Invalid operation" :
+     err == GL_INVALID_FRAMEBUFFER_OPERATION ? "Invalid framebuffer operation" :
+     err == GL_OUT_OF_MEMORY ? "Out of memory" :
+     err == GL_STACK_UNDERFLOW ? "Stack underflow" :
+     err == GL_STACK_OVERFLOW ? "Stack overflow" :
+     "Unknown error") <<
+    endl;
+}
+
+void GLErrorCheck(string file, int line) {
+  GLenum err = glGetError();
+  if (err == GL_NO_ERROR) return;
+  cerr << "Error at line " << line << " in file " << file << ": " <<
+    (err == GL_INVALID_ENUM ? "Invalid enum value" :
+     err == GL_INVALID_VALUE ? "Invalid value" :
+     err == GL_INVALID_OPERATION ? "Invalid operation" :
+     err == GL_INVALID_FRAMEBUFFER_OPERATION ? "Invalid framebuffer operation" :
+     err == GL_OUT_OF_MEMORY ? "Out of memory" :
+     err == GL_STACK_UNDERFLOW ? "Stack underflow" :
+     err == GL_STACK_OVERFLOW ? "Stack overflow" :
+     "Unknown error") <<
+    endl;
+}
+
+void Application::setTrace(bool t) {
+  if (t != traceP) cerr << endl;
+  traceP = t;
+}
+
+void Application::notify(const string & message) {
+  glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0, 
+      GL_DEBUG_SEVERITY_NOTIFICATION, -1, message.c_str());
+}
+
+void Application::initDebugging() {
   cerr <<
     "OpenGL Version:  " << ContextInfo::version()  << endl <<
     "OpenGL Vendor:   " << ContextInfo::vendor()   << endl <<
@@ -152,30 +149,96 @@ void Application::init(const string & title) {
     "OpenGL Revision: " << Meta::glRevision() << " (gl.xml)" << endl <<
     "GLSL Version:    " << glGetString(GL_SHADING_LANGUAGE_VERSION) <<
     endl << endl;
-  // cerr << "Extention: " << glGetString(GL_EXTENSIONS) << endl;
   Check;
-# endif // _DEBUG
 
-# if defined(_DEBUG)
-  setCallbackMask(CallbackMask::Unresolved | CallbackMask::BeforeAndAfter | CallbackMask::ParametersAndReturnValue);
-  cerr << "Setting callbacks for unresolved API calls...  ";
+  glEnable(GL_DEBUG_OUTPUT);
+  glDebugMessageCallback([](GLenum source, GLenum type, GLuint id,
+        GLenum severity, GLsizei length, const GLchar *message, const void *userParam) {
+        const char *_source = "Unknown";
+        switch (source) {
+        case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   _source = "WinSys";         break;
+        case GL_DEBUG_SOURCE_APPLICATION:     _source = "App";            break;
+        case GL_DEBUG_SOURCE_API:             _source = "OpenGL";         break;
+        case GL_DEBUG_SOURCE_SHADER_COMPILER: _source = "ShaderCompiler"; break;
+        case GL_DEBUG_SOURCE_THIRD_PARTY:     _source = "3rdParty";       break;
+        case GL_DEBUG_SOURCE_OTHER:           _source = "Other";          break;
+        }
+        const char *_type = "Unknown";
+        switch (type) {
+        case GL_DEBUG_TYPE_ERROR:               _type = "Error";       break;
+        case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: _type = "Deprecated";  break;
+        case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  _type = "Undefined";   break;
+        case GL_DEBUG_TYPE_PORTABILITY:         _type = "Portability"; break;
+        case GL_DEBUG_TYPE_PERFORMANCE:         _type = "Performance"; break;
+        case GL_DEBUG_TYPE_MARKER:              _type = "Marker";      break;
+        case GL_DEBUG_TYPE_PUSH_GROUP:          _type = "PushGrp";     break;
+        case GL_DEBUG_TYPE_POP_GROUP:           _type = "PopGrp";      break;
+        case GL_DEBUG_TYPE_OTHER:               _type = "Other";       break;
+        }
+        const char *_severity = "Unknown";
+        switch (severity) {
+          case GL_DEBUG_SEVERITY_HIGH:         _severity = "High";   break;
+          case GL_DEBUG_SEVERITY_MEDIUM:       _severity = "Med";    break;
+          case GL_DEBUG_SEVERITY_LOW:          _severity = "Low";    break;
+          case GL_DEBUG_SEVERITY_NOTIFICATION: _severity = "Notify"; break;
+        }
+        cout << _source << "." << _type << "[" << _severity << "](" <<
+        id << "): " << message << endl;
+      }, nullptr);
+  glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+  glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0, 
+      GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Start debugging");
+
+  setCallbackMaskExcept(
+      CallbackMask::Unresolved |
+      CallbackMask::After |
+      CallbackMask::ParametersAndReturnValue,
+      { "glGetError", "glDebugMessageInsert" });
+
+  glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0, 
+      GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Setting debugging related callbacks");
+
   setUnresolvedCallback([](const AbstractFunction & f) {
-      cerr << "Unresolved API (" << f.name() << ") was called" << endl;
+        cerr << "Unresolved API (" << f.name() << ") was called" << endl;
       });
-  cerr << "Setting before&after callbacks for API calls...  ";
-  setBeforeCallback([](const FunctionCall & call) {
-      cerr << ">>> " << call.function->name();
+
+  setAfterCallback([this](const FunctionCall & call) {
+        GLErrorCheck();
+        if (this->traceP) {
+          ostringstream s;
+          s << call.function->name() << "(";
+          for (unsigned i = 0; i < call.parameters.size(); ++i) {
+            s << call.parameters[i]->asString();
+            if (i < call.parameters.size() - 1) s << ", ";
+          }
+          s << ") => " << call.returnValue;
+          glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0, 
+            GL_DEBUG_SEVERITY_NOTIFICATION, -1, s.str().c_str());
+        }
       });
-  setAfterCallback([](const FunctionCall & call) {
-      cerr << "(";
-      for (unsigned i = 0; i < call.parameters.size(); ++i) {
-        cerr << call.parameters[i]->asString();
-        if (i < call.parameters.size() - 1) cerr << ", ";
-      }
-      cerr << ")" << endl;
-      });
-  cerr << "done." << endl;
   Check;
+
+  glfwSetErrorCallback([] (int error, const char* description) {
+      ostringstream s;
+      s << "GFLW error (" << error << "): " << description;
+      glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0, 
+      GL_DEBUG_SEVERITY_NOTIFICATION, -1, s.str().c_str());
+  });
+}
+
+void Application::init(const string & title) {
+  app        = this;
+  info.title = title;
+
+  initGLFW();
+# if defined(_DEBUG)
+  cerr << "App.Marker[Notify](0): Initialization of GLFW completed" << endl;
+# endif
+  glbinding::Binding::initialize();
+# if defined(_DEBUG)
+  cerr << "App.Marker[Notify](0): OpenGL API binding completed" << endl;
+
+  initDebugging();
 # endif
 }
 
@@ -218,7 +281,11 @@ void Application::onScroll(GLFWwindow *win, double xoffset, double yoffset) {}
 
 void Application::getCursorPos(GLFWwindow *window, double &xpos, double &ypos) {}
 
-void Application::onDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar &message) {}
+/*
+void Application::onDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar &message) {
+  cerr << source << ":" << type << "[" << severity << "](" << id << "): " << message << endl;
+}
+*/
 
 // Bug: Extract the extension!
 static GLenum Shader::typeOf(const string &path) {
@@ -402,6 +469,7 @@ void Program::printActiveUniforms() {
     cout << results[2] << " " << name << " " << getTypeString(results[1]) << endl;
     delete [] name;
   }
+  cout << endl;
 }
 
 void Program::printActiveUniformBlocks() {
@@ -439,25 +507,27 @@ void Program::printActiveUniformBlocks() {
 
     delete [] unifIndexes;
   }
+  cout << endl;
 }
 
 void Program::printActiveAttribs() {
   GLint numAttribs;
-  glGetProgramInterfaceiv( handle, GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES, &numAttribs);
+  glGetProgramInterfaceiv(handle, GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES, &numAttribs);
 
-  GLenum properties[] = {GL_NAME_LENGTH, GL_TYPE, GL_LOCATION};
+  GLenum properties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION };
 
   printf("Active attributes:\n");
-  for( int i = 0; i < numAttribs; ++i ) {
+  for (int i = 0; i < numAttribs; ++i) {
     GLint results[3];
     glGetProgramResourceiv(handle, GL_PROGRAM_INPUT, i, 3, properties, 3, nullptr, results);
 
     GLint nameBufSize = results[0] + 1;
     char *name = new char[nameBufSize];
     glGetProgramResourceName(handle, GL_PROGRAM_INPUT, i, nameBufSize, nullptr, name);
-    cout << results[2] << " " << name << " (" << getTypeString(results[1]) << ")" << endl;
+    cout << setw(5) << showpos << left << results[2] << name << " (" << getTypeString(results[1]) << ")" << endl;
     delete [] name;
   }
+  cout << endl;
 }
 
 void Program::validate() throw (ProgramException) {
