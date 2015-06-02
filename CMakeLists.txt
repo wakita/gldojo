@@ -20,6 +20,8 @@ else()
   set(BUILD_SHARED_LIBS ON)
 endif()
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 set(CMAKE_BUILD_TYPE Debug)
 add_definitions(-std=c++11)
 add_definitions("-DOS_${CMAKE_SYSTEM_NAME}")
@@ -65,24 +67,25 @@ foreach(X app glfw)
 endforeach(X)
 
 ######################################################################
-set(SBSRC
-    sb02a sb02b sb02c
-    sb03a sb03b sb03c sb03d sb03e sb03f sb03g
-    sb04
-    sb05a sb05b sb05c sb05d sb05e sb05f sb05f1 sb05g
-    )
-
-foreach(X ${SBSRC})
-  add_executable(${X} sb/${X}.cpp)
-  target_link_libraries(${X} smartnova ${COMMON_LIBS})
-endforeach(X)
+set(sblibs ${gllibs})
+foreach(N 02 03 04 05)
+  add_subdirectory(sb${N})
+endforeach(N)
 
 ######################################################################
-# add_subdirectory(cb)
+include_directories(cb)
+set(glcblibs ${gllibs})
+list(APPEND glcblibs cb)
 
-#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/cb)
-#
-#foreach(X cb02a)
-#  add_executable(${X} cb/cb02/${X}.cpp)
-#  target_link_libraries(${X} smartnova ${COMMON_LIBS})
-#endforeach(X)
+function(cook)
+  foreach(X ${ARGV})
+    add_executable(${chapter}${X} ${chapter}${X}.cpp)
+    target_link_libraries(${chapter}${X} ${glcblibs})
+  endforeach(X)
+endfunction(cook)
+
+add_subdirectory(cb)
+forEach(N 01 02)
+  set(chapter cb${N})
+  add_subdirectory(cb${N})
+endForEach(N)

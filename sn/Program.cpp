@@ -136,6 +136,21 @@ void Application::setTrace(bool t) {
   traceP = t;
 }
 
+
+const int SAMPLES = 50;
+int renderedFrames = 0;
+double renderingTime = 0;
+
+void Application::showFPS(double t) {
+  if (renderedFrames++ % SAMPLES == 0) {
+    ostringstream s;
+    s.precision(4);
+    s << info.title << " (fps: " << (SAMPLES / (t - renderingTime)) << ")";
+    glfwSetWindowTitle(window, s.str().c_str());
+    renderingTime = t;
+  }
+}
+
 void Application::notify(const string & message) {
   glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0, 
       GL_DEBUG_SEVERITY_NOTIFICATION, -1, message.c_str());

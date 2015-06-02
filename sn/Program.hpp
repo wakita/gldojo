@@ -115,6 +115,7 @@ class Application {
     virtual void init(const string & title);
     void notify(const string & message);
     void setTrace(bool);
+    void showFPS(double t);
 
   private:
     void initGLFW();
