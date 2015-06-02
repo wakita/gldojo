@@ -28,7 +28,8 @@ class CB01D : public Application {
     program.printActiveAttribs();
 
     // Create and set-up the vertex array object
-    GLuint vao; glGenVertexArrays(1, &vao);
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
     GLuint vbo[N_VBO];
@@ -59,7 +60,6 @@ class CB01D : public Application {
     mat4 rotationMatrix = glm::rotate(mat4(1.f), (float)t, vec3(0.f, 0.f, 1.f));
     glUniformMatrix4fv(locRotationMatrix, 1, GL_FALSE, &rotationMatrix[0][0]);
 
-    glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, 3);
   }
 };
