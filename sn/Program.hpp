@@ -22,6 +22,7 @@ using namespace std;
 #include <glbinding/gl43/gl.h>
 using namespace gl43;
 
+#define GLM_FORCE_CXX11
 #define GLM_EXT_INCLUDED
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_SIZE_FUNC // vec4.length() => vec4.size()
