@@ -106,7 +106,7 @@ class Chapter05E : public Application {
     cout << endl;
 
     program1.load("sb05/sb05e1", vector<string> { "vs" });
-    program2.load("ssb05/b05e2", vector<string> { "vs" });
+    program2.load("sb05/sb05e2", vector<string> { "vs" });
 
     cout << "Analyzing uniform block structure in [std140] layout" << endl;
     setValuesToProgram(program1);
