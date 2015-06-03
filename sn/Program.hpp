@@ -111,6 +111,7 @@ class Application {
     SNGL_APP_INFO info;
     static Application *app;
     GLFWwindow *window = nullptr;
+    mat4 Projection;
 
     Application();
     virtual void init(const string & title);
@@ -203,7 +204,8 @@ class Program {
     void setUniform(const char * name, const vec4 & v);
     void setUniform(const char * name, const mat3 & m);
     void setUniform(const char * name, const mat4 & m);
-    void setUniform(const char * name, float val);
+    void setUniform(const char * name, double x);
+    void setUniform(const char * name, float x);
     void setUniform(const char * name, int x);
     void setUniform(const char * name, bool x);
     void setUniform(const char * name, GLuint x);

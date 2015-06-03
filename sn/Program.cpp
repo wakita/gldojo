@@ -273,6 +273,8 @@ void Application::run() {
   init();
   startup();
 
+  onResize(window, info.winWidth, info.winHeight);
+
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
     double t = glfwGetTime();
@@ -288,8 +290,12 @@ void Application::onFramebufferSize(GLFWwindow *win, int w, int h) {
   onResize(win, w, h);
 }
 
+mat4 Projection(1);
+
 void Application::onResize(GLFWwindow *win, int w, int h) {
   info.winWidth = w; info.winHeight = h;
+  glViewport(0, 0, w, h);
+  Projection = glm::perspective(glm::radians(70.0f), (float)w/h, 0.3f, 100.0f);
 }
 
 void Application::onKey(GLFWwindow *win, int key, int scancode, int action, int mods) {
@@ -474,6 +480,10 @@ void Program::setUniform(const char *name, const vec4 &v) {
 SET_UNIFORM_M(3fv, mat3)
 SET_UNIFORM_M(4fv, mat4)
 
+void Program::setUniform(const char *name, const double x) {
+  glUniform1f(uniformLocation(name), (float)x);
+}
+
 #define SET_UNIFORM(suffix, T) \
 void Program::setUniform(const char *name, const T x) { \
   glUniform##suffix(uniformLocation(name), x); \
@@ -482,7 +492,7 @@ void Program::setUniform(const char *name, const T x) { \
 SET_UNIFORM(1f,  float)
 SET_UNIFORM(1i,  int)
 SET_UNIFORM(1ui, GLuint)
-SET_UNIFORM(1i, bool)
+SET_UNIFORM(1i,  bool)
 
 void Program::printActiveUniforms() {
   GLint numUniforms = 0;
