@@ -137,17 +137,19 @@ void Application::setTrace(bool t) {
 }
 
 
-const int SAMPLES = 50;
+const double MeasurementTime = 0.5;
 int renderedFrames = 0;
-double renderingTime = 0;
+double dueTime = -1;
 
 void Application::showFPS(double t) {
-  if (renderedFrames++ % SAMPLES == 0) {
+  renderedFrames++;
+  if (t > dueTime) {
     ostringstream s;
-    s.precision(4);
-    s << info.title << " (fps: " << (SAMPLES / (t - renderingTime)) << ")";
+    s << info.title << " (fps: " << (int)(renderedFrames / MeasurementTime) << ")";
     glfwSetWindowTitle(window, s.str().c_str());
-    renderingTime = t;
+
+    renderedFrames = 0;
+    dueTime = t + MeasurementTime;
   }
 }
 
@@ -273,7 +275,9 @@ void Application::run() {
 
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
-    render(glfwGetTime());
+    double t = glfwGetTime();
+    render(t);
+    showFPS(t);
     glfwSwapBuffers(window);
   }
   shutdown();

@@ -24,17 +24,18 @@ class CB02C : public Application {
 
     shape = new VBOTeapot(13, mat4(1.f));
 
-    program.setUniform("Light.Ld",    1.f, 1.f, 1.f);
-    program.setUniform("Light.La",    .4f, .4f, .4f);
-    program.setUniform("Light.Ls",    1.f, 1.f, 1.f);
-    program.setUniform("Material.Kd", .9f, .5f, .3f);
-    program.setUniform("Material.Ka", .9f, .5f, .3f);
-    program.setUniform("Material.Ks", .8f, .8f, .8f);
-    program.setUniform("Material.Shininess", 100.f);
+    program.setUniform("Light.Ld",       1.f, 1.f, 1.f);
+    program.setUniform("Light.La",       .4f, .4f, .4f);
+    program.setUniform("Light.Ls",       1.f, 1.f, 1.f);
     program.setUniform("Light.Position", vec4(0.f, 0.f, 0.f, 1.f));
 
+    program.setUniform("Material.Kd",        .9f, .5f, .3f);
+    program.setUniform("Material.Ka",        .9f, .5f, .3f);
+    program.setUniform("Material.Ks",        .8f, .8f, .8f);
+    program.setUniform("Material.Shininess", 100.f);
+
     program.setUniform("ModelViewMatrix", MV);
-    program.setUniform("NormalMatrix", mat3(vec3(MV[0]), vec3(MV[1]), vec3(MV[2])));
+    program.setUniform("NormalMatrix",    mat3(vec3(MV[0]), vec3(MV[1]), vec3(MV[2])));
 
     glEnable(GL_DEPTH_TEST);
 
@@ -55,8 +56,6 @@ class CB02C : public Application {
     program.setUniform("MVP", Projection * MV);
 
     shape->render();
-
-    showFPS(t);
   }
 };
 

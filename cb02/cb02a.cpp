@@ -67,8 +67,6 @@ class CB02A : public Application {
     program.setUniform("MVP", Projection * MV);
 
     torus->render();
-
-    showFPS(t);
   }
 };
 
