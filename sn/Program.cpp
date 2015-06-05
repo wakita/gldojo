@@ -13,7 +13,6 @@ Application *Application::app;
 
 Application::Application() {
   info.winWidth      = 800;
-  info.winWidth      = 800;
   info.winHeight     = 600;
   info.majorVersion  = 4;
   info.minorVersion  = 1;
@@ -51,11 +50,9 @@ void Application::initGLFW() {
     int monitor_count;
     GLFWmonitor**monitors = glfwGetMonitors(&monitor_count);
     monitor = monitors[0];
-    if (info.winWidth == 0 || info.winHeight == 0) {
-      const GLFWvidmode *videoMode = glfwGetVideoMode(monitor);
-      info.winWidth  = videoMode->width;
-      info.winHeight = videoMode->height;
-    }
+    const GLFWvidmode *videoMode = glfwGetVideoMode(monitor);
+    info.winWidth  = videoMode->width;
+    info.winHeight = videoMode->height;
     swapInterval = info.flags.vsync;
   }
 
