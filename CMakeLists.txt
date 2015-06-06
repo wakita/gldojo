@@ -33,8 +33,8 @@ endif()
 
 find_package(OpenGL)
 find_package(glfw3)
-#find_package(PkgConfig REQUIRED)
-#pkg_search_module(GLFW REQUIRED glfw3)
+find_package(PkgConfig REQUIRED)
+#pkg_search_module(TCLAP REQUIRED tclap)
 include_directories(${GLFW3_INCLUDE_DIR})
 set(gllibs ${GLFW3_LIBRARY} ${OPENGL_LIBRARIES})
 
@@ -44,12 +44,30 @@ list(APPEND gllibs ${GLBINDING_LIBRARIES} ${OPENGL_LIBRARIES})
 
 message(STATUS "Includes:")
 message(STATUS "  GLFW:      ${GLFW3_INCLUDE_DIR}")
-message(STATUS "  glbinding: ${GLBINDING_INCLUDES}\n")
+message(STATUS "  glbinding: ${GLBINDING_INCLUDES}")
+message(STATUS "  tclap:     ${TCLAP_INCLUDE_DIRS}\n")
 
 message(STATUS "Libraries:")
 message(STATUS "  OpenGL:    ${OPENGL_LIBRARIES}")
 message(STATUS "  GLFW:      ${GLFW3_LIBRARY}")
 message(STATUS "  glbinding: ${GLBINDING_LIBRARIES}")
+
+######################################################################
+# The TCLAP header-only library
+
+# include_directories(${TCLAP_INCLUDE_DIRS})
+
+######################################################################
+# The json11 library
+
+add_subdirectory(others/json11)
+include_directories(others/json11)
+link_directories(others/json11)
+
+######################################################################
+# Test
+
+add_subdirectory(test)
 
 ######################################################################
 # The "smartnova" library
