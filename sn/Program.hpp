@@ -1,8 +1,5 @@
 #pragma once
 
-# ifndef SMARTNOVA_GL_PROGRAM_HPP
-# define SMARTNOVA_GL_PROGRAM_HPP
-
 #include <exception>
 #include <iostream>
 #include <map>
@@ -46,13 +43,21 @@ static const float PI = glm::pi<float>();
 static const vec3 X = vec3(1, 0, 0), Y = vec3(0, 1, 0), Z = vec3(0, 0, 1);
 static const mat4 I4 = mat4(1);
 
+#include <json11.hpp>
+
 # ifdef _DEBUG
 #   define Check smartnova::gl::GLErrorCheck(__FILE__, __LINE__)
 # else
 #   define Check
 # endif
 
-namespace smartnova { namespace gl {
+#include "Utility.hpp"
+
+using smartnova::util::ProgramException;
+
+namespace smartnova {
+  
+  namespace gl {
 
 void GLErrorCheck(string file, int line);
 
@@ -62,13 +67,6 @@ class ShaderException : public runtime_error {
   public:
     ShaderException(const string & msg) : runtime_error(msg) {}
     ShaderException(const string & path, const string & msg) :
-      runtime_error("\"" + path + "\": " + msg) {}
-};
-
-class ProgramException : public runtime_error {
-  public:
-    ProgramException(const string & msg) : runtime_error(msg) {}
-    ProgramException(const string & path, const string & msg) :
       runtime_error("\"" + path + "\": " + msg) {}
 };
 
@@ -154,15 +152,6 @@ namespace Shader {
   void throwOnShaderError(GLuint shader, GLenum pname, const string &path, const string & message);
 }
 
-/* glbinding が enum->char* の機能を提供しているので不要になった
-static map<GLenum, const char *> _type2Name =
-map<GLenum, const char *>({
-    { GL_FLOAT, "float" }, { GL_FLOAT_VEC2, "vec2" }, { GL_FLOAT_VEC3, "vec3" },
-    { GL_FLOAT_VEC4, "vec4" }, { GL_DOUBLE, "double" }, { GL_INT, "int" },
-    { GL_UNSIGNED_INT, "unsigned int" }, { GL_BOOL, "bool" }, { GL_FLOAT_MAT2, "mat2" },
-    { GL_FLOAT_MAT3, "mat3" }, { GL_FLOAT_MAT4, "mat4" } });
-*/
-
 class Program {
   private:
     GLuint handle;
@@ -210,6 +199,9 @@ class Program {
     void setUniform(const char * name, bool x);
     void setUniform(const char * name, GLuint x);
 
+    void setUniform(const string &name, const string &type, json11::Json&x);
+    void setUniformBlock(const string &name, json11::Json &x);
+
     void printActiveUniforms();
     void printActiveUniformBlocks();
     void printActiveAttribs();
@@ -217,5 +209,3 @@ class Program {
 
 const char * getTypeString(GLint type);
 } } // namespace smartnova::gl
-
-#endif

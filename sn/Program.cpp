@@ -5,6 +5,7 @@
 #include <sstream>
 
 #define _DEBUG
+#include "Utility.hpp"
 #include "Program.hpp"
 
 namespace smartnova { namespace gl {
