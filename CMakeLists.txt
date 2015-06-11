@@ -36,11 +36,10 @@ find_package(glfw3)
 find_package(PkgConfig REQUIRED)
 #pkg_search_module(TCLAP REQUIRED tclap)
 include_directories(${GLFW3_INCLUDE_DIR})
-set(gllibs ${GLFW3_LIBRARY} ${OPENGL_LIBRARIES})
-
 find_package(glbinding REQUIRED)
 include_directories(${GLBINDING_INCLUDES})
-list(APPEND gllibs ${GLBINDING_LIBRARIES} ${OPENGL_LIBRARIES})
+
+set(gllibs ${GLFW3_LIBRARY} ${OPENGL_LIBRARIES} ${GLBINDING_LIBRARIES} ${OPENGL_LIBRARIES})
 
 message(STATUS "Includes:")
 message(STATUS "  GLFW:      ${GLFW3_INCLUDE_DIR}")
@@ -76,8 +75,7 @@ add_subdirectory(sn)
 include_directories(sn)
 link_directories(sn)
 
-set(sblibs ${gllibs})
-list(APPEND sblibs smartnova)
+set(sblibs ${gllibs} smartnova)
 
 ######################################################################
 # Utility
@@ -117,8 +115,7 @@ cookall(02 03 04 05)
 # OpenGL Shader programming cookbook
 
 include_directories(cb00)
-set(glcblibs ${sblibs})
-list(APPEND glcblibs cb)
+set(glcblibs ${sblibs} cb)
 
 set(booktitle cb)
 set(ingredients ${glcblibs})
