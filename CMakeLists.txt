@@ -72,16 +72,15 @@ add_subdirectory(test)
 ######################################################################
 # The "smartnova" library
 
-add_library(smartnova sn/Program.cpp)
-target_link_libraries(smartnova ${gllibs})
+add_subdirectory(sn)
+include_directories(sn)
+link_directories(sn)
 
 set(sblibs ${gllibs})
 list(APPEND sblibs smartnova)
 
 ######################################################################
 # Utility
-
-set(ingredients ${gllibs})
 
 function(cook)
   foreach(X ${ARGV})
@@ -100,7 +99,6 @@ endfunction(cookall)
 ######################################################################
 # Simple tests
 
-include_directories(sn)
 set(ingredients ${sblibs})
 
 foreach(X app glfw)

@@ -402,11 +402,14 @@ void Program::compile(const string &source, GLenum type, const string &path)
 
 void Program::compile(const string &path, GLenum type)
   throw (ProgramException) {
+    /*
     ifstream f(path.c_str());
     if (!f) throw ProgramException(path, "Unable to open a shader (" + path + ")");
     string code((istreambuf_iterator<char>(f)), istreambuf_iterator<char>());
 
     compile(code, type, path);
+    */
+    compile(smartnova::util::readFile(path), type, path);
   }
 
 void Program::compile(const string &path)
