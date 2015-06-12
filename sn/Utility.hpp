@@ -18,4 +18,7 @@ std::string readFile(const std::string &path)
 json11::Json readJSON(const std::string &path)
   throw (ProgramException);
 
+json11::Json readConfig(const std::string &name)
+  throw (ProgramException);
+
 } }

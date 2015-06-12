@@ -18,4 +18,11 @@ json11::Json readJSON(const std::string &path)
     return x;
   }
 
+json11::Json readConfig(const std::string &name)
+  throw (ProgramException) {
+    const char *dir = getenv("CONFIG_DIR");
+    const std::string base(dir ? dir : "config");
+    return readJSON(base + "/" + name + ".json");
+  }
+
 } }
