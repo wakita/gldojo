@@ -63,7 +63,7 @@ namespace smartnova {
 
 void GLErrorCheck(string file, int line);
 
-void traceAPICalls();
+// void traceAPICalls();
 
 class ShaderException : public runtime_error {
   public:
@@ -204,8 +204,9 @@ class Program {
 
     GLint uniformLocation(const char* name);
 
-    void setUniform(UniformSpec spec, json11::Json x);
-    void setUniformBlock(const string &block, json11::Json &x);
+    void setUniform(const string &spec, const json11::Json &x);
+    void setUniforms(const string &name, const json11::Json &x);
+    void setUniformBlock(const string &block, const json11::Json &x);
 
     void setUniform(const char * name, float x, float y, float z);
     void setUniform(const char * name, double x, double y, double z);

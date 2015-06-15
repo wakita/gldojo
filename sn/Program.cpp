@@ -170,6 +170,8 @@ void Application::initDebugging() {
   glEnable(GL_DEBUG_OUTPUT);
   glDebugMessageCallback([](GLenum source, GLenum type, GLuint id,
         GLenum severity, GLsizei length, const GLchar *message, const void *userParam) {
+
+#       pragma GCC diagnostic ignored "-Wswitch"
         const char *_source = "Unknown";
         switch (source) {
         case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   _source = "WinSys";         break;
@@ -198,6 +200,7 @@ void Application::initDebugging() {
           case GL_DEBUG_SEVERITY_LOW:          _severity = "Low";    break;
           case GL_DEBUG_SEVERITY_NOTIFICATION: _severity = "Notify"; break;
         }
+#       pragma GCC diagnostic warning "-Wswitch"
         cout << _source << "." << _type << "[" << _severity << "](" <<
         id << "): " << message << endl;
       }, nullptr);
@@ -499,10 +502,40 @@ SET_UNIFORM(1i,  int)
 SET_UNIFORM(1ui, GLuint)
 SET_UNIFORM(1i,  bool)
 
-void Program::setUniform(UniformSpec spec, Json x) {
+#define FV(x) ((GLfloat)(x.number_value()))
+
+void Program::setUniform(const string &name, const json11::Json &x) {
+  UniformSpec *spec = uniforms[name].get();
+  GLuint loc = spec->location;
+  const char *name_ = name.c_str();
+# pragma GCC diagnostic ignored "-Wswitch"
+  switch (spec->type) {
+    case GL_FLOAT:
+      glUniform1f(loc, (GLfloat)x.number_value());
+      break;
+    case GL_FLOAT_VEC3:
+      {
+        auto v = x.array_items();
+        glUniform3f(loc, FV(v[0]), FV(v[1]), FV(v[2]));
+      }
+      break;
+    case GL_FLOAT_VEC4:
+      {
+        auto v = x.array_items();
+        glUniform4f(loc, FV(v[0]), FV(v[1]), FV(v[2]), FV(v[3]));
+      }
+      break;
+  }
+# pragma GCC diagnostic warning "-Wswitch"
 }
 
-void Program::setUniformBlock(const string &block, Json &x) {
+void Program::setUniforms(const string &name, const json11::Json &x) {
+  for (const auto &kv : x.object_items()) {
+    setUniform(name + "." + kv.first, kv.second);
+  }
+}
+
+void Program::setUniformBlock(const string &block, const json11::Json &x) {
 }
 
 void Program::analyzeActiveUniforms() {

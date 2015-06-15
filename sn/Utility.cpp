@@ -25,4 +25,16 @@ json11::Json readConfig(const std::string &name)
     return readJSON(base + "/" + name + ".json");
   }
 
+#define FV(v, i) ((gl43::GLfloat)(v)[i].number_value())
+
+glm::vec3 vec3(const json11::Json &x) {
+  json11::Json::array v = x.array_items();
+  return glm::vec3(FV(v, 0), FV(v, 1), FV(v, 2));
+}
+
+glm::vec4 vec4(const json11::Json &x) {
+  json11::Json::array v = x.array_items();
+  return glm::vec4(FV(v, 0), FV(v, 1), FV(v, 2), FV(v, 3));
+}
+
 } }

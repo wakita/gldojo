@@ -24,6 +24,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 set(CMAKE_BUILD_TYPE Debug)
 add_definitions(-std=c++11)
+add_definitions(-Wswitch)
 add_definitions("-DOS_${CMAKE_SYSTEM_NAME}")
 add_definitions("-DSYSTEM_NAME=\"${CMAKE_SYSTEM_NAME}\"")
 
