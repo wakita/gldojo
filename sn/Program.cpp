@@ -1,12 +1,12 @@
 #include <iomanip>
-#include <iostream>
 #include <fstream>
-#include <map>
 #include <sstream>
 
 #define _DEBUG
 #include "Utility.hpp"
 #include "Program.hpp"
+
+using json11::Json;
 
 namespace smartnova { namespace gl {
 
@@ -314,6 +314,12 @@ void Application::onDebugMessage(GLenum source, GLenum type, GLuint id, GLenum s
 }
 */
 
+UniformSpec::UniformSpec(string _name, GLenum _type, GLint _location) {
+  name = _name;
+  type = _type;
+  location = _location;
+}
+
 // Bug: Extract the extension!
 static GLenum Shader::typeOf(const string &path) {
   const string::size_type i = path.rfind('.');
@@ -328,7 +334,7 @@ void Shader::throwOnShaderError(GLuint shader, GLenum pname, const string &messa
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
     string log;
     if (length > 0) {
-      char *_log = new char[length];
+      GLchar* _log = new GLchar[length];
       int written = 0;
       glGetShaderInfoLog(shader, length, &written, _log);
       log = _log;
@@ -348,11 +354,10 @@ void Program::throwOnProgramError(GLenum pname, const string &message) {
     glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &length);
     string log;
     if (length > 0) {
-      char *_log = new char[length];
+      GLchar* _log = new GLchar[length];
       int written = 0;
       glGetProgramInfoLog(handle, length, &written, _log);
       log = _log;
-      delete [] _log;
     } else {
       log = "No further error information available, sorry.";
     }
@@ -373,12 +378,11 @@ Program::~Program() {
   GLint nShaders = 0;
   glGetProgramiv(handle, GL_ATTACHED_SHADERS, &nShaders);
 
-  GLuint *shaderNames = new GLuint[nShaders];
-  glGetAttachedShaders(handle, nShaders, nullptr, shaderNames);
+  std::unique_ptr<GLuint> shaderNames(new GLuint[nShaders]);
+  glGetAttachedShaders(handle, nShaders, nullptr, shaderNames.get());
 
-  for (int i = 0; i < nShaders; i++) glDeleteShader(shaderNames[i]);
+  for (int i = 0; i < nShaders; i++) glDeleteShader(shaderNames.get()[i]);
   glDeleteProgram(handle);
-  delete[] shaderNames;
 }
 
 void Program::compile(const string &source, GLenum type, const string &path)
@@ -402,13 +406,6 @@ void Program::compile(const string &source, GLenum type, const string &path)
 
 void Program::compile(const string &path, GLenum type)
   throw (ProgramException) {
-    /*
-    ifstream f(path.c_str());
-    if (!f) throw ProgramException(path, "Unable to open a shader (" + path + ")");
-    string code((istreambuf_iterator<char>(f)), istreambuf_iterator<char>());
-
-    compile(code, type, path);
-    */
     compile(smartnova::util::readFile(path), type, path);
   }
 
@@ -420,10 +417,17 @@ void Program::compile(const string &path)
 void Program::load(const string &stem, vector<string> exts)
   throw (ProgramException) {
   const char *dir = getenv("SHADERS_DIR");
-  const string base(dir ? dir : "shaders");
+  const string base(dir ? dir : ".");
   for (const auto ext : exts)
     Program::compile(base + "/" + stem + "." + ext);
   Program::link();
+
+  analyzeActiveUniforms();
+  analyzeActiveUniformBlocks();
+# if defined(_DEBUG)
+    printActiveUniformBlocks();
+    printActiveUniforms();
+# endif
 }
 
 void Program::link() throw (ProgramException) {
@@ -495,61 +499,59 @@ SET_UNIFORM(1i,  int)
 SET_UNIFORM(1ui, GLuint)
 SET_UNIFORM(1i,  bool)
 
-void Program::printActiveUniforms() {
+void Program::setUniform(UniformSpec spec, Json x) {
+}
+
+void Program::setUniformBlock(const string &block, Json &x) {
+}
+
+void Program::analyzeActiveUniforms() {
   GLint numUniforms = 0;
   glGetProgramInterfaceiv(handle, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms);
-
-  GLenum properties[] = {GL_NAME_LENGTH, GL_TYPE, GL_LOCATION, GL_BLOCK_INDEX};
-  cout << "Active uniforms:" << endl;
-  for (int i = 0; i < numUniforms; ++i) {
-    GLint results[4];
-    glGetProgramResourceiv(handle, GL_UNIFORM, i, 4, properties, 4, nullptr, results);
-    if (results[3] != -1) continue;
-    GLint nameBufSize = results[0] + 1;
-    char *name = new char[nameBufSize];
-    glGetProgramResourceName(handle, GL_UNIFORM, i, nameBufSize, nullptr, name);
-    cout << results[2] << " " << name << " " << getTypeString(results[1]) << endl;
-    delete [] name;
+  GLenum properties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION, GL_BLOCK_INDEX };
+  GLint info[sizeof(properties)/sizeof(GLenum)];
+  for (int i = 0; i < numUniforms; i++) {
+    glGetProgramResourceiv(handle, GL_UNIFORM, i, 4, properties, 4, nullptr, info);
+    if (info[3] != -1) continue;
+    GLint s = info[0] + 1;
+    char *name_ = new char[s];
+    glGetProgramResourceName(handle, GL_UNIFORM, i, s, nullptr, name_);
+    string name(name_); delete[] name_;
+    std::unique_ptr<UniformSpec> us(new UniformSpec(name, (GLenum)info[1], info[2]));
+    uniforms[name] = std::move(us);
   }
-  cout << endl;
+}
+
+void Program::printActiveUniforms() {
+  cout << "Active uniforms:" << endl;
+  for (auto it = begin(uniforms); it != end(uniforms); it++) {
+    UniformSpec *spec = it->second.get();
+    cout << "    " << spec->name << "(" << spec->type << ")@" << spec->location << endl;
+  }
+}
+
+void Program::analyzeActiveUniformBlocks() {
+  GLint nBlocks = 0;
+  glGetProgramInterfaceiv(handle, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, &nBlocks);
+  cerr << "#active uniform blocks = " << nBlocks << endl;
+
+  GLenum properties[] = { GL_NAME_LENGTH };
+  GLenum indices[] = { GL_ACTIVE_VARIABLES };
+  for (int b = 0; b < nBlocks; b++) {
+    GLint info[sizeof(properties)/sizeof(GLenum)];
+    glGetProgramResourceiv(handle, GL_UNIFORM_BLOCK, b, 1, properties, 1, nullptr, info);
+    char *name_ = new char[info[0] + 1];
+    glGetProgramResourceName(handle, GL_UNIFORM_BLOCK, b, info[0]+1, nullptr, name_);
+    uniformBlocks.push_back(string(name_));
+    delete[] name_;
+  }
 }
 
 void Program::printActiveUniformBlocks() {
-  GLint numBlocks = 0;
-
-  glGetProgramInterfaceiv(handle, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, &numBlocks);
-  GLenum blockProps[] = {GL_NUM_ACTIVE_VARIABLES, GL_NAME_LENGTH};
-  GLenum blockIndex[] = {GL_ACTIVE_VARIABLES};
-  GLenum props[] = {GL_NAME_LENGTH, GL_TYPE, GL_BLOCK_INDEX};
-
-  for(int block = 0; block < numBlocks; ++block) {
-    GLint blockInfo[2];
-    glGetProgramResourceiv(handle, GL_UNIFORM_BLOCK, block, 2, blockProps, 2, nullptr, blockInfo);
-    GLint numUnis = blockInfo[0];
-
-    char *blockName = new char[blockInfo[1]+1];
-    glGetProgramResourceName(handle, GL_UNIFORM_BLOCK, block, blockInfo[1]+1, nullptr, blockName);
-    cout << "Uniform block \"" << blockName << "\":" << endl;
-    delete [] blockName;
-
-    GLint *unifIndexes = new GLint[numUnis];
-    glGetProgramResourceiv(handle, GL_UNIFORM_BLOCK, block, 1, blockIndex, numUnis, nullptr, unifIndexes);
-
-    for( int unif = 0; unif < numUnis; ++unif ) {
-      GLint uniIndex = unifIndexes[unif];
-      GLint results[3];
-      glGetProgramResourceiv(handle, GL_UNIFORM, uniIndex, 3, props, 3, nullptr, results);
-
-      GLint nameBufSize = results[0] + 1;
-      char *name = new char[nameBufSize];
-      glGetProgramResourceName(handle, GL_UNIFORM, uniIndex, nameBufSize, nullptr, name);
-      cout << "    " << name << " (" << getTypeString(results[1]) << ")" << endl;
-      delete [] name;
-    }
-
-    delete [] unifIndexes;
+  cout << "Active uniform blocks:" << endl;
+  for (auto it = begin(uniformBlocks); it != end(uniformBlocks); it++) {
+    cout << "    " << *it << endl;
   }
-  cout << endl;
 }
 
 void Program::printActiveAttribs() {

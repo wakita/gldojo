@@ -2,7 +2,9 @@
 
 #include <exception>
 #include <iostream>
+#include <list>
 #include <map>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -152,17 +154,33 @@ namespace Shader {
   void throwOnShaderError(GLuint shader, GLenum pname, const string &path, const string & message);
 }
 
+class UniformSpec {
+  public:
+    string name;
+    GLenum type;
+    GLint location;
+
+    UniformSpec();
+    UniformSpec(string n, GLenum type, GLint location);
+};
+
 class Program {
   private:
     GLuint handle;
     bool linked;
-    map<string, GLint> uniformLocations;
 
     void throwOnProgramError(GLenum pname, const string & message);
     void throwOnProgramError(GLenum pname, const string & path, const string & message);
 
     Program(const Program & other) {}
     Program & operator=(const Program &other) { return *this; }
+
+    map<string, GLint> uniformLocations;
+    map<string, std::unique_ptr<UniformSpec>> uniforms;
+    list<string> uniformBlocks;
+
+    void analyzeActiveUniforms();
+    void analyzeActiveUniformBlocks();
 
   public:
     Program();
@@ -186,6 +204,9 @@ class Program {
 
     GLint uniformLocation(const char* name);
 
+    void setUniform(UniformSpec spec, json11::Json x);
+    void setUniformBlock(const string &block, json11::Json &x);
+
     void setUniform(const char * name, float x, float y, float z);
     void setUniform(const char * name, double x, double y, double z);
     void setUniform(const char * name, const vec2 & v);
@@ -200,7 +221,6 @@ class Program {
     void setUniform(const char * name, GLuint x);
 
     void setUniform(const string &name, const string &type, json11::Json&x);
-    void setUniformBlock(const string &name, json11::Json &x);
 
     void printActiveUniforms();
     void printActiveUniformBlocks();
