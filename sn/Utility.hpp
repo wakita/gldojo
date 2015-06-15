@@ -1,6 +1,15 @@
 #pragma once
 
 #include <stdexcept>
+
+#define GLM_FORCE_CXX11
+#define GLM_EXT_INCLUDED
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_SIZE_FUNC // vec4.length() => vec4.size()
+#include <glm/glm.hpp>
+
+#include <glbinding/gl43/gl.h>
+
 #include <json11.hpp>
 
 namespace smartnova { namespace util {
@@ -20,5 +29,9 @@ json11::Json readJSON(const std::string &path)
 
 json11::Json readConfig(const std::string &name)
   throw (ProgramException);
+
+glm::vec3 vec3(const json11::Json &x);
+
+glm::vec4 vec4(const json11::Json &x);
 
 } }
