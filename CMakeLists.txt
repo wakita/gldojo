@@ -121,3 +121,6 @@ set(glcblibs ${sblibs} cb)
 set(booktitle cb)
 set(ingredients ${glcblibs})
 cookall(00 01 02)
+
+set(chapter kw)
+add_subdirectory(kw)
