@@ -1,6 +1,8 @@
 #include "vbotorus.h"
 #include "Program.hpp"
+#include "Utility.hpp"
 
+using namespace smartnova;
 using namespace smartnova::gl;
 
 using glm::radians;
@@ -9,6 +11,8 @@ using glm::lookAt;
 using glm::perspective;
 
 class CB02B : public Application {
+  json11::Json C = util::readConfig("cb02/cb02b");
+
   virtual void init() {
     Application::init("cb02b: Diffuse shader");
   }
@@ -21,13 +25,17 @@ class CB02B : public Application {
     program.load("cb02/cb02b", vector<string> { "vs", "fs" });
     program.use();
 
-    torus = new VBOTorus(.7, .3, 50, 50);
+    { vec4 _ = util::vec4(C["Torus"]);
+      torus = new VBOTorus(_[0], _[1], _[2], _[3]); }
 
-    View = lookAt(vec3(0, 0, 2), vec3(0), Y);
+    { json11::Json Look = C["Look"];
+      View = lookAt(util::vec3(Look["eye"]), util::vec3(Look["at"]), util::vec3(Look["up"])); }
 
-    program.setUniform("Kd", .9, .5, .3);
-    program.setUniform("Ld", 1., 1., 1.);
-    program.setUniform("LightPosition", View * vec4(5, 5, 2, 1));
+#   define FV(x) ((GLfloat)C[x].number_value())
+
+    program.setUniform("Kd", FV("Kd"));
+    program.setUniform("Ld", FV("Ld"));
+    program.setUniform("LightPosition", FV("LightPosition"));
 
     glEnable(GL_DEPTH_TEST);
   }

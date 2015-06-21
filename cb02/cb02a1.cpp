@@ -13,7 +13,7 @@ class CB02A : public Application {
 
   virtual void init() {
     Application::init("cb02a: Phong's ADS (Ambient, Diffuse, and Specular) shading");
-    C = util::readConfig("cb02a");
+    C = util::readConfig("cb02/cb02a");
   }
 
   Program program;

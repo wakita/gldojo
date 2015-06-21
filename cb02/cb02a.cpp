@@ -1,5 +1,6 @@
 #include "vbotorus.h"
 #include "Program.hpp"
+#include "Utility.hpp"
 
 using glm::radians;
 using glm::rotate;
