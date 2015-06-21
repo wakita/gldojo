@@ -27,7 +27,7 @@ class Chapter03G : public Application {
   virtual void startup() {
     program.load("sb03/sb03g", vector<string>{ "vs", "tcs", "tes", "geom", "fs" });
     
-    glGenVertexArrays(2, vao);
+    glGenVertexArrays(1, vao);
     glBindVertexArray(vao[vaOffset]);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
