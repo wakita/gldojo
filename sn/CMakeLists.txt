@@ -1,4 +1,7 @@
-add_library(smartnova Utility.cpp Program.cpp)
+add_library(smartnova
+  Utility.cpp Program.cpp
+  Drawable
+  RegularPolygon)
 if (APPLE)
   find_library(cf_framework CoreFoundation)
   find_library(cg_framework CoreGraphics)

@@ -2,6 +2,8 @@
 
 #include "Utility.hpp"
 
+using namespace gl;
+
 namespace smartnova { namespace util {
 
 std::string readFile(const std::string &path)
@@ -24,6 +26,20 @@ json11::Json readConfig(const std::string &name)
     const std::string base(dir ? dir : "config");
     return readJSON(base + "/" + name + ".json");
   }
+
+glm::vec3 rgb2hsv(const glm::vec3 &c) {
+  int r = (int)(255 * c.r), g = (int)(255 * c.g), b = (int)(255 * c.b);
+  int max = r > g ? (r > b ? r : b) : (g > b ? g : b);
+  int min = r < g ? (r < b ? r : b) : (g < b ? g : b);
+  int d = max - min;
+  int hue =
+    d == 0 ? 0 :
+    max == r ? (60 * (g - b) / d + 360) % 360 :
+    max == g ? (60 * (b - r) / d + 120) :
+    (60 * (r - g) / d + 240);
+  GLfloat saturation = (max == 0) ? (GLfloat)0.f : ((GLfloat) d / max);
+  return glm::vec3(hue / 360.f, saturation, max / 256.f);
+}
 
 #define FV(v, i) ((gl43::GLfloat)(v)[i].number_value())
 

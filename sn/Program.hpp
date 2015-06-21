@@ -191,6 +191,7 @@ class Program {
     void compile(const string & source, GLenum type, const string & path)
       throw (ProgramException);
     void load(const string &stem, vector<string> exts) throw (ProgramException);
+    void load(const string &stem, string exts) throw (ProgramException);
 
     void link() throw (ProgramException);
     void validate() throw (ProgramException);

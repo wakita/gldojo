@@ -1,5 +1,7 @@
 #include <iomanip>
+#include <iterator>
 #include <fstream>
+#include <regex>
 #include <sstream>
 
 #define _DEBUG
@@ -433,6 +435,25 @@ void Program::load(const string &stem, vector<string> exts)
 # endif
 }
 
+void Program::load(const string &stem, string exts)
+  throw (ProgramException) {
+    const char *dir = getenv("SHADERS_DIR");
+    const string base(dir ? dir : ".");
+    const std::regex words_rx("\\w+");
+    for (std::sregex_iterator i = std::sregex_iterator(exts.begin(), exts.end(), words_rx);
+        i != std::sregex_iterator(); ++i) {
+      Program::compile(base + "/" + stem + "." + (*i).str());
+    }
+    Program::link();
+
+    analyzeActiveUniforms();
+    analyzeActiveUniformBlocks();
+# if defined(_DEBUG)
+    printActiveUniformBlocks();
+    printActiveUniforms();
+# endif
+  }
+
 void Program::link() throw (ProgramException) {
   if (linked) return;
   if (handle <= 0) throw ProgramException("Program has not been created.");
@@ -559,7 +580,7 @@ void Program::printActiveUniforms() {
   cout << "Active uniforms:" << endl;
   for (auto it = begin(uniforms); it != end(uniforms); it++) {
     UniformSpec *spec = it->second.get();
-    cout << "    " << spec->name << "(" << spec->type << ")@" << spec->location << endl;
+    cout << "    " << spec->name << "::" << spec->type << "@" << spec->location << endl;
   }
 }
 
