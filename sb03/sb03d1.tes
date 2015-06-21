@@ -6,8 +6,7 @@ in vec4 g;
 
 void main(void) {
   vec3 u = gl_TessCoord;
-  float v = min(u.x, min(u.y, u.z));
-  float s = (1.0 / 3 - v) * 3;
+  float s = 1 - min(u.x, min(u.y, u.z)) * 3;
 
   vec4 p =
     u.x * gl_in[0].gl_Position +
