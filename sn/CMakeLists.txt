@@ -1,7 +1,7 @@
 add_library(smartnova
   Utility.cpp Program.cpp
-  Drawable
-  RegularPolygon)
+  Volume
+  Point RegularPolygon Sphere)
 if (APPLE)
   find_library(cf_framework CoreFoundation)
   find_library(cg_framework CoreGraphics)

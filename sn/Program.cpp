@@ -262,7 +262,6 @@ void Application::init(const string & title) {
 # if defined(_DEBUG)
   cerr << "App.Marker[Notify](0): OpenGL API binding completed" << endl;
 
-  initDebugging();
 # endif
 }
 

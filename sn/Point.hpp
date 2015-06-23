@@ -2,12 +2,12 @@
 
 #include "Volume.hpp"
 
-class RegularPolygon : public Volume {
+class Point : public Volume {
   private:
     float r;
 
   public:
-    RegularPolygon(float, int);
+    Point();
     virtual void render(double);
     virtual void render();
 };
