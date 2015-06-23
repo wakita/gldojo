@@ -7,17 +7,17 @@ using namespace smartnova::gl;
 class KW2 : public Application {
   virtual void init() {
     info.winWidth = 600;
-    Application::init("kw1: 一頂点から三角形");
+    Application::init("kw2: 一頂点から三角形");
   }
 
   Program program;
   Point *point;
   
   virtual void startup() {
-    point = new Point();
+    point = new Point(5);
     program.load("kw/kw2", "vs, tcs, tes, fs");
     program.use();
-    glPointSize(15);
+    glPointSize(5);
   }
 
   GLfloat bgcolor[4] = { 0, 0, 0, 0 };

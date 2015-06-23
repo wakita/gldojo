@@ -3,11 +3,8 @@
 #include "Volume.hpp"
 
 class Point : public Volume {
-  private:
-    float r;
-
   public:
-    Point();
+    Point(float r);
     virtual void render(double);
     virtual void render();
 };

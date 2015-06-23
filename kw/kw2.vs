@@ -1,7 +1,12 @@
 #version 430
 
-layout (location=0) in vec2 VertexPosition;
+layout (location=0) in vec4 VertexPosition;
+
+out vec4 c;
+out float r_tcs;
 
 void main() {
-  gl_Position = vec4(VertexPosition, 0, 1);
+  c = vec4(VertexPosition);
+  gl_Position = c;
+  r_tcs = VertexPosition.w;
 }
