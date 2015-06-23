@@ -1,11 +1,15 @@
 #include "vboteapot.h"
 #include "Program.hpp"
+#include "Utility.hpp"
 
 using glm::radians;
 using glm::rotate;
+using namespace smartnova;
 using namespace smartnova::gl;
 
 class CB02C : public Application {
+  json11::Json C = util::readConfig("cb02/cb02c");
+
   virtual void init() {
     Application::init("cb02c: Discard");
   }
