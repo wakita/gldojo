@@ -10,20 +10,21 @@ class KW1 : public Application {
     Application::init("kw1: 多角形");
   }
 
-  Program program;
-  RegularPolygon *RPolygon;
+  RegularPolygon *polygon;
   
   virtual void startup() {
-    RPolygon = new RegularPolygon(0.8f, 3);
+    Program program;
     program.load("kw/kw1", "vs, fs");
     program.use();
+
+    polygon = new RegularPolygon(0.5f, 3);
   }
 
-  GLfloat bgcolor[4] = { 0, 0, 0, 0 };
+  GLfloat bgcolor[4] = { 0, 0, 0, 1 };
 
   virtual void render(double t) {
     glClearBufferfv(GL_COLOR, 0, bgcolor);
-    RPolygon->render(t);
+    polygon->render(t);
   }
 };
 
