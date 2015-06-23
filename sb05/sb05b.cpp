@@ -30,7 +30,7 @@ const int N_TRIANGLES = sizeof(vertex) / sizeof(VertexData);
 class Chapter05B : public Application {
 
   virtual void init() {
-    Application::init("構造体の配列をシェーダに渡す例です．でもバグってます．");
+    Application::init("構造体の配列をシェーダに渡す例です．");
   }
 
   enum VertexArrays  { Position, Color };
