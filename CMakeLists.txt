@@ -100,10 +100,10 @@ endfunction(cookall)
 
 set(ingredients ${sblibs})
 
-foreach(X app glfw)
-  add_executable(${X} sn/test/${X}.cpp)
-  target_link_libraries(${X} ${ingredients})
-endforeach(X)
+#foreach(X app glfw)
+#  add_executable(${X} sn/test/${X}.cpp)
+#  target_link_libraries(${X} ${ingredients})
+#endforeach(X)
 
 ######################################################################
 # OpenGL Superbible
