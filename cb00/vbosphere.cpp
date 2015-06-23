@@ -9,7 +9,6 @@
 VBOSphere::VBOSphere(float rad, int sl, int st) :
        radius(rad), slices(sl), stacks(st) 
 {
-  
     nVerts = (slices+1) * (stacks + 1);
     elements = (slices * 2 * (stacks-1) ) * 3;
 
