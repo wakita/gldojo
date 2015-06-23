@@ -1,0 +1,18 @@
+#version 430
+
+layout (vertices = 3) out;
+
+in float r_tcs;
+out float r_tes;
+
+const vec4 dummy = vec4(0);
+
+void main() {
+  gl_TessLevelInner[0] = 0;
+  gl_TessLevelOuter[0] = 12;
+  gl_TessLevelOuter[1] = 6;
+  gl_TessLevelOuter[2] = 3;
+  gl_out[gl_InvocationID].gl_Position = dummy;
+
+  r_tes = r_tcs;
+}
