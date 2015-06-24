@@ -14,29 +14,25 @@ class CB02C : public Application {
     Application::init("cb02c: Discard");
   }
 
+# define FV(x) ((GLfloat)C[x].number_value())
+
   Program program;
   VBOTeapot *shape;
+  json11::Json Look = C["Look"];
   const mat4
     Model =
     glm::translate(vec3(0.0, -1.5, 0.0)) * rotate(radians(-90.f), vec3(1, 0, 0)),
-    View = lookAt(vec3(0, 0, 7), vec3(0), Y),
+    View = lookAt(util::vec3(Look["eye"]), util::vec3(Look["at"]), util::vec3(Look["up"])),
     ModelView = View * Model;
 
   virtual void startup() {
-    program.load("cb02/cb02c", vector<string> { "vs", "fs" });
+    program.load("cb02/cb02c", "vs, fs");
     program.use();
 
     shape = new VBOTeapot(13, mat4(1.f));
 
-    program.setUniform("Light.Ld",       1., 1., 1.);
-    program.setUniform("Light.La",       .4, .4, .4);
-    program.setUniform("Light.Ls",       1., 1., 1.);
-    program.setUniform("Light.Position", vec4(0, 0, 0, 1));
-
-    program.setUniform("Material.Kd",        .9, .5, .3);
-    program.setUniform("Material.Ka",        .9, .5, .3);
-    program.setUniform("Material.Ks",        .8, .8, .8);
-    program.setUniform("Material.Shininess", 100.);
+    program.setUniforms("Light", C["Light"]);
+    program.setUniforms("Material", C["Material"]);
 
     program.setUniform("ModelViewMatrix", ModelView);
     program.setUniform("NormalMatrix",    glm::inverseTranspose(mat3(ModelView)));
