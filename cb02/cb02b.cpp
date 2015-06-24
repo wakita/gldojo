@@ -22,7 +22,7 @@ class CB02B : public Application {
   mat4 View = mat4(1.f);
 
   virtual void startup() {
-    program.load("cb02/cb02b", vector<string> { "vs", "fs" });
+    program.load("cb02/cb02b", "vs, fs");
     program.use();
 
     { vec4 _ = util::vec4(C["Torus"]);
@@ -31,11 +31,9 @@ class CB02B : public Application {
     { json11::Json Look = C["Look"];
       View = lookAt(util::vec3(Look["eye"]), util::vec3(Look["at"]), util::vec3(Look["up"])); }
 
-#   define FV(x) ((GLfloat)C[x].number_value())
-
-    program.setUniform("Kd", FV("Kd"));
-    program.setUniform("Ld", FV("Ld"));
-    program.setUniform("LightPosition", FV("LightPosition"));
+    program.setUniform("Kd", util::vec3(C["Kd"]));
+    program.setUniform("Ld", util::vec3(C["Ld"]));
+    program.setUniform("LightPosition", util::vec4(C["LightPosition"]));
 
     glEnable(GL_DEPTH_TEST);
   }
