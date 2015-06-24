@@ -14,9 +14,7 @@ var config = {
   LightPosition: [ 5., 5., 2., 1. ],
 
   Kd: [ .9, .5, .3 ],
-  Ld: [ 1., 1., 1. ],
-
-  InitRot: [ -35., 35. ]
+  Ld: [ 1., 1., 1. ]
 };
 
 require('fs').writeFileSync(config.Project + '.json', JSON.stringify(config));
