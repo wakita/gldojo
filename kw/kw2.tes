@@ -4,7 +4,7 @@ const float PI = 3.14159265359;
 
 layout (triangles, equal_spacing, cw) in;
 
-in float r_tes;
+in float[] r_tes;
 out vec4 color_fs;
 
 void main() {
