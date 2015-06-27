@@ -17,7 +17,7 @@ using namespace smartnova::gl;
 
 class Chapter03G : public Application {
   virtual void init() {
-    Application::init("chap03g: （バグ）vs-fs 間に別のシェーダが挟まるとデータを送れない．．．");
+    Application::init("chap03g: vs-fs 間で色の授受");
   }
 
   enum { vaOffset };
@@ -25,7 +25,7 @@ class Chapter03G : public Application {
   Program program;
 
   virtual void startup() {
-    program.load("sb03/sb03g", vector<string>{ "vs", "tcs", "tes", "geom", "fs" });
+    program.load("sb03/sb03g", vector<string>{ "vs", "tcs", "tes", "gs", "fs" });
     
     glGenVertexArrays(1, vao);
     glBindVertexArray(vao[vaOffset]);
