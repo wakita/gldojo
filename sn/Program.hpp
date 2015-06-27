@@ -61,6 +61,13 @@ namespace smartnova {
   
   namespace gl {
 
+// https://gist.github.com/Bigcheese/5148643
+struct GLFWwindowDeleter {
+  void operator ()(GLFWwindow *window) {
+    glfwDestroyWindow(window);
+  }
+};
+
 void GLErrorCheck(string file, int line);
 
 // void traceAPICalls();
@@ -92,6 +99,7 @@ struct SNGL_APP_INFO {
 
 class Application {
   public:
+    static  void initializeGLcontext();
     virtual void init() {}
     virtual void startup() = 0;
     virtual void render(double currentTime) = 0;
@@ -108,9 +116,9 @@ class Application {
     virtual void getCursorPos  (GLFWwindow *win, double & xpos, double & ypos);
 
   protected:
-    SNGL_APP_INFO info;
-    static Application *app;
-    GLFWwindow *window = nullptr;
+    static SNGL_APP_INFO info;
+    static std::unique_ptr<GLFWwindow, GLFWwindowDeleter> Window;
+    static std::unique_ptr<Application> App;
     mat4 Projection;
 
     Application();
@@ -120,14 +128,14 @@ class Application {
     void showFPS(double t);
 
   private:
-    void initGLFW();
-    void initDebugging();
+    static void setDebugging(bool);
     bool traceP = false;
 };
 
 #define DECLARE_MAIN(APP)                         \
 int main(int argc, const char ** argv) {          \
   try {                                           \
+    Application::initializeGLcontext();           \
     APP *app = new APP();                         \
     app->run();                                   \
     delete app;                                   \

@@ -13,14 +13,14 @@ std::string readFile(const std::string &path)
     return std::string(std::istreambuf_iterator<char>(f), std::istreambuf_iterator<char>());
   }
 
-json11::Json readJSON(const std::string &path)
+Json readJSON(const std::string &path)
   throw (smartnova::util::ProgramException) {
     std::string err;
-    json11::Json x(json11::Json::parse(readFile(path), err));
+    Json x(Json::parse(readFile(path), err));
     return x;
   }
 
-json11::Json readConfig(const std::string &name)
+Json readConfig(const std::string &name)
   throw (ProgramException) {
     const char *dir = getenv("CONFIG_DIR");
     const std::string base(dir ? dir : "config");
@@ -43,13 +43,13 @@ glm::vec3 rgb2hsv(const glm::vec3 &c) {
 
 #define FV(v, i) ((gl43::GLfloat)(v)[i].number_value())
 
-glm::vec3 vec3(const json11::Json &x) {
-  json11::Json::array v = x.array_items();
+glm::vec3 vec3(const Json &x) {
+  Json::array v = x.array_items();
   return glm::vec3(FV(v, 0), FV(v, 1), FV(v, 2));
 }
 
-glm::vec4 vec4(const json11::Json &x) {
-  json11::Json::array v = x.array_items();
+glm::vec4 vec4(const Json &x) {
+  Json::array v = x.array_items();
   return glm::vec4(FV(v, 0), FV(v, 1), FV(v, 2), FV(v, 3));
 }
 

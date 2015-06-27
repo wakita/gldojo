@@ -85,7 +85,7 @@ class Chapter05F1 : public Application {
     glDepthFunc(GL_LEQUAL);
     Check;
 
-    onResize(window, info.winWidth, info.winHeight);
+    onResize(Window.get(), info.winWidth, info.winHeight);
   }
 
   mat4 Projection = I4;
@@ -101,7 +101,7 @@ class Chapter05F1 : public Application {
 
   virtual void render(double time) {
     int fbufSize[4];
-    glfwGetFramebufferSize(window, fbufSize, fbufSize+1);
+    glfwGetFramebufferSize(Window.get(), fbufSize, fbufSize+1);
     glViewport(0, 0, fbufSize[0], fbufSize[1]);
 
     static const GLfloat bgcolor[4] = { 0, 0.25, 0, 1 };

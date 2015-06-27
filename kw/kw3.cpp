@@ -6,17 +6,16 @@ using namespace smartnova::gl;
 
 class KW3 : public Application {
   virtual void init() {
-    info.winWidth = 600;
     Application::init("kw3: 一頂点から三角形がたくさん");
   }
 
   Program program;
-  Point *point;
+  unique_ptr<Point> point;
   
   virtual void startup() {
-    point = new Point(5);
     program.load("kw/kw3", "vs, tcs, tes, fs");
     program.use();
+    point.reset(new Point(5));
     glPointSize(5);
   }
 
@@ -24,7 +23,7 @@ class KW3 : public Application {
 
   virtual void render(double t) {
     glClearBufferfv(GL_COLOR, 0, bgcolor);
-    point->render(t);
+    point.get()->render(t);
   }
 };
 

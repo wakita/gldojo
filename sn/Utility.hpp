@@ -12,6 +12,8 @@
 
 #include <json11.hpp>
 
+using json11::Json;
+
 namespace smartnova { namespace util {
 
 class ProgramException : public std::runtime_error {

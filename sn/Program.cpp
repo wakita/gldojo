@@ -12,7 +12,11 @@ using json11::Json;
 
 namespace smartnova { namespace gl {
 
-Application *Application::app;
+SNGL_APP_INFO Application::info;
+std::unique_ptr<GLFWwindow, GLFWwindowDeleter> Application::Window(nullptr);
+std::unique_ptr<Application> Application::App(nullptr);
+
+// Application *Application::app;
 
 Application::Application() {
   info.winWidth      = 800;
@@ -26,29 +30,23 @@ Application::Application() {
   info.flags.debug   = 1;
 }
 
-void Application::initGLFW() {
+void Application::initializeGLcontext() {
+  info.winWidth      = 800;
+  info.winHeight     = 600;
+
   if (!glfwInit()) {
     cerr << "Failed to initialize GLFW" << endl;
     exit(EXIT_FAILURE);
   }
 
   glfwSetErrorCallback([] (int error, const char* description) {
-      cerr << "GLFW Error (" << error << "): " << description << endl; });
+    cerr << "GLFW Error (" << error << "): " << description << endl; });
 
   glfwDefaultWindowHints();
-# if defined(OS_Darwin)
-  cerr << "Darwin" << endl;
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, info.majorVersion);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, info.minorVersion);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
-  glfwWindowHint(GLFW_OPENGL_PROFILE,        GLFW_OPENGL_CORE_PROFILE);
-  glfwWindowHint(GLFW_SAMPLES,               info.samples);
-  glfwWindowHint(GLFW_STEREO,                info.flags.stereo);
-  glfwWindowHint(GLFW_VISIBLE,               info.flags.visible);
-# endif
+
+  int swapInterval = 1;
 
   GLFWmonitor *monitor = nullptr;
-  int swapInterval = 1;
   if (info.flags.fullscreen) {
     int monitor_count;
     GLFWmonitor**monitors = glfwGetMonitors(&monitor_count);
@@ -59,46 +57,61 @@ void Application::initGLFW() {
     swapInterval = info.flags.vsync;
   }
 
-  if (!(window = glfwCreateWindow(info.winWidth, info.winHeight,
-          info.title.c_str(),
-          monitor, nullptr))) {
+  Window.reset(
+      glfwCreateWindow(info.winWidth, info.winHeight,
+        info.title.c_str(),
+        monitor, nullptr));
+  if (!Window.get()) {
     cerr << "Failed to open window" << endl;
     glfwTerminate();
     exit(EXIT_FAILURE);
   }
+  GLFWwindow *window = Window.get();
+
   glfwGetWindowSize(window, &info.winWidth, &info.winHeight);
 
 # if defined(_DEBUG)
   glbinding::Binding::addContextSwitchCallback([](glbinding::ContextHandle handle) {
-      cerr << "OpenGL.Marker[Notify](0): Activating context (" << handle << ")" << endl;
-      });
+    cerr << "OpenGL.Marker[Notify](0): Activating context (" << handle << ")" << endl;
+  });
 # endif
 
   glfwMakeContextCurrent(window);
   // glfwSwapInterval(swapInterval);
 
   // Callbacks
-  glfwSetFramebufferSizeCallback(window,
-      [] (GLFWwindow *win, int w, int h) {
-        app->onFramebufferSize(win, w, h); });
-  glfwSetWindowSizeCallback(window,
-      [] (GLFWwindow *win, int w, int h) {
-        app->onResize(win, w, h); });
-  glfwSetKeyCallback(window,
-      [] (GLFWwindow *win, int key, int scancode, int action, int mods) {
-        app->onKey(win, key, scancode, action, mods); });
-  glfwSetMouseButtonCallback(window,
-      [] (GLFWwindow *win, int button, int action, int mods) {
-        app->onMouseButton(win, button, action, mods); });
-  glfwSetCursorPosCallback(window,
-      [] (GLFWwindow *win, double xpos, double ypos) {
-        app->onCursorPos(win, xpos, ypos); });
-  glfwSetScrollCallback(window,
-      [] (GLFWwindow *win, double xoffset, double yoffset) {
-        app->onScroll(win, xoffset, yoffset); });
+  glfwSetFramebufferSizeCallback(
+    window, [] (GLFWwindow *win, int w, int h) {
+      App.get()->onFramebufferSize(win, w, h); });
+  glfwSetWindowSizeCallback(
+    window, [] (GLFWwindow *win, int w, int h) {
+      App.get()->onResize(win, w, h); });
+  glfwSetKeyCallback(
+    window, [] (GLFWwindow *win, int key, int scancode, int action, int mods) {
+      App.get()->onKey(win, key, scancode, action, mods); });
+  glfwSetMouseButtonCallback(
+    window, [] (GLFWwindow *win, int button, int action, int mods) {
+      App.get()->onMouseButton(win, button, action, mods); });
+  glfwSetCursorPosCallback(
+    window, [] (GLFWwindow *win, double xpos, double ypos) {
+      App.get()->onCursorPos(win, xpos, ypos); });
+  glfwSetScrollCallback(
+    window, [] (GLFWwindow *win, double xoffset, double yoffset) {
+      App.get()->onScroll(win, xoffset, yoffset); });
 
   glfwSetInputMode(window, GLFW_CURSOR,
       info.flags.cursor ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+
+# if defined(_DEBUG)
+  cerr << "App.Marker[Notify](0): Initialization of GLFW completed" << endl;
+# endif
+
+  glbinding::Binding::initialize();
+
+# if defined(_DEBUG)
+  cerr << "App.Marker[Notify](0): OpenGL API binding completed" << endl;
+  setDebugging(true);
+# endif
 }
 
 void GLErrorCheck() {
@@ -131,9 +144,9 @@ void GLErrorCheck(string file, int line) {
     endl;
 }
 
-void Application::setTrace(bool t) {
-  if (t != traceP) cerr << endl;
-  traceP = t;
+void Application::setTrace(bool trace) {
+  if (trace != traceP) cerr << endl;
+  traceP = trace;
 }
 
 
@@ -146,7 +159,7 @@ void Application::showFPS(double t) {
   if (t > dueTime) {
     ostringstream s;
     s << info.title << " (fps: " << (int)(renderedFrames / MeasurementTime) << ")";
-    glfwSetWindowTitle(window, s.str().c_str());
+    glfwSetWindowTitle(Window.get(), s.str().c_str());
 
     renderedFrames = 0;
     dueTime = t + MeasurementTime;
@@ -158,33 +171,35 @@ void Application::notify(const string & message) {
       GL_DEBUG_SEVERITY_NOTIFICATION, -1, message.c_str());
 }
 
-void Application::initDebugging() {
+void Application::setDebugging(bool debug) {
   using glbinding::ContextInfo;
-  cerr <<
-    "OpenGL Version:  " << ContextInfo::version()  << endl <<
-    "OpenGL Vendor:   " << ContextInfo::vendor()   << endl <<
-    "OpenGL Renderer: " << ContextInfo::renderer() << endl <<
-    "OpenGL Revision: " << glbinding::Meta::glRevision() << " (gl.xml)" << endl <<
-    "GLSL Version:    " << glGetString(GL_SHADING_LANGUAGE_VERSION) <<
-    endl << endl;
-  Check;
+  if (debug) {
+    cerr <<
+      "OpenGL Version:  " << ContextInfo::version()  << endl <<
+      "OpenGL Vendor:   " << ContextInfo::vendor()   << endl <<
+      "OpenGL Renderer: " << ContextInfo::renderer() << endl <<
+      "OpenGL Revision: " << glbinding::Meta::glRevision() << " (gl.xml)" << endl <<
+      "GLSL Version:    " << glGetString(GL_SHADING_LANGUAGE_VERSION) <<
+      endl << endl;
+    Check;
 
-  glEnable(GL_DEBUG_OUTPUT);
-  glDebugMessageCallback([](GLenum source, GLenum type, GLuint id,
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback([](
+        GLenum source, GLenum type, GLuint id,
         GLenum severity, GLsizei length, const GLchar *message, const void *userParam) {
 
-#       pragma GCC diagnostic ignored "-Wswitch"
-        const char *_source = "Unknown";
-        switch (source) {
+#     pragma GCC diagnostic ignored "-Wswitch"
+      const char *_source = "Unknown";
+      switch (source) {
         case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   _source = "WinSys";         break;
         case GL_DEBUG_SOURCE_APPLICATION:     _source = "App";            break;
         case GL_DEBUG_SOURCE_API:             _source = "OpenGL";         break;
         case GL_DEBUG_SOURCE_SHADER_COMPILER: _source = "ShaderCompiler"; break;
         case GL_DEBUG_SOURCE_THIRD_PARTY:     _source = "3rdParty";       break;
         case GL_DEBUG_SOURCE_OTHER:           _source = "Other";          break;
-        }
-        const char *_type = "Unknown";
-        switch (type) {
+      }
+      const char *_type = "Unknown";
+      switch (type) {
         case GL_DEBUG_TYPE_ERROR:               _type = "Error";       break;
         case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: _type = "Deprecated";  break;
         case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  _type = "Undefined";   break;
@@ -194,95 +209,92 @@ void Application::initDebugging() {
         case GL_DEBUG_TYPE_PUSH_GROUP:          _type = "PushGrp";     break;
         case GL_DEBUG_TYPE_POP_GROUP:           _type = "PopGrp";      break;
         case GL_DEBUG_TYPE_OTHER:               _type = "Other";       break;
-        }
-        const char *_severity = "Unknown";
-        switch (severity) {
-          case GL_DEBUG_SEVERITY_HIGH:         _severity = "High";   break;
-          case GL_DEBUG_SEVERITY_MEDIUM:       _severity = "Med";    break;
-          case GL_DEBUG_SEVERITY_LOW:          _severity = "Low";    break;
-          case GL_DEBUG_SEVERITY_NOTIFICATION: _severity = "Notify"; break;
-        }
-#       pragma GCC diagnostic warning "-Wswitch"
-        cout << _source << "." << _type << "[" << _severity << "](" <<
+      }
+      const char *_severity = "Unknown";
+      switch (severity) {
+        case GL_DEBUG_SEVERITY_HIGH:         _severity = "High";   break;
+        case GL_DEBUG_SEVERITY_MEDIUM:       _severity = "Med";    break;
+        case GL_DEBUG_SEVERITY_LOW:          _severity = "Low";    break;
+        case GL_DEBUG_SEVERITY_NOTIFICATION: _severity = "Notify"; break;
+      }
+#     pragma GCC diagnostic warning "-Wswitch"
+      cout << _source << "." << _type << "[" << _severity << "](" <<
         id << "): " << message << endl;
-      }, nullptr);
-  glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-  glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0, 
-      GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Start debugging");
+    }, nullptr);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+    glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0, 
+                         GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Start debugging");
 
-  using glbinding::CallbackMask;
+    using glbinding::CallbackMask;
 
-  glbinding::setCallbackMaskExcept(
+    glbinding::setCallbackMaskExcept(
       CallbackMask::Unresolved |
       CallbackMask::After |
       CallbackMask::ParametersAndReturnValue,
       { "glGetError", "glDebugMessageInsert" });
 
-  glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0, 
-      GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Setting debugging related callbacks");
+    glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0, 
+                         GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Setting debugging related callbacks");
 
-  glbinding::setUnresolvedCallback([](const glbinding::AbstractFunction & f) {
-        cerr << "Unresolved API (" << f.name() << ") was called" << endl;
-      });
+    glbinding::setUnresolvedCallback([](const glbinding::AbstractFunction & f) {
+      cerr << "Unresolved API (" << f.name() << ") was called" << endl;
+    });
 
-  glbinding::setAfterCallback([this](const glbinding::FunctionCall & call) {
-        GLErrorCheck();
-        if (this->traceP) {
-          ostringstream s;
-          s << call.function->name() << "(";
-          for (unsigned i = 0; i < call.parameters.size(); ++i) {
-            s << call.parameters[i]->asString();
-            if (i < call.parameters.size() - 1) s << ", ";
-          }
-          s << ") => " << call.returnValue;
-          glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0, 
-            GL_DEBUG_SEVERITY_NOTIFICATION, -1, s.str().c_str());
-        }
-      });
-  Check;
-
-  glfwSetErrorCallback([] (int error, const char* description) {
+    glfwSetErrorCallback([] (int error, const char* description) {
       ostringstream s;
       s << "GFLW error (" << error << "): " << description;
       glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0, 
-      GL_DEBUG_SEVERITY_NOTIFICATION, -1, s.str().c_str());
-  });
+                           GL_DEBUG_SEVERITY_NOTIFICATION, -1, s.str().c_str());
+    });
+  } else {
+    glbinding::setCallbackMask(glbinding::CallbackMask::None);
+    glDebugMessageCallback([](GLenum source, GLenum type, GLuint id,
+                              GLenum severity, GLsizei length, const GLchar *message,
+                              const void *userParam) {}, nullptr);
+    glfwSetErrorCallback(NULL);
+    glDisable(GL_DEBUG_OUTPUT);
+  }
 }
 
 void Application::init(const string & title) {
-  app        = this;
   info.title = title;
+  App.reset(this);
 
-  initGLFW();
-# if defined(_DEBUG)
-  cerr << "App.Marker[Notify](0): Initialization of GLFW completed" << endl;
-# endif
-
-  glbinding::Binding::initialize();
-# if defined(_DEBUG)
-  cerr << "App.Marker[Notify](0): OpenGL API binding completed" << endl;
-
-# endif
+  glbinding::setAfterCallback([this](const glbinding::FunctionCall & call) {
+    GLErrorCheck();
+    if (this->traceP) {
+      ostringstream s;
+      s << call.function->name() << "(";
+      for (unsigned i = 0; i < call.parameters.size(); ++i) {
+        s << call.parameters[i]->asString();
+        if (i < call.parameters.size() - 1) s << ", ";
+      }
+      s << ") => " << call.returnValue;
+      glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0, 
+                           GL_DEBUG_SEVERITY_NOTIFICATION, -1, s.str().c_str());
+    }
+  });
 }
 
 void Application::shutdown() {
-  glfwDestroyWindow(window);
+  setDebugging(false);
   glfwTerminate();
-  app->~Application();
+  App.get()->~Application();
 }
 
 void Application::run() {
   init();
   startup();
 
-  onResize(window, info.winWidth, info.winHeight);
+  GLFWwindow *win = Window.get();
+  onResize(win, info.winWidth, info.winHeight);
 
-  while (!glfwWindowShouldClose(window)) {
+  while (!glfwWindowShouldClose(win)) {
     glfwPollEvents();
     double t = glfwGetTime();
     render(t);
     showFPS(t);
-    glfwSwapBuffers(window);
+    glfwSwapBuffers(win);
   }
   shutdown();
   exit(EXIT_SUCCESS);
@@ -302,7 +314,7 @@ void Application::onResize(GLFWwindow *win, int w, int h) {
 
 void Application::onKey(GLFWwindow *win, int key, int scancode, int action, int mods) {
   if ((key == GLFW_KEY_Q || key == GLFW_KEY_ESCAPE) && action == GLFW_PRESS) {
-    glfwSetWindowShouldClose(window, true);
+    glfwSetWindowShouldClose(win, true);
   }
 }
 
@@ -338,11 +350,10 @@ void Shader::throwOnShaderError(GLuint shader, GLenum pname, const string &messa
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
     string log;
     if (length > 0) {
-      GLchar* _log = new GLchar[length];
+      unique_ptr<GLchar[]> _log(new GLchar[length]);
+      GLchar *log = _log.get();
       int written = 0;
-      glGetShaderInfoLog(shader, length, &written, _log);
-      log = _log;
-      delete[] _log;
+      glGetShaderInfoLog(shader, length, &written, log);
     } else {
       log = "No further error information available, sorry.";
     }
@@ -567,9 +578,9 @@ void Program::analyzeActiveUniforms() {
     glGetProgramResourceiv(handle, GL_UNIFORM, i, 4, properties, 4, nullptr, info);
     if (info[3] != -1) continue;
     GLint s = info[0] + 1;
-    char *name_ = new char[s];
-    glGetProgramResourceName(handle, GL_UNIFORM, i, s, nullptr, name_);
-    string name(name_); delete[] name_;
+    unique_ptr<char[]> name_(new char[s]);
+    glGetProgramResourceName(handle, GL_UNIFORM, i, s, nullptr, name_.get());
+    string name(name_.get());
     std::unique_ptr<UniformSpec> us(new UniformSpec(name, (GLenum)info[1], info[2]));
     uniforms[name] = std::move(us);
   }
@@ -593,10 +604,9 @@ void Program::analyzeActiveUniformBlocks() {
   for (int b = 0; b < nBlocks; b++) {
     GLint info[sizeof(properties)/sizeof(GLenum)];
     glGetProgramResourceiv(handle, GL_UNIFORM_BLOCK, b, 1, properties, 1, nullptr, info);
-    char *name_ = new char[info[0] + 1];
-    glGetProgramResourceName(handle, GL_UNIFORM_BLOCK, b, info[0]+1, nullptr, name_);
-    uniformBlocks.push_back(string(name_));
-    delete[] name_;
+    unique_ptr<char[]> name_(new char[info[0] + 1]);
+    glGetProgramResourceName(handle, GL_UNIFORM_BLOCK, b, info[0]+1, nullptr, name_.get());
+    uniformBlocks.push_back(string(name_.get()));
   }
 }
 
@@ -619,10 +629,9 @@ void Program::printActiveAttribs() {
     glGetProgramResourceiv(handle, GL_PROGRAM_INPUT, i, 3, properties, 3, nullptr, results);
 
     GLint nameBufSize = results[0] + 1;
-    char *name = new char[nameBufSize];
-    glGetProgramResourceName(handle, GL_PROGRAM_INPUT, i, nameBufSize, nullptr, name);
-    cout << setw(5) << showpos << left << results[2] << name << " (" << getTypeString(results[1]) << ")" << endl;
-    delete [] name;
+    unique_ptr<char[]> name_(new char[nameBufSize]);
+    glGetProgramResourceName(handle, GL_PROGRAM_INPUT, i, nameBufSize, nullptr, name_.get());
+    cout << setw(5) << showpos << left << results[2] << name_.get() << " (" << getTypeString(results[1]) << ")" << endl;
   }
   cout << endl;
 }
