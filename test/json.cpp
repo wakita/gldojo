@@ -10,14 +10,14 @@ int main() {
   Json json1 = Json::object {
     { "k1", "v1" },
     { "k2", false },
-    { "k3", Json::array { 1, 2, 3 } }
+    { "k3", Json::array { 1, 2, 3 } },
+    { "k4", Json::array { -4.5, -3.5, -2.5, 2.5, 3.5, 4.5} },
   };
+  cout << json1.dump() << endl;
 
-  ifstream f("/wakita/Dropbox (smartnova)/work/opengl/dojo/config/x.json");
+  ifstream f("/Users/wakita/Dropbox (smartnova)/work/opengl/dojo/config/x.json");
   string input((istreambuf_iterator<char>(f)), istreambuf_iterator<char>()), err;
   Json x(Json::parse(input, err));
-
-  // Dumping JSON
   cout << x.dump() << endl;
 
   // Retrieval and conversion of a JSON element

@@ -65,11 +65,6 @@ include_directories(others/json11)
 link_directories(others/json11)
 
 ######################################################################
-# Test
-
-add_subdirectory(test)
-
-######################################################################
 # The "smartnova" library
 
 add_subdirectory(sn)
@@ -77,6 +72,11 @@ include_directories(sn)
 link_directories(sn)
 
 set(sblibs ${gllibs} smartnova)
+
+######################################################################
+# Test
+
+add_subdirectory(test)
 
 ######################################################################
 # Utility

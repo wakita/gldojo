@@ -19,6 +19,9 @@ std::unique_ptr<Application> Application::App(nullptr);
 // Application *Application::app;
 
 Application::Application() {
+}
+
+void Application::initializeGLcontext() {
   info.winWidth      = 800;
   info.winHeight     = 600;
   info.majorVersion  = 4;
@@ -28,11 +31,6 @@ Application::Application() {
   info.flags.visible = 1;
   info.flags.cursor  = 1;
   info.flags.debug   = 1;
-}
-
-void Application::initializeGLcontext() {
-  info.winWidth      = 800;
-  info.winHeight     = 600;
 
   if (!glfwInit()) {
     cerr << "Failed to initialize GLFW" << endl;
