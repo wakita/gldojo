@@ -97,9 +97,14 @@ struct SNGL_APP_INFO {
   } flags;
 };
 
+/**
+ * @brief ApplicationクラスはOpenGLアプリケーションの抽象クラスです．
+ **/
+
 class Application {
   public:
     static  void initializeGLcontext();
+    static  void initialize(json11::Json);
     virtual void init() {}
     virtual void startup() = 0;
     virtual void render(double currentTime) = 0;
@@ -121,7 +126,15 @@ class Application {
     static std::unique_ptr<Application> App;
     mat4 Projection;
 
+    /**
+     * @brief デフォルトコンストラクタ
+     */
     Application();
+    /**
+     * @brief 初期化：GLFWウィンドウを取得してglbindingを初期化する．
+     * @param title ウィンドウのタイトル
+     * GLFWの設定値を定めてGLFWのウィンドウを取得したのちにglbindingを初期化する．
+     */
     virtual void init(const string & title);
     void notify(const string & message);
     void setTrace(bool);
@@ -131,6 +144,20 @@ class Application {
     static void setDebugging(bool);
     bool traceP = false;
 };
+
+#define GLMAIN(APP)                             \
+int main(int argc, char const * const argv[]) { \
+  try {                                         \
+    json11::Json C = util::readConfig(argv[1]); \
+    Application::initialize(C);                 \
+    std::unique_ptr<APP> app(new APP(C));       \
+    app.get()->run();                           \
+    return EXIT_SUCCESS;                        \
+  } catch (exception &e) {                      \
+    std::cerr <<                                \
+      "Caught exception:" << std::endl << "    " << e.what() << std::endl; \
+  }                                             \
+}
 
 #define DECLARE_MAIN(APP)                         \
 int main(int argc, const char ** argv) {          \
@@ -147,14 +174,14 @@ int main(int argc, const char ** argv) {          \
 
 namespace Shader {
   static map<string, GLenum> typeOfExt = map<string, GLenum>({
-      { string(".vs"),   GL_VERTEX_SHADER },
-      { string(".tcs"),  GL_TESS_CONTROL_SHADER },
-      { string(".tes"),  GL_TESS_EVALUATION_SHADER },
-      { string(".geom"), GL_GEOMETRY_SHADER },
-      { string(".gs"),   GL_GEOMETRY_SHADER },
-      { string(".fs"),   GL_FRAGMENT_SHADER  },
-      { string(".comp"), GL_COMPUTE_SHADER },
-      { string(".cs"),   GL_COMPUTE_SHADER  } });
+      { string("vs"),   GL_VERTEX_SHADER },
+      { string("tcs"),  GL_TESS_CONTROL_SHADER },
+      { string("tes"),  GL_TESS_EVALUATION_SHADER },
+      { string("geom"), GL_GEOMETRY_SHADER },
+      { string("gs"),   GL_GEOMETRY_SHADER },
+      { string("fs"),   GL_FRAGMENT_SHADER  },
+      { string("comp"), GL_COMPUTE_SHADER },
+      { string("cs"),   GL_COMPUTE_SHADER  } });
 
   static GLenum typeOf(const string & path);
 
@@ -198,6 +225,7 @@ class Program {
     void compile(const string & path, GLenum type) throw (ProgramException);
     void compile(const string & source, GLenum type, const string & path)
       throw (ProgramException);
+    void load(const json11::Json &shaderset) throw (ProgramException);
     void load(const string &stem, vector<string> exts) throw (ProgramException);
     void load(const string &stem, string exts) throw (ProgramException);
 

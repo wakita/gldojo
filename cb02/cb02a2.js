@@ -1,12 +1,13 @@
-#!/usr/bin/env node
-
-var C = require('../config/common.json');
+var C = require('const');
 
 var red  = [ .8, .2, .2 ];
 var blue = [ .0, .5, .8 ];
 
 var config = {
-  Project: 'cb02a',
+  name: 'config-test',
+  title: 'Phong\'s ADS (Ambient, Diffuse, and Specular) shading',
+
+  shaders: [ 'cb02/cb02a2.shaders' ],
 
   Look: {
     eye:   [ 0., 0., 2. ],
@@ -14,8 +15,6 @@ var config = {
     right: [ 0.10, 0., 2. ],
     at: C.Origin,
     up: C.Y },
-
-  Shaders: 'vs,fs'.split(',').pop(),
 
   Torus: [ .7, .3, 50., 50. ],
 
@@ -44,7 +43,13 @@ var config = {
     La: [ .4, .4, .4 ],
     Ls: [ 1., 1., 1. ] },
 
-  InitRot: [ -35., 35. ]
+  TorusMotion: {
+    InitRot: [ -35., 35. ],
+    Relocation: [ 0., 0., 0.01 ],
+    RotY: 8
+  }
 };
 
-require('fs').writeFileSync(config.Project + '.json', JSON.stringify(config));
+exports.configure = function (c) {
+  c.app = config;
+};

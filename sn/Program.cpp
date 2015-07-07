@@ -21,6 +21,99 @@ std::unique_ptr<Application> Application::App(nullptr);
 Application::Application() {
 }
 
+void Application::initialize(json11::Json C) {
+  cout << "Application::initialize(Json)" << endl;
+  if (!glfwInit()) {
+    cerr << "Failed to initialize GLFW" << endl;
+    exit(EXIT_FAILURE);
+  }
+
+  glfwSetErrorCallback([] (int error, const char* description) {
+    cerr << "GLFW Error (" << error << "): " << description << endl; });
+
+  glfwDefaultWindowHints();
+
+  int swapInterval = 1;
+
+  json11::Json GLFW = C["glfw"];
+
+  GLFWmonitor *monitor = nullptr;
+  if (GLFW["fullscreen"].bool_value()) {
+    cout << "fullscreen" << endl;
+    int monitor_count;
+    GLFWmonitor**monitors = glfwGetMonitors(&monitor_count);
+    monitor = monitors[0];
+    const GLFWvidmode *videoMode = glfwGetVideoMode(monitor);
+    info.winWidth = videoMode->width;
+    info.winHeight = videoMode->height;
+  } else {
+    if (GLFW[ "windowSize" ].is_array()) {
+      json11::Json::array size = GLFW[ "windowSize" ].array_items();
+      info.winWidth  = size[0].int_value();
+      info.winHeight = size[1].int_value();
+    } else {
+      info.winWidth  = 800;
+      info.winHeight = 600;
+    }
+  }
+
+  Window.reset(
+      glfwCreateWindow(info.winWidth, info.winHeight,
+        info.title.c_str(),
+        monitor, nullptr));
+  if (!Window.get()) {
+    cerr << "Failed to open window" << endl;
+    glfwTerminate();
+    exit(EXIT_FAILURE);
+  }
+  GLFWwindow *window = Window.get();
+
+  glfwGetWindowSize(window, &info.winWidth, &info.winHeight);
+
+# if defined(_DEBUG)
+  glbinding::Binding::addContextSwitchCallback([](glbinding::ContextHandle handle) {
+    cerr << "OpenGL.Marker[Notify](0): Activating context (" << handle << ")" << endl;
+  });
+# endif
+
+  glfwMakeContextCurrent(window);
+  // glfwSwapInterval(swapInterval);
+
+  // Callbacks
+  glfwSetFramebufferSizeCallback(
+    window, [] (GLFWwindow *win, int w, int h) {
+      App.get()->onFramebufferSize(win, w, h); });
+  glfwSetWindowSizeCallback(
+    window, [] (GLFWwindow *win, int w, int h) {
+      App.get()->onResize(win, w, h); });
+  glfwSetKeyCallback(
+    window, [] (GLFWwindow *win, int key, int scancode, int action, int mods) {
+      App.get()->onKey(win, key, scancode, action, mods); });
+  glfwSetMouseButtonCallback(
+    window, [] (GLFWwindow *win, int button, int action, int mods) {
+      App.get()->onMouseButton(win, button, action, mods); });
+  glfwSetCursorPosCallback(
+    window, [] (GLFWwindow *win, double xpos, double ypos) {
+      App.get()->onCursorPos(win, xpos, ypos); });
+  glfwSetScrollCallback(
+    window, [] (GLFWwindow *win, double xoffset, double yoffset) {
+      App.get()->onScroll(win, xoffset, yoffset); });
+
+  glfwSetInputMode(window, GLFW_CURSOR,
+      GLFW[ "cursor" ].bool_value() ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+
+# if defined(_DEBUG)
+  cerr << "App.Marker[Notify](0): Initialization of GLFW completed" << endl;
+# endif
+
+  glbinding::Binding::initialize();
+
+# if defined(_DEBUG)
+  cerr << "App.Marker[Notify](0): OpenGL API binding completed" << endl;
+  setDebugging(true);
+# endif
+}
+
 void Application::initializeGLcontext() {
   info.winWidth      = 800;
   info.winHeight     = 600;
@@ -255,7 +348,7 @@ void Application::setDebugging(bool debug) {
 }
 
 void Application::init(const string & title) {
-  info.title = title;
+  if (info.title.empty()) info.title = title;
   App.reset(this);
 
   glbinding::setAfterCallback([this](const glbinding::FunctionCall & call) {
@@ -322,12 +415,6 @@ void Application::onScroll(GLFWwindow *win, double xoffset, double yoffset) {}
 
 void Application::getCursorPos(GLFWwindow *window, double &xpos, double &ypos) {}
 
-/*
-void Application::onDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar &message) {
-  cerr << source << ":" << type << "[" << severity << "](" << id << "): " << message << endl;
-}
-*/
-
 UniformSpec::UniformSpec(string _name, GLenum _type, GLint _location) {
   name = _name;
   type = _type;
@@ -337,7 +424,7 @@ UniformSpec::UniformSpec(string _name, GLenum _type, GLint _location) {
 // Bug: Extract the extension!
 static GLenum Shader::typeOf(const string &path) {
   const string::size_type i = path.rfind('.');
-  return typeOfExt.find(path.substr(i))->second;
+  return typeOfExt.find(path.substr(i+1))->second;
 }
 
 void Shader::throwOnShaderError(GLuint shader, GLenum pname, const string &message) {
@@ -425,6 +512,24 @@ void Program::compile(const string &path, GLenum type)
 void Program::compile(const string &path)
   throw (ProgramException) {
     compile(path, Shader::typeOf(path));
+  }
+
+void Program::load(const json11::Json &shaderset)
+  throw (ProgramException) {
+    for (auto &kv: shaderset.object_items()) {
+      const string type = kv.first;
+      GLenum t = Shader::typeOfExt.find(type)->second;
+      const string source = kv.second.string_value();
+      compile(source, Shader::typeOfExt.find(type)->second, string("<shaderset>.") + type);
+    }
+    Program::link();
+
+    analyzeActiveUniforms();
+    analyzeActiveUniformBlocks();
+# if defined(_DEBUG)
+    printActiveUniformBlocks();
+    printActiveUniforms();
+# endif
   }
 
 void Program::load(const string &stem, vector<string> exts)
@@ -542,6 +647,12 @@ void Program::setUniform(const string &name, const json11::Json &x) {
     case GL_FLOAT:
       glUniform1f(loc, (GLfloat)x.number_value());
       break;
+    case GL_FLOAT_VEC2:
+      {
+        auto v = x.array_items();
+        glUniform2f(loc, FV(v[0]), FV(v[1]));
+      }
+      break;
     case GL_FLOAT_VEC3:
       {
         auto v = x.array_items();
@@ -585,6 +696,7 @@ void Program::analyzeActiveUniforms() {
 }
 
 void Program::printActiveUniforms() {
+  if (uniforms.size() == 0) return;
   cout << "Active uniforms:" << endl;
   for (auto it = begin(uniforms); it != end(uniforms); it++) {
     UniformSpec *spec = it->second.get();
@@ -595,7 +707,6 @@ void Program::printActiveUniforms() {
 void Program::analyzeActiveUniformBlocks() {
   GLint nBlocks = 0;
   glGetProgramInterfaceiv(handle, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, &nBlocks);
-  cerr << "#active uniform blocks = " << nBlocks << endl;
 
   GLenum properties[] = { GL_NAME_LENGTH };
   GLenum indices[] = { GL_ACTIVE_VARIABLES };
@@ -609,6 +720,7 @@ void Program::analyzeActiveUniformBlocks() {
 }
 
 void Program::printActiveUniformBlocks() {
+  if (uniformBlocks.size() == 0) return;
   cout << "Active uniform blocks:" << endl;
   for (auto it = begin(uniformBlocks); it != end(uniformBlocks); it++) {
     cout << "    " << *it << endl;

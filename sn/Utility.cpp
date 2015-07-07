@@ -41,7 +41,12 @@ glm::vec3 rgb2hsv(const glm::vec3 &c) {
   return glm::vec3(hue / 360.f, saturation, max / 256.f);
 }
 
-#define FV(v, i) ((gl43::GLfloat)(v)[i].number_value())
+#define FV(v, i) ((gl::GLfloat)(v)[i].number_value())
+
+glm::vec2 vec2(const Json &x) {
+  Json::array v = x.array_items();
+  return glm::vec2(FV(v, 0), FV(v, 1));
+}
 
 glm::vec3 vec3(const Json &x) {
   Json::array v = x.array_items();
