@@ -1,0 +1,14 @@
+#!/usr/bin/env node
+
+var config_name = 'config';
+
+var command = process.argv[2];
+
+var argv = [];
+for (var i = 2; i < process.argv.length; i++) {
+  argv.push(process.argv[i]);
+}
+
+require('config').configure(config_name + '.json', argv);
+
+require('child_process').execFile(command, [ config_name ]);
