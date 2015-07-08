@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var C = require('../config/common.json');
+var C = require('const');
 
 var red  = [ .8, .2, .2 ];
 var blue = [ .0, .5, .8 ];
@@ -15,7 +15,7 @@ var config = {
     at: C.Origin,
     up: C.Y },
 
-  Shaders: 'vs,fs'.split(',').pop(),
+  shaders: [ 'cb02/cb02a.shaders' ],
 
   Torus: [ .7, .3, 50., 50. ],
 
@@ -44,7 +44,13 @@ var config = {
     La: [ .4, .4, .4 ],
     Ls: [ 1., 1., 1. ] },
 
-  InitRot: [ -35., 35. ]
+  TorusMotion: {
+    InitRot: [ -35., 35. ],
+    RotY: 8
+  }
 };
 
-require('fs').writeFileSync(config.Project + '.json', JSON.stringify(config));
+exports.configure = function (c) {
+  c.app = config;
+  c.glfw.title = config.Project;
+};

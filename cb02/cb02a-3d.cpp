@@ -11,7 +11,10 @@ using namespace smartnova;
 using namespace smartnova::gl;
 
 class CB02A_3D : public Application {
-  json11::Json C = util::readConfig("cb02/cb02a");
+  json11::Json C, app;
+
+  public:
+  CB02A_3D(json11::Json config) { C = config; }
 
   virtual void init() {
     info.winWidth = 1920; info.winHeight = 1080;
@@ -24,13 +27,15 @@ class CB02A_3D : public Application {
   mat4 View1 = mat4(1.f), View2 = mat4(1.f);
 
   virtual void startup() {
-    program.load("cb02/cb02a", vector<string> { "vs", "fs" });
+    app = C["app"];
+
+    program.load(app["shaders"].array_items()[0]);
     program.use();
 
-    { vec4 _ = util::vec4(C["Torus"]);
+    { vec4 _ = util::vec4(app["Torus"]);
       Torus = new VBOTorus(_[0], _[1], _[2], _[3]); }
 
-    { json11::Json Look = C["Look"];
+    { json11::Json Look = app["Look"];
       View1 = glm::lookAt(util::vec3(Look["left"]),
           util::vec3(Look["at"]), util::vec3(Look["up"]));
       View2 = glm::lookAt(util::vec3(Look["right"]),
@@ -39,8 +44,8 @@ class CB02A_3D : public Application {
     View1 = lookAt(vec3(-.01, 0, 2), vec3(0), Y);
     View2 = lookAt(vec3( .01, 0, 2), vec3(0), Y);
 
-    program.setUniforms("Material", C["Material"]);
-    program.setUniforms("Light", C["Light"]);
+    program.setUniforms("Material", app["Material"]);
+    program.setUniforms("Light", app["Light"]);
 
     glEnable(GL_DEPTH_TEST);
   }
@@ -59,7 +64,7 @@ class CB02A_3D : public Application {
     mat4 Model =
       rotate(radians((float)t * 8), Y) * rotate(radians(-35.f), X) * rotate(radians(35.f), Y);
 
-    vec4 worldLight = util::vec4(C["WorldLight"]);
+    vec4 worldLight = util::vec4(app["WorldLight"]);
 
     glViewport(0, 0, w2, h);
     mat4 ModelView = View1 * Model;
@@ -79,4 +84,4 @@ class CB02A_3D : public Application {
   }
 };
 
-DECLARE_MAIN(CB02A_3D)
+GLMAIN(CB02A_3D)
