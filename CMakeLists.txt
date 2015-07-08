@@ -76,6 +76,7 @@ set(sblibs ${gllibs} smartnova)
 ######################################################################
 # Test
 
+include_directories(cb00)
 add_subdirectory(test)
 
 ######################################################################
@@ -98,7 +99,7 @@ endfunction(cookall)
 ######################################################################
 # Simple tests
 
-set(ingredients ${sblibs})
+set(ingredients ${sblibs} json11)
 
 #foreach(X app glfw)
 #  add_executable(${X} sn/test/${X}.cpp)

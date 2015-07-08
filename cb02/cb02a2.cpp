@@ -1,5 +1,3 @@
-#include <json11.hpp>
-
 #include "vbotorus.h"
 
 #include "Program.hpp"
@@ -12,11 +10,11 @@ using glm::translate;
 using namespace smartnova;
 using namespace smartnova::gl;
 
-class TestConfig : public Application {
+class CB02A2 : public Application {
   json11::Json C, app;
 
   public:
-  TestConfig(json11::Json config) {
+  CB02A2(json11::Json config) {
     C = config;
     app = C["app"];
   }
@@ -31,12 +29,6 @@ class TestConfig : public Application {
   glm::vec2 initRot;
   glm::vec3 relocation;
   GLfloat rotY;
-  /*
-  json11::Json motion = C["TorusMotion"];
-  glm::vec2 initRot = util::vec2(motion["InitRot"]);
-  glm::vec3 relocation = util::vec3(motion["Relocation"]);
-  GLfloat rotY = motion["RotY"].number_value();;
-  */
 
   virtual void startup() {
     program.load(app["shaders"].array_items()[0]);
@@ -84,4 +76,4 @@ class TestConfig : public Application {
   }
 };
 
-GLMAIN(TestConfig)
+GLMAIN(CB02A2)

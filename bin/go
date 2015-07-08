@@ -11,4 +11,11 @@ for (var i = 2; i < process.argv.length; i++) {
 
 require('config').configure(config_name + '.json', argv);
 
-require('child_process').execFile(command, [ config_name ]);
+require('child_process').execFile(command, [ config_name ],
+  function (error, stdout, stderr) {
+    console.log('stdout:\n', stdout);
+    console.error('stderr:\n', stderr);
+    if (error !== null) {
+      console.error('exec error: ' + error);
+    }
+});

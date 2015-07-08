@@ -7,7 +7,7 @@ var config = {
 
   Look: { eye: [ 0., 0., 7. ], at: C.Origin, up: C.Y },
 
-  // Shaders: 'vs,fs'.split(',').pop(),
+  shaders: [ 'cb02/cb02c.shaders' ],
 
   Light: {
     Ld: [ 1., 1., 1. ],
@@ -19,6 +19,17 @@ var config = {
     Ka: [ .9, .5, .3 ],
     Ks: [ .8, .8, .8 ],
     Shininess: 100. },
+
+  Teapot: {
+    grid: 13
+  },
+
+  TeapotMotion: {
+    Translate: [ 0.0, -1.5, 0.0 ]
+  }
 };
 
-require('fs').writeFileSync(config.Project + '.json', JSON.stringify(config));
+exports.configure = function (c) {
+  c.app = config;
+  c.glfw.title = config.Project;
+};
