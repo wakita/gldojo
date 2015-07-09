@@ -125,11 +125,13 @@ class Application {
     static std::unique_ptr<GLFWwindow, GLFWwindowDeleter> Window;
     static std::unique_ptr<Application> App;
     mat4 Projection;
+    json11::Json C, A;
 
     /**
      * @brief デフォルトコンストラクタ
      */
     Application();
+    Application(json11::Json config);
     /**
      * @brief 初期化：GLFWウィンドウを取得してglbindingを初期化する．
      * @param title ウィンドウのタイトル
@@ -148,7 +150,7 @@ class Application {
 #define GLMAIN(APP)                             \
 int main(int argc, char const * const argv[]) { \
   try {                                         \
-    json11::Json C = util::readConfig(argv[1]); \
+    json11::Json C = smartnova::util::readConfig(argv[1]); \
     Application::initialize(C);                 \
     std::unique_ptr<APP> app(new APP(C));       \
     app.get()->run();                           \
@@ -226,8 +228,10 @@ class Program {
     void compile(const string & source, GLenum type, const string & path)
       throw (ProgramException);
     void load(const json11::Json &shaderset) throw (ProgramException);
+    void load(const json11::Json &shaderset, const int) throw (ProgramException);
     void load(const string &stem, vector<string> exts) throw (ProgramException);
     void load(const string &stem, string exts) throw (ProgramException);
+    // static void loadall(vector<Program> &, const json11::Json&) throw (ProgramException);
 
     void link() throw (ProgramException);
     void validate() throw (ProgramException);

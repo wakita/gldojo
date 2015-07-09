@@ -1,20 +1,9 @@
 #!/usr/bin/env node
 
-var C = require('../config/common.json');
+exports.configure = function (config) {
+  require('cb02a').configure(config);
 
-var config = {
-  Project: 'cb02b',
-
-  Look: { eye: [ 0., 0., 2. ], at: C.Origin, up: C.Y },
-
-  Shaders: 'vs,fs'.split(',').pop(),
-
-  Torus: [ .7, .3, 50., 50. ],
-
-  LightPosition: [ 5., 5., 2., 1. ],
-
-  Kd: [ .9, .5, .3 ],
-  Ld: [ 1., 1., 1. ]
+  config.app.Project = 'cb02b';
+  config.app.shaders = [ 'cb02/cb02b.shaders' ];
+  config.glfw.title = config.app.Project;
 };
-
-require('fs').writeFileSync(config.Project + '.json', JSON.stringify(config));

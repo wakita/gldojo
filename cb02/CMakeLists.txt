@@ -1,1 +1,1 @@
-cook(a a1 a-3d a2 b c)
+cook(a a1 a2 b c)

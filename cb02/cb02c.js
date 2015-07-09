@@ -2,7 +2,7 @@
 
 var C = require('../config/common.json');
 
-var config = {
+var app = {
   Project: 'cb02c',
 
   Look: { eye: [ 0., 0., 7. ], at: C.Origin, up: C.Y },
@@ -21,15 +21,12 @@ var config = {
     Shininess: 100. },
 
   Teapot: {
-    grid: 13
-  },
-
-  TeapotMotion: {
+    grid: 13,
     Translate: [ 0.0, -1.5, 0.0 ]
   }
 };
 
-exports.configure = function (c) {
-  c.app = config;
-  c.glfw.title = config.Project;
+exports.configure = function (config) {
+  config.app = app;
+  app.glfw.title = app.Project;
 };

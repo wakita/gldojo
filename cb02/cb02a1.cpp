@@ -8,59 +8,57 @@ using glm::rotate;
 using namespace smartnova;
 using namespace smartnova::gl;
 
-class CB02A : public Application {
-  json11::Json C, app;
+class CB02A1 : public Application {
 
   public:
-  CB02A(json11::Json config) {
-    C = config;
-    app = C["app"];
-  }
+    CB02A1(json11::Json config) : Application(config) {}
 
-  virtual void init() { Application::init(""); }
+    VBOTorus *Torus;
+    mat4 View = mat4(1.f);
+    vec2 initRot;
+    GLfloat rotY;
 
-  Program program;
-  VBOTorus *Torus;
-  vec2 initRot;
-  mat4 View = mat4(1.f);
-  GLfloat rotY;
+    virtual void init() {
+      Application::init("");
 
-  virtual void startup() {
-    program.load(app["shaders"].array_items()[0]);
-    program.use();
+      { vec4 _ = util::vec4(A["Torus"]);
+        Torus = new VBOTorus(_[0], _[1], _[2], _[3]); }
 
-    { vec4 _ = util::vec4(app["Torus"]);
-      Torus = new VBOTorus(_[0], _[1], _[2], _[3]); }
+      { json11::Json Look = A["Look"];
+        View = glm::lookAt(util::vec3(Look["eye"]), util::vec3(Look["at"]), util::vec3(Look["up"])); }
 
-    { json11::Json Look = app["Look"];
-      View = glm::lookAt(util::vec3(Look["eye"]), util::vec3(Look["at"]), util::vec3(Look["up"])); }
+      initRot = util::vec2(A["TorusMotion"]["InitRot"]);
+      rotY = A["TorusMotion"]["RotY"].number_value();
+    }
 
-    vec4 worldLight = util::vec4(app["WorldLight"]);
+    Program program;
 
-    program.setUniforms("Material", app["Material"]);
-    program.setUniforms("Light",    app["Light"]);
+    virtual void startup() {
+      program.load(A["shaders"], 0);
+      program.use();
 
-    initRot = util::vec2(app["TorusMotion"]["InitRot"]);
-    rotY = app["TorusMotion"]["RotY"].number_value();
+      program.load(A["shaders"], 0);
+      program.setUniforms("Material", A["Material"]);
+      program.setUniforms("Light",    A["Light"]);
 
-    glEnable(GL_DEPTH_TEST);
-  }
+      glEnable(GL_DEPTH_TEST);
+    }
 
-  virtual void render(double t) {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    virtual void render(double t) {
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    mat4 Model =
-      rotate(radians((float)t * rotY), Y) *
-      rotate(radians(initRot.x), X) *
-      rotate(radians(initRot.y), Y);
-    mat4 ModelView = View * Model;
+      mat4 Model =
+        rotate(radians((float)t * rotY), Y) *
+        rotate(radians(initRot.x), X) *
+        rotate(radians(initRot.y), Y);
+      mat4 ModelView = View * Model;
 
-    program.setUniform("ModelViewMatrix", ModelView);
-    program.setUniform("NormalMatrix",    glm::inverseTranspose(mat3(ModelView)));
-    program.setUniform("MVP",             Projection * ModelView);
+      program.setUniform("ModelViewMatrix", ModelView);
+      program.setUniform("NormalMatrix",    glm::inverseTranspose(mat3(ModelView)));
+      program.setUniform("MVP",             Projection * ModelView);
 
-    Torus->render();
-  }
+      Torus->render();
+    }
 };
 
-GLMAIN(CB02A)
+GLMAIN(CB02A1)

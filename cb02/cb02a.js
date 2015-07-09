@@ -46,6 +46,7 @@ var config = {
 
   TorusMotion: {
     InitRot: [ -35., 35. ],
+    Relocation: [ 0., 0., 0.01 ],
     RotY: 8
   }
 };

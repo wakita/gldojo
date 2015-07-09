@@ -11,47 +11,47 @@ using glm::lookAt;
 using glm::perspective;
 
 class CB02B : public Application {
-  json11::Json C = util::readConfig("cb02/cb02b");
+  public:
+    CB02B(json11::Json config): Application(config) { }
 
-  virtual void init() {
-    Application::init("cb02b: Diffuse shader");
-  }
+    VBOTorus *torus;
+    mat4 View = mat4(1.f);
 
-  Program program;
-  VBOTorus *torus;
-  mat4 View = mat4(1.f);
+    virtual void init() {
+      Application::init("");
+      { vec4 _ = util::vec4(A["Torus"]);
+        torus = new VBOTorus(_[0], _[1], _[2], _[3]); }
 
-  virtual void startup() {
-    program.load("cb02/cb02b", "vs, fs");
-    program.use();
+      { json11::Json Look = A["Look"];
+        View = lookAt(util::vec3(Look["eye"]), util::vec3(Look["at"]), util::vec3(Look["up"])); }
+    }
 
-    { vec4 _ = util::vec4(C["Torus"]);
-      torus = new VBOTorus(_[0], _[1], _[2], _[3]); }
+    Program program;
 
-    { json11::Json Look = C["Look"];
-      View = lookAt(util::vec3(Look["eye"]), util::vec3(Look["at"]), util::vec3(Look["up"])); }
+    virtual void startup() {
+      program.load(A["shaders"], 0);
+      program.use();
 
-    program.setUniform("Kd", util::vec3(C["Kd"]));
-    program.setUniform("Ld", util::vec3(C["Ld"]));
-    program.setUniform("LightPosition", util::vec4(C["LightPosition"]));
+      program.setUniform("Kd",            util::vec3(A["Material"]["Kd"]));
+      program.setUniform("Ld",            util::vec3(A["Light"]["Ld"]));
+      program.setUniform("LightPosition", util::vec4(A["WorldLight"]));
 
-    glEnable(GL_DEPTH_TEST);
-  }
+      glEnable(GL_DEPTH_TEST);
+    }
 
-  virtual void render(double t) {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    virtual void render(double t) {
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    mat4 Model =
-      rotate(radians((float)t * 8), Y) * rotate(radians(-35.f), X) * rotate(radians(35.f), Y);
+      mat4 Model =
+        rotate(radians((float)t * 8), Y) * rotate(radians(-35.f), X) * rotate(radians(35.f), Y);
 
-    // Set matrices
-    mat4 ModelView = View * Model;
-    program.setUniform("ModelViewMatrix", ModelView);
-    program.setUniform("NormalMatrix", glm::inverseTranspose(mat3(ModelView)));
-    program.setUniform("MVP", Projection * ModelView);
+      mat4 ModelView = View * Model;
+      program.setUniform("ModelViewMatrix", ModelView);
+      program.setUniform("NormalMatrix",    glm::inverseTranspose(mat3(ModelView)));
+      program.setUniform("MVP",             Projection * ModelView);
 
-    torus->render();
-  }
+      torus->render();
+    }
 };
 
-DECLARE_MAIN(CB02B)
+GLMAIN(CB02B)

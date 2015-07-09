@@ -18,7 +18,10 @@ std::unique_ptr<Application> Application::App(nullptr);
 
 // Application *Application::app;
 
-Application::Application() {
+Application::Application() { }
+Application::Application(json11::Json config) {
+  C = config;
+  A = config["app"];
 }
 
 void Application::initialize(json11::Json C) {
@@ -100,7 +103,7 @@ void Application::initialize(json11::Json C) {
       App.get()->onScroll(win, xoffset, yoffset); });
 
   glfwSetInputMode(window, GLFW_CURSOR,
-      GLFW[ "cursor" ].bool_value() ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+      GLFW[ "cursor" ].bool_value() ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
 
 # if defined(_DEBUG)
   cerr << "App.Marker[Notify](0): Initialization of GLFW completed" << endl;
@@ -532,6 +535,11 @@ void Program::load(const json11::Json &shaderset)
 # endif
   }
 
+void Program::load(const json11::Json &shaders, const int i)
+  throw (ProgramException) {
+    load(shaders.array_items()[i]);
+}
+
 void Program::load(const string &stem, vector<string> exts)
   throw (ProgramException) {
   const char *dir = getenv("SHADERS_DIR");
@@ -566,6 +574,19 @@ void Program::load(const string &stem, string exts)
     printActiveUniforms();
 # endif
   }
+
+/*
+void Program::loadall(const vector<Program> &programs, const json11::Json &shaders)
+  throw (ProgramException) {
+    int i = 0;
+    for (auto shader : shaders.array_items()) {
+      Program program;
+      program.load(shader);
+      progs[i] = program;
+      i++;
+    }
+}
+*/
 
 void Program::link() throw (ProgramException) {
   if (linked) return;

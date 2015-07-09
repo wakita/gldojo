@@ -11,69 +11,65 @@ using namespace smartnova;
 using namespace smartnova::gl;
 
 class CB02A2 : public Application {
-  json11::Json C, app;
-
   public:
-  CB02A2(json11::Json config) {
-    C = config;
-    app = C["app"];
-  }
+    CB02A2(json11::Json config) : Application(config) {}
 
-  virtual void init() { Application::init(""); }
+    VBOTorus *Torus;
+    vector<mat4> Views { mat4(1.f), mat4(1.f) };
+    json11::Json motion;
+    glm::vec2 initRot;
+    glm::vec3 relocation;
+    GLfloat rotY;
 
-  Program program;
-  VBOTorus *Torus;
-  vector<mat4> Views { mat4(1.f), mat4(1.f) };
+    virtual void init() {
+      Application::init("");
 
-  json11::Json motion;
-  glm::vec2 initRot;
-  glm::vec3 relocation;
-  GLfloat rotY;
+      { vec4 _ = util::vec4(A["Torus"]);
+        Torus = new VBOTorus(_[0], _[1], _[2], _[3]); }
 
-  virtual void startup() {
-    program.load(app["shaders"].array_items()[0]);
-    program.use();
-
-    { vec4 _ = util::vec4(app["Torus"]);
-      Torus = new VBOTorus(_[0], _[1], _[2], _[3]); }
-
-    { json11::Json Look = app["Look"];
+      { json11::Json Look = A["Look"];
 #     define LOOK(n) util::vec3(Look[n])
-      Views[0] = glm::lookAt(LOOK("left"),  LOOK("at"), LOOK("up"));
-      Views[1] = glm::lookAt(LOOK("right"), LOOK("at"), LOOK("up"));
+        Views[0] = glm::lookAt(LOOK("left"),  LOOK("at"), LOOK("up"));
+        Views[1] = glm::lookAt(LOOK("right"), LOOK("at"), LOOK("up"));
+      }
+
+      motion = A["TorusMotion"];
+      initRot = util::vec2(motion["InitRot"]);
+      relocation = util::vec3(motion["Relocation"]);
+      rotY = motion["RotY"].number_value();;
     }
 
-    program.setUniforms("Material", app["Material"]);
-    program.setUniforms("Light",    app["Light"]);
+    Program program;
 
-    motion = app["TorusMotion"];
-    initRot = util::vec2(motion["InitRot"]);
-    relocation = util::vec3(motion["Relocation"]);
-    rotY = motion["RotY"].number_value();;
+    virtual void startup() {
+      program.load(A["shaders"], 0);
+      program.use();
+      program.setUniforms("Material", A["Material"]);
+      program.setUniforms("Light",    A["Light"]);
 
-    glEnable(GL_DEPTH_TEST);
-  }
-
-  virtual void render(double t) {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    mat4 Model =
-      translate(I4, relocation * t) *
-      rotate(radians((float)t * rotY), Y) *
-      rotate(radians(initRot.x), X) *
-      rotate(radians(initRot.y), Y);
-
-    for (int i = 0; i < Views.size(); i++) {
-      mat4 View = Views.at(i);
-      mat4 ModelView = View * Model;
-      program.setUniform("ModelViewMatrix", ModelView);
-      program.setUniform("NormalMatrix",    glm::inverseTranspose(mat3(ModelView)));
-      program.setUniform("MVP",             Projection * ModelView);
-      program.setUniform("FSMOD",           (GLint)i);
-      program.setUniforms("Material",       app[i == 0 ? "MaterialL" : "MaterialR"]);
-      Torus->render();
+      glEnable(GL_DEPTH_TEST);
     }
-  }
+
+    virtual void render(double t) {
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+      mat4 Model =
+        translate(I4, relocation * t) *
+        rotate(radians((float)t * rotY), Y) *
+        rotate(radians(initRot.x), X) *
+        rotate(radians(initRot.y), Y);
+
+      for (int i = 0; i < Views.size(); i++) {
+        mat4 View = Views.at(i);
+        mat4 ModelView = View * Model;
+        program.setUniform("ModelViewMatrix", ModelView);
+        program.setUniform("NormalMatrix",    glm::inverseTranspose(mat3(ModelView)));
+        program.setUniform("MVP",             Projection * ModelView);
+        program.setUniform("FSMOD",           (GLint)i);
+        program.setUniforms("Material",       A[i == 0 ? "MaterialL" : "MaterialR"]);
+        Torus->render();
+      }
+    }
 };
 
 GLMAIN(CB02A2)

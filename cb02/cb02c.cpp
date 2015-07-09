@@ -12,37 +12,32 @@ using namespace smartnova::gl;
 #define _DEBUG
 
 class CB02C : public Application {
-  json11::Json C;
-
   public:
-  CB02C(json11::Json config) { C = config; }
-
-  virtual void init() { Application::init(""); }
+  CB02C(json11::Json config) : Application(config) {}
 
   Program program;
   VBOTeapot *shape;
   mat4 Model, View, ModelView;
 
+  virtual void init() {
+    Application::init("");
+
+    shape = new VBOTeapot(A["Teapot"]["grid"].int_value(), mat4(1.f));
+
+    { json11::Json Look = A["Look"];
+      View = lookAt(util::vec3(Look["eye"]), util::vec3(Look["at"]), util::vec3(Look["up"])); }
+
+    Model = translate(util::vec3(A["Teapot"]["Translate"])) * rotate(radians(-90.f), X);
+    ModelView = View * Model;
+  }
+
   virtual void startup() {
     setTrace(C["trace"].bool_value());
 
-    json11::Json app = C["app"], Look = app["Look"];
-    {
-#     define LOOK(n) util::vec3(Look[n])
-      View = lookAt(LOOK("eye"), LOOK("at"), LOOK("up"));
-    }
-
-    Model = translate(util::vec3(app["TeapotMotion"]["Translate"])) * rotate(radians(-90.f), X);
-    ModelView = View * Model;
-
-    program.load(app["shaders"].array_items()[0]);
+    program.load(A["shaders"], 0);
     program.use();
-
-    shape = new VBOTeapot(app["Teapot"]["grid"].int_value(), mat4(1.f));
-
-    program.setUniforms("Light",          app["Light"]);
-    program.setUniforms("Material",       app["Material"]);
-
+    program.setUniforms("Light",          A["Light"]);
+    program.setUniforms("Material",       A["Material"]);
     program.setUniform("ModelViewMatrix", ModelView);
     program.setUniform("NormalMatrix",    glm::inverseTranspose(mat3(ModelView)));
 
