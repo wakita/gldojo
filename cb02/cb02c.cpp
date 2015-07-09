@@ -20,7 +20,7 @@ class CB02C : public Application {
   mat4 Model, View, ModelView;
 
   virtual void init() {
-    Application::init("");
+    Application::init();
 
     shape = new VBOTeapot(A["Teapot"]["grid"].int_value(), mat4(1.f));
 

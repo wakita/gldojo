@@ -18,7 +18,7 @@ class CB02B : public Application {
     mat4 View = mat4(1.f);
 
     virtual void init() {
-      Application::init("");
+      Application::init();
       { vec4 _ = util::vec4(A["Torus"]);
         torus = new VBOTorus(_[0], _[1], _[2], _[3]); }
 

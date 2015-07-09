@@ -20,7 +20,7 @@ class CB02A : public Application {
   CB02A(json11::Json config) : Application(config) {}
 
   virtual void init() {
-    Application::init("");
+    Application::init();
 
     { vec4 _ = util::vec4(A["Torus"]);
       Torus = new VBOTorus(_[0], _[1], _[2], _[3]); }

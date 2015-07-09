@@ -22,7 +22,7 @@ class CB02A2 : public Application {
     GLfloat rotY;
 
     virtual void init() {
-      Application::init("");
+      Application::init();
 
       { vec4 _ = util::vec4(A["Torus"]);
         Torus = new VBOTorus(_[0], _[1], _[2], _[3]); }
