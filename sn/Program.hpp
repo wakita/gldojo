@@ -105,7 +105,7 @@ class Application {
   public:
     static  void initializeGLcontext();
     static  void initialize(json11::Json);
-    virtual void init() {}
+    virtual void init();
     virtual void startup() = 0;
     virtual void render(double currentTime) = 0;
     virtual void shutdown();

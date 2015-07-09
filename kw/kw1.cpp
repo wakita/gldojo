@@ -5,15 +5,18 @@
 using namespace smartnova::gl;
 
 class KW1 : public Application {
+  public:
+    KW1(json11::Json config): Application(config) {}
+
   virtual void init() {
-    Application::init("kw1: 多角形");
+    Application::init();
   }
 
   unique_ptr<RegularPolygon> polygon;
   
   virtual void startup() {
     Program program;
-    program.load("kw/kw1", "vs, fs");
+    program.load(A["shaders"], 0);
     program.use();
 
     polygon.reset(new RegularPolygon(0.5f, 3));
@@ -27,4 +30,4 @@ class KW1 : public Application {
   }
 };
 
-DECLARE_MAIN(KW1)
+GLMAIN(KW1)

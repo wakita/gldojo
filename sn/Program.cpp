@@ -370,6 +370,12 @@ void Application::init(const string & title) {
   });
 }
 
+void Application::init() {
+  info.title = C["glfw"]["title"].string_value();
+  init("");
+}
+
+
 void Application::shutdown() {
   setDebugging(false);
   glfwTerminate();
