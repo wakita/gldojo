@@ -1,0 +1,19 @@
+==> kw3.vs <==
+#version 430
+
+layout (location=0) in vec2 position_vs;
+
+void main() {
+  gl_Position = vec4(position_vs, 0, 1);
+}
+
+==> kw3.fs <==
+#version 430
+
+layout (location=0) out vec4 Color;
+
+void main() {
+  vec4 fc = gl_FragCoord;
+  // Color = vec4(0.5, 0.5, 0.5, 1);
+  Color = vec4((fc.x / 800), 0, (fc.y / 600), 1);
+}
