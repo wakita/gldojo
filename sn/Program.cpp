@@ -312,7 +312,7 @@ void Application::setDebugging(bool debug) {
         case GL_DEBUG_SEVERITY_NOTIFICATION: _severity = "Notify"; break;
       }
 #     pragma GCC diagnostic warning "-Wswitch"
-      cout << _source << "." << _type << "[" << _severity << "](" <<
+      cerr << _source << "." << _type << "[" << _severity << "](" <<
         id << "): " << message << endl;
     }, nullptr);
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
