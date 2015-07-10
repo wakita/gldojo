@@ -13,8 +13,8 @@ require('config').configure(config_name + '.json', argv);
 
 require('child_process').execFile(command, [ config_name ],
   function (error, stdout, stderr) {
-    console.log('stdout:\n', stdout);
-    console.error('stderr:\n', stderr);
+    console.log('stdout:'); console.log(stdout);
+    console.error('stderr:'); console.log(stderr);
     if (error !== null) {
       console.error('exec error: ' + error);
     }
