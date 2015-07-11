@@ -12,17 +12,9 @@ void main() {
 
 layout (location=0) out vec4 Color;
 
-uniform uint BITS;
-
-const uint SCALE = 1 << BITS;
-const uint MASK = SCALE - 1;
-const float S = SCALE - 0.5;
+const uint MASK = (1 << 8) - 1;
+const float S = 255.f;
 
 void main() {
-  const uint x = uint(gl_FragCoord.x), y = uint(gl_FragCoord.y);
-
-  uint r = x >> BITS, g = x & MASK;
-  uint b = y >> BITS, a = y & MASK;
-
-  Color = vec4(float(r) / S, float(g) / S, float(b) / S, float(a) / S);
+  Color = vec4(0, (gl_FragCoord.x - 0.5)/S, 0, (gl_FragCoord.y - 0.5)/S);
 }

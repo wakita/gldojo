@@ -1,0 +1,34 @@
+==> kw4.vs <==
+#version 430
+
+layout (location=0) in vec2 position_vs;
+
+void main() {
+  gl_Position = vec4(position_vs, 0, 1);
+}
+
+==> kw4.fs <==
+#version 430
+
+layout (location=0) out vec4 Color;
+
+layout (std430, binding=0) buffer data {
+  uint x[];
+  uint y[];
+};
+
+uniform uint BITS;
+
+const uint SE = 0x7e << 23;
+const uint MASK = (1 << 23) - 1;
+
+void main() {
+  uint x = uint(gl_FragCoord.x), y = uint(gl_FragCoord.y);
+  data.x[x] = x;
+  data.y[y] = y;
+  /*
+  uint id = ((x << 12) | y) & MASK;
+  float f = uintBitsToFloat(SE | x);
+  */
+  Color = vec4(0, 0, 0, 1);
+}

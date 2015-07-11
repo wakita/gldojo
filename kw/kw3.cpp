@@ -1,3 +1,5 @@
+#include <fstream>
+
 #include "Program.hpp"
 #include "Utility.hpp"
 #include "RegularPolygon.hpp"
@@ -5,7 +7,6 @@
 using namespace smartnova::gl;
 
 class KW3 : public Application {
-  GLuint BITS, SCALE, MASK;
 
   public:
     KW3(json11::Json config): Application(config) {}
@@ -13,9 +14,6 @@ class KW3 : public Application {
     virtual void init() {
       info.flags.vsync = 1;
       Application::init();
-      BITS = A["bits"].int_value();
-      SCALE = 1 << BITS;
-      MASK = SCALE - 1;
     }
 
     virtual void startup() {
@@ -31,8 +29,6 @@ class KW3 : public Application {
       glBufferData(GL_ARRAY_BUFFER, sizeof(point), point, GL_STATIC_DRAW);
       glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-      program.setUniform("BITS",    BITS);
-
       glEnableVertexAttribArray(0);
     }
 
@@ -42,35 +38,14 @@ class KW3 : public Application {
       glClearBufferfv(GL_COLOR, 0, bgcolor);
       glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-      GLfloat d[4 * SCALE * SCALE];
-      glReadPixels(0, 0, SCALE, SCALE, GL_RGBA, GL_FLOAT, d);
-      for (int curX = 0; curX < SCALE; curX++) {
-        for (int curY = 0; curY < SCALE; curY++) {
-          int p = 4 * (curY * SCALE + curX);
-          GLfloat fr = d[p + 0], fg = d[p + 1], fb = d[p + 2], fa = d[p + 3];
-          GLuint r, g, b, a;
-          GLuint x, y, z;
+      GLubyte d[sizeof(GLuint) * 256], *p = d;
+      glReadPixels(0, 0, 256, 1, GL_RGBA, GL_UNSIGNED_BYTE, d);
+      for (int X = 0; X < 256; X++) {
+        GLuint r = *p++, g = *p++, b = *p++, a = *p++;
+        GLint x = (r << 8) | g, y = (b << 8) | a;
 
-          switch (FAILURE) {
-            case 0:
-              r = (GLuint)(SCALE * fr); g = (GLuint)(SCALE * fg);
-              b = (GLuint)(SCALE * fb); a = (GLuint)(SCALE * fa);
-              x = (r << BITS) + g; y = (b << BITS) + a;
-              break;
-
-            case 1:
-              r = glm::floatBitsToInt(fr);
-              g = glm::floatBitsToInt(fg);
-              b = glm::floatBitsToInt(fb);
-              a = glm::floatBitsToInt(fa);
-              break;
-          }
-
-          std::cout <<
-            glm::uvec2(curX, curY) <<
-            ", xy: " << glm::uvec2(x, y) <<
-            ", Δ: " << glm::uvec2(x - curX, y - curY) << std::endl;
-        }
+        std::cout << "X: " << X << ", xy: " << x << ", " << y << std::endl;
+        assert(x == X); assert(y == 0);
       }
       glfwSetWindowShouldClose(Window.get(), true);
     }
