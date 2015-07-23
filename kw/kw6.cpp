@@ -113,7 +113,7 @@ class KW6: public Application {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearBufferfv(GL_COLOR, 0, bgcolor);
 
-    View = lookAt(rotate(LookEye, (GLfloat)(PI * (.9 - t / 10)), Y), LookAt, LookUp);
+    View = lookAt(rotate(LookEye, (GLfloat)(PI * (.9 - t / 20)), Y), LookAt, LookUp);
 
     program.setUniform("t",   (GLfloat)t);
     program.setUniform("MVP", Projection * View * Model);

@@ -1,4 +1,5 @@
 #include <fstream>
+#include <iostream>
 #include <stdlib.h>
 
 #include "Utility.hpp"
@@ -31,6 +32,14 @@ Json readConfig(const std::string &name)
 Json readConfig()
   throw (ProgramException) {
     return readJSON(std::string(getenv("HOME")) + "/.gl-config.json");
+  }
+
+Json readConfig(char const * const argv[])
+  throw (ProgramException) {
+    const std::string command(argv[0]);
+    std::string cmd = command.substr(command.find_last_of("\\") + 1);
+    cmd = cmd.substr(0, cmd.find_last_of("."));
+    return readJSON(std::string(getenv("HOME")) + "/.gldojo/" + cmd + ".json");
   }
 
 glm::vec3 rgb2hsv(const glm::vec3 &c) {

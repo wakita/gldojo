@@ -150,7 +150,7 @@ class Application {
 #define GLMAIN(APP)                             \
 int main(int argc, char const * const argv[]) { \
   try {                                         \
-    json11::Json C = smartnova::util::readConfig(); \
+    json11::Json C = smartnova::util::readConfig(argv); \
     Application::initialize(C);                 \
     std::unique_ptr<APP> app(new APP(C));       \
     app.get()->run();                           \
