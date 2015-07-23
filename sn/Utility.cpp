@@ -1,4 +1,5 @@
 #include <fstream>
+#include <stdlib.h>
 
 #include "Utility.hpp"
 
@@ -25,6 +26,11 @@ Json readConfig(const std::string &name)
     const char *dir = getenv("CONFIG_DIR");
     const std::string base(dir ? dir : "config");
     return readJSON(base + "/" + name + ".json");
+  }
+
+Json readConfig()
+  throw (ProgramException) {
+    return readJSON(std::string(getenv("HOME")) + "/.gl-config.json");
   }
 
 glm::vec3 rgb2hsv(const glm::vec3 &c) {

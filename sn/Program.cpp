@@ -384,17 +384,26 @@ void Application::shutdown() {
 
 void Application::run() {
   init();
+  if (A["trace"].bool_value()) setTrace(true);
   startup();
 
   GLFWwindow *win = Window.get();
   onResize(win, info.winWidth, info.winHeight);
 
+  bool maybeTracing = true;
+
   while (!glfwWindowShouldClose(win)) {
     glfwPollEvents();
     double t = glfwGetTime();
     render(t);
+    glFinish();
+
     showFPS(t);
     glfwSwapBuffers(win);
+    if (maybeTracing) {
+      setTrace(false);
+      maybeTracing = false;
+    }
   }
   shutdown();
   exit(EXIT_SUCCESS);

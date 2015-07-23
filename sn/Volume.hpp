@@ -2,7 +2,7 @@
 
 #include "Program.hpp"
 
-enum VBO_attributes { Position, Normal, Texture, Color, N_VBO = Color + 1 };
+enum VBO_attributes { Position, Normal, Texture, Color, Element, N_VBO = Color + 1 };
 
 class Volume {
   protected:
