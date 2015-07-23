@@ -66,7 +66,7 @@ class KW4 : public Application {
         }
         std::ofstream ofs("x.dat");
         for (int id = 0; id < SCALE * SCALE; id++) {
-          ofs << std::dec << id << " " << std::hex << buffer[id] << std::endl;
+          ofs << std::dec << id << " " << std::hex << d[id] << std::endl;
           // ofs << std::dec << id << " " << std::hex << v[id] << std::endl;
         }
         ofs.close();
