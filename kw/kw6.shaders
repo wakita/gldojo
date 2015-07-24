@@ -26,6 +26,7 @@ void main() {
 layout (location = 0) out vec4 FragColor;
 
 uniform vec3 Light;
+uniform float t;
 
 /*
  * 参考： 床井先生「シェーダで Point Sprite」
@@ -44,7 +45,7 @@ void paintNormal() {
   if (normal.z < 0) discard;
   normal.z = sqrt(normal.z);
   float luminance = dot(Light, normalize(normal));
-  FragColor = vec4(vec3(luminance) * 0.8 + vec3(0.2, 0.2, 0.5), 1);
+  FragColor = vec4(vec3(luminance) * 0.8 + vec3(0.2, 0.2, 0.5), 1 / max(1, (t - 10) / 5));
 }
 
 void main() {
