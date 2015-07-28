@@ -1,0 +1,10 @@
+#!/bin/sh
+
+command=$1
+driver_command=/tmp/run-`basename $0`
+
+shift; args=$*
+
+node node_modules/configure.js $command $args
+cp $_PROJECT_BUILD_/bin/$command $driver_command
+$driver_command $command

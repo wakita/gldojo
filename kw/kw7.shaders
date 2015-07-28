@@ -1,4 +1,4 @@
-==> kw6.vs <==
+==> kw7.vs <==
 #version 430
 #extension GL_ARB_shader_storage_buffer_object: enable
 
@@ -18,7 +18,7 @@ void main() {
   gl_ClipDistance[0] = - distance(VertexPosition, vec3(0.6, 0.3, 0.4)) + (t - T_WAIT)/6;
 }
 
-==> kw6.fs <==
+==> kw7.fs <==
 #version 430
 
 // subroutine void paintType();

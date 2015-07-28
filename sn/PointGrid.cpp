@@ -5,7 +5,8 @@ PointGrid::PointGrid(float radius, int dim) {
   nVertices = dim * dim * dim;
 
   { // Positions
-    const float s = (float)dim / 2, s2 = 1.f;
+    std::cout << "#vertices = " << nVertices << std::endl;
+    const float s = (float)(dim - 1) / 2, s2 = 1;
     std::unique_ptr<GLfloat[]> vertices(new GLfloat[3 * nVertices]);
     GLfloat *p = vertices.get();
     for (int x = 0; x < dim; x++) {
@@ -38,7 +39,7 @@ PointGrid::PointGrid(float radius, int dim) {
 void PointGrid::render(double t) {
   glBindVertexArray(vao);
   glPointSize(r);
-  glDrawArrays(GL_POINTS, 0, 3 * nVertices);
+  glDrawArrays(GL_POINTS, 0, nVertices);
 }
 
 void PointGrid::render() { render(0); }

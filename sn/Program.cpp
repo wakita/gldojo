@@ -39,6 +39,8 @@ void Application::initialize(json11::Json C) {
   int swapInterval = 1;
 
   json11::Json GLFW = C["glfw"];
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GLFW["version"].array_items()[0].int_value());
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GLFW["version"].array_items()[1].int_value());
 
   GLFWmonitor *monitor = nullptr;
   if (GLFW["fullscreen"].bool_value()) {
@@ -427,8 +429,30 @@ void Application::onKey(GLFWwindow *win, int key, int scancode, int action, int 
   }
 }
 
-void Application::onMouseButton(GLFWwindow *win, int button, int action, int mods) {}
-void Application::onCursorPos(GLFWwindow *win, double xpos, double ypos) {}
+bool mousePressing = false, mouseDragging = false;
+
+void Application::onMouseButton(GLFWwindow *win, int button, int action, int mods) {
+  if (action == GLFW_RELEASE) {
+    mouseReleased(win, button, action, mods);
+    if (!mouseDragging) mouseClicked(win, button, action, mods);
+    mousePressing = mouseDragging = false;
+  } else if (action == GLFW_PRESS && !mousePressing) {
+    mousePressed(win, button, action, mods);
+    mousePressing = true;
+  } else {
+    std::cerr << "Unknown mouse operation (" << action << ")" << std::endl;
+  }
+}
+void Application::mousePressed (GLFWwindow *win, int button, int action, int mods) {}
+void Application::mouseReleased(GLFWwindow *win, int button, int action, int mods) {}
+void Application::mouseClicked (GLFWwindow *win, int button, int action, int mods) {}
+
+void Application::mouseDragged(GLFWwindow *win, double xpos, double ypos) {}
+void Application::mouseMoved  (GLFWwindow *win, double xpos, double ypos) {}
+void Application::onCursorPos (GLFWwindow *win, double xpos, double ypos) {
+  if (mousePressing) mouseDragged(win, xpos, ypos);
+  else mouseMoved(win, xpos, ypos);
+}
 void Application::onScroll(GLFWwindow *win, double xoffset, double yoffset) {}
 
 void Application::getCursorPos(GLFWwindow *window, double &xpos, double &ypos) {}
@@ -518,7 +542,7 @@ void Program::compile(const string &source, GLenum type, const string &path)
     glCompileShader(shader);
     Check;
     Shader::throwOnShaderError(shader, GL_COMPILE_STATUS,
-        string("Shader compilation failed for \"") + path + "\"");
+        string("Shader compilation failed for \"") + path + "\":\n" + c_code);
     glAttachShader(handle, shader);
   }
 
@@ -628,6 +652,18 @@ void Program::bindAttribLocation(GLuint location, const char *name) {
 
 void Program::bindFragDataLocation(GLuint location, const char *name) {
   glBindFragDataLocation(handle, location, name);
+}
+
+void Program::setUniform(const char * name, const glm::ivec2 &v) {
+  glUniform2i(uniformLocation(name), v.x, v.y);
+}
+
+void Program::setUniform(const char * name, const glm::ivec3 &v) {
+  glUniform3i(uniformLocation(name), v.x, v.y, v.z);
+}
+
+void Program::setUniform(const char * name, const glm::ivec4 &v) {
+  glUniform4i(uniformLocation(name), v.x, v.y, v.z, v.w);
 }
 
 void Program::setUniform(const char *name, const vec2 &v) {

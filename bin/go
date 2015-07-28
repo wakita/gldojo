@@ -11,6 +11,8 @@ for (var i = 2; i < process.argv.length; i++) {
 
 require('config').configure(path.join(process.env['HOME'], '.gldojo', command + '.json'), argv);
 
+console.log("Configuration done");
+
 require('child_process').execFile(command,
   function (error, stdout, stderr) {
     console.log('stdout:'); console.log(stdout);

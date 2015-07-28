@@ -12,20 +12,21 @@ void main() {
 
 layout (location=0) out vec4 Color;
 
-layout (std430, binding=0) buffer data {
-  uint x[];
-  uint y[];
+layout (std430, binding = 0) buffer SSB {
+  uint d_x;
+  uint d_y;
 };
 
 uniform uint BITS;
 
-const uint SE = 0x7e << 23;
+//const uint SE = 0x7e << 23;
 const uint MASK = (1 << 23) - 1;
 
 void main() {
   uint x = uint(gl_FragCoord.x), y = uint(gl_FragCoord.y);
-  data.x[x] = x;
-  data.y[y] = y;
+  d_x = x;
+  d_y = y;
+
   /*
   uint id = ((x << 12) | y) & MASK;
   float f = uintBitsToFloat(SE | x);
