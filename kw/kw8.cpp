@@ -10,8 +10,12 @@ class MouseEvent {
     double clickedX = -1, clickedY = -1;
     bool shouldHandle() { return clickedX != -1; }
     void shouldHandle(GLFWwindow *win, int button, int action, int mods) {
-      glfwGetCursorPos(win, &clickedX, &clickedY);
-      std::cout << "Clicked position: " << clickedX << ", " << clickedY << std::endl;
+      if (clickedX == -1 && clickedY == -1) {
+        glfwGetCursorPos(win, &clickedX, &clickedY);
+        std::cout << "Clicked position: " << clickedX << ", " << clickedY << std::endl;
+      } else {
+        std::cerr << "Too frequent mouse clicking.  Sorry, but ignored." << std::endl;
+      }
     }
     void clear() { clickedX = clickedY = -1; }
 };
@@ -51,6 +55,7 @@ class KW8: public Application {
     program.load(A["shaders"], 0);
     program.use();
     program.setUniform("PointSize", A["PointSize"].number_value());
+    std::cout << "PointSize: " << A["PointSize"].number_value() << std::endl;
     program.setUniform("Light", glm::normalize(util::vec3(A["WorldLight"])));
 
     points.reset(new PointGrid(1.f, A["DIM"].int_value()));
