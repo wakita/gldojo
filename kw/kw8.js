@@ -10,8 +10,8 @@ exports.configure = function (config) {
     app.Project = 'kw8: object pick test';
     app.shaders = [ 'kw/kw8.shaders' ];
     app.Look = { eye: [ 0, 0, 3 ], at: C.Origin, up: C.Y };
-    app.DIM = 2;
-    app.PointSize = 300 / app.DIM;
+    app.DIM = 100;
+    app.PointSize = 300.0 / app.DIM;
     app.WorldLight = [ 5, 10, 20, 1 ];
     app.trace = false;
   }

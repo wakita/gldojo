@@ -5,6 +5,19 @@
 using namespace smartnova;
 using namespace smartnova::gl;
 
+class MouseEvent {
+  public:
+    double clickedX = -1, clickedY = -1;
+    bool shouldHandle() { return clickedX != -1; }
+    void shouldHandle(GLFWwindow *win, int button, int action, int mods) {
+      glfwGetCursorPos(win, &clickedX, &clickedY);
+      std::cout << "Clicked position: " << clickedX << ", " << clickedY << std::endl;
+    }
+    void clear() { clickedX = clickedY = -1; }
+};
+
+MouseEvent mouseEvent;
+
 struct SSB {
   GLint  pick_oid;
   GLfloat pick_z;
@@ -52,24 +65,27 @@ class KW8: public Application {
     }
   }
 
-  bool shouldHandleMouseClick = false;
   void mouseClicked(GLFWwindow *win, int button, int action, int mods) {
-    double x, y;
-    glfwGetCursorPos(win, &x, &y);
-    program.setUniform("clickedPosition", glm::ivec2((int)x, (int)y));
-    SSB *d = (SSB *)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-    d->pick_oid = -1;
-    d->pick_z = 1000;
-    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-    shouldHandleMouseClick = true;
+    mouseEvent.shouldHandle(win, button, action, mods);
   }
 
-  void handleMouseClick() {
-    if (shouldHandleMouseClick) {
+  void handleMouseClickBefore() {
+    if (mouseEvent.shouldHandle()) {
+      program.setUniform("clickedPosition",
+          glm::ivec2((int)mouseEvent.clickedX, (int)mouseEvent.clickedY));
+      SSB *d = (SSB *)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+      d->pick_oid = -1;
+      d->pick_z = 1000;
+      glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+    }
+  }
+
+  void handleMouseClickAfter() {
+    if (mouseEvent.shouldHandle()) {
       SSB *d = (SSB *)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
       std::cout << "Clicked OID: " << d->pick_oid << ", z: " << d->pick_z << std::endl;
       glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-      shouldHandleMouseClick = false;
+      mouseEvent.clear();
     }
   }
 
@@ -79,10 +95,12 @@ class KW8: public Application {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearBufferfv(GL_COLOR, 0, bgcolor);
 
+    handleMouseClickBefore();
+
     program.setUniform("MVP", Projection * View * Model);
     points.get()->render();
 
-    handleMouseClick();
+    handleMouseClickAfter();
   }
 };
 
