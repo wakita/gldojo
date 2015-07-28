@@ -1,0 +1,20 @@
+==> kw3.vs <==
+#version 430
+
+layout (location=0) in vec2 position_vs;
+
+void main() {
+  gl_Position = vec4(position_vs, 0, 1);
+}
+
+==> kw3.fs <==
+#version 430
+
+layout (location=0) out vec4 Color;
+
+const uint MASK = (1 << 8) - 1;
+const float S = 255.f;
+
+void main() {
+  Color = vec4(0, (gl_FragCoord.x - 0.5)/S, 0, (gl_FragCoord.y - 0.5)/S);
+}

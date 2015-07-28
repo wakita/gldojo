@@ -115,7 +115,14 @@ class Application {
     virtual void onResize      (GLFWwindow *win, int w, int h);
     virtual void onKey         (GLFWwindow *win, int key, int scancode, int action, int mods);
     virtual void onMouseButton (GLFWwindow *win, int button, int action, int mods);
+    virtual void mousePressed  (GLFWwindow *win, int button, int action, int mods);
+    virtual void mouseReleased (GLFWwindow *win, int button, int action, int mods);
+    virtual void mouseClicked  (GLFWwindow *win, int button, int action, int mods);
+
+    virtual void mouseDragged  (GLFWwindow *win, double xpos, double ypos);
+    virtual void mouseMoved    (GLFWwindow *win, double xpos, double ypos);
     virtual void onCursorPos   (GLFWwindow *win, double xpos, double ypos);
+
     virtual void onScroll      (GLFWwindow *win, double xoffset, double yoffset);
 
     virtual void getCursorPos  (GLFWwindow *win, double & xpos, double & ypos);
@@ -150,7 +157,7 @@ class Application {
 #define GLMAIN(APP)                             \
 int main(int argc, char const * const argv[]) { \
   try {                                         \
-    json11::Json C = smartnova::util::readConfig(argv[1]); \
+    json11::Json C = smartnova::util::readConfig(argv); \
     Application::initialize(C);                 \
     std::unique_ptr<APP> app(new APP(C));       \
     app.get()->run();                           \
@@ -251,6 +258,9 @@ class Program {
 
     void setUniform(const char * name, float x, float y, float z);
     void setUniform(const char * name, double x, double y, double z);
+    void setUniform(const char * name, const glm::ivec2 & v);
+    void setUniform(const char * name, const glm::ivec3 & v);
+    void setUniform(const char * name, const glm::ivec4 & v);
     void setUniform(const char * name, const vec2 & v);
     void setUniform(const char * name, const vec3 & v);
     void setUniform(const char * name, const vec4 & v);

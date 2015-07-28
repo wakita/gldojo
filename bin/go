@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var config_name = 'config';
+var path = require('path');
 
 var command = process.argv[2];
 
@@ -9,9 +9,11 @@ for (var i = 2; i < process.argv.length; i++) {
   argv.push(process.argv[i]);
 }
 
-require('config').configure(config_name + '.json', argv);
+require('config').configure(path.join(process.env['HOME'], '.gldojo', command + '.json'), argv);
 
-require('child_process').execFile(command, [ config_name ],
+console.log("Configuration done");
+
+require('child_process').execFile(command,
   function (error, stdout, stderr) {
     console.log('stdout:'); console.log(stdout);
     console.error('stderr:'); console.log(stderr);

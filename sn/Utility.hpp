@@ -32,6 +32,12 @@ json11::Json readJSON(const std::string &path)
 json11::Json readConfig(const std::string &name)
   throw (ProgramException);
 
+json11::Json readConfig()
+  throw (ProgramException);
+
+Json readConfig(char const * const argv[])
+  throw (ProgramException);
+
 glm::vec3 rgb2hsv(const glm::vec3 &c);
 glm::vec3 hsv2rgb(const glm::vec3 &c);
 
