@@ -46,11 +46,11 @@ class KW8: public Application {
   enum { POS };
   Program program;
   unique_ptr<PointGrid> points;
+  GLuint pickObjectOn, pickObjectOff;
 
   virtual void startup() {
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-    glEnable(GL_POINT_SPRITE);
+    glEnable(GL_PROGRAM_POINT_SIZE);
 
     program.load(A["shaders"], 0);
     program.use();
@@ -68,6 +68,13 @@ class KW8: public Application {
       glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(SSB), &ssb, GL_DYNAMIC_READ);
       glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
     }
+
+    {
+      pickObjectOn =
+        glGetSubroutineIndex(program.getHandle(), GL_FRAGMENT_SHADER, "pickObjectOn");
+      pickObjectOff =
+        glGetSubroutineIndex(program.getHandle(), GL_FRAGMENT_SHADER, "pickObjectOff");
+    }
   }
 
   void mouseClicked(GLFWwindow *win, int button, int action, int mods) {
@@ -82,6 +89,10 @@ class KW8: public Application {
       d->pick_oid = -1;
       d->pick_z = 1000;
       glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+      glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pickObjectOn);
+    } else {
+      glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pickObjectOff);
     }
   }
 

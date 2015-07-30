@@ -164,7 +164,8 @@ int main(int argc, char const * const argv[]) { \
     return EXIT_SUCCESS;                        \
   } catch (exception &e) {                      \
     std::cerr <<                                \
-      "Caught exception:" << std::endl << "    " << e.what() << std::endl; \
+      "Caught exception:" << std::endl <<       \
+      "    " << e.what() << std::endl;          \
   }                                             \
 }
 

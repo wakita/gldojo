@@ -475,16 +475,14 @@ void Shader::throwOnShaderError(GLuint shader, GLenum pname, const string &messa
   if (result == false) {
     int length = 0;
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-    string log;
     if (length > 0) {
-      unique_ptr<GLchar[]> _log(new GLchar[length]);
-      GLchar *log = _log.get();
+      unique_ptr<GLchar[]> log(new GLchar[length]);
       int written = 0;
-      glGetShaderInfoLog(shader, length, &written, log);
+      glGetShaderInfoLog(shader, length, &written, log.get());
+      throw ShaderException(message + "\n" + log.get());
     } else {
-      log = "No further error information available, sorry.";
+      throw ShaderException(message + "\nNo further error information available, sorry.");
     }
-    throw ShaderException(message + "\n" + log);
   }
 }
 
