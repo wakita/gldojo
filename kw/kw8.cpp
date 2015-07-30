@@ -47,6 +47,7 @@ class KW8: public Application {
   Program program;
   unique_ptr<PointGrid> points;
   GLuint pickObjectOn, pickObjectOff;
+  SSB *ssb;
 
   virtual void startup() {
     glEnable(GL_DEPTH_TEST);
@@ -61,12 +62,12 @@ class KW8: public Application {
     points.reset(new PointGrid(1.f, A["DIM"].int_value()));
 
     { // Prepare a shader storage buffer
-      struct SSB ssb = { -1, -1000.f };
       GLuint ssbo;
       glGenBuffers(1, &ssbo);
       glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-      glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(SSB), &ssb, GL_DYNAMIC_READ);
+      glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(SSB), nullptr, GL_DYNAMIC_COPY);
       glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
+      ssb = (SSB *)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_WRITE);
     }
 
     {
@@ -85,10 +86,8 @@ class KW8: public Application {
     if (mouseEvent.shouldHandle()) {
       program.setUniform("clickedPosition",
           glm::ivec2((int)mouseEvent.clickedX, (int)mouseEvent.clickedY));
-      SSB *d = (SSB *)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-      d->pick_oid = -1;
-      d->pick_z = 1000;
-      glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+      ssb->pick_oid = -1;
+      ssb->pick_z = 1000;
 
       glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pickObjectOn);
     } else {
@@ -98,9 +97,8 @@ class KW8: public Application {
 
   void handleMouseClickAfter() {
     if (mouseEvent.shouldHandle()) {
-      SSB *d = (SSB *)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
-      std::cout << "Clicked OID: " << d->pick_oid << ", z: " << d->pick_z << std::endl;
-      glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+      glFinish();
+      std::cout << "Clicked OID: " << ssb->pick_oid << ", z: " << ssb->pick_z << std::endl;
       mouseEvent.clear();
     }
   }
