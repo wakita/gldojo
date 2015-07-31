@@ -46,7 +46,7 @@ class KW8: public Application {
   enum { POS };
   Program program;
   unique_ptr<PointGrid> points;
-  GLuint pickObjectOn, pickObjectOff;
+  GLuint fsPickWithSSBFunction, fsPaintFunction;
   SSB *ssb;
 
   virtual void startup() {
@@ -71,10 +71,10 @@ class KW8: public Application {
     }
 
     {
-      pickObjectOn =
-        glGetSubroutineIndex(program.getHandle(), GL_FRAGMENT_SHADER, "pickObjectOn");
-      pickObjectOff =
-        glGetSubroutineIndex(program.getHandle(), GL_FRAGMENT_SHADER, "pickObjectOff");
+      fsPickWithSSBFunction =
+        glGetSubroutineIndex(program.getHandle(), GL_FRAGMENT_SHADER, "fsPickWithSSBFunction");
+      fsPaintFunction =
+        glGetSubroutineIndex(program.getHandle(), GL_FRAGMENT_SHADER, "fsPaintFunction");
     }
   }
 
@@ -82,39 +82,28 @@ class KW8: public Application {
     mouseEvent.shouldHandle(win, button, action, mods);
   }
 
-  void handleMouseClickBefore() {
+  GLfloat bgcolor[4] = { .1f, .1f, .1f, 1.f };
+
+  virtual void render(double t) {
     if (mouseEvent.shouldHandle()) {
-      program.setUniform("clickedPosition",
-          glm::ivec2((int)mouseEvent.clickedX, (int)mouseEvent.clickedY));
+      program.setUniform("clickedPosition", glm::ivec2((int)mouseEvent.clickedX, (int)mouseEvent.clickedY));
       ssb->pick_oid = -1;
       ssb->pick_z = 1000;
-
-      glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pickObjectOn);
+      glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &fsPickWithSSBFunction);
     } else {
-      glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pickObjectOff);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      glClearBufferfv(GL_COLOR, 0, bgcolor);
+      glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &fsPaintFunction);
     }
-  }
 
-  void handleMouseClickAfter() {
+    program.setUniform("MVP", Projection * View * Model);
+    points.get()->render();
+
     if (mouseEvent.shouldHandle()) {
       glFinish();
       std::cout << "Clicked OID: " << ssb->pick_oid << ", z: " << ssb->pick_z << std::endl;
       mouseEvent.clear();
     }
-  }
-
-  GLfloat bgcolor[4] = { .1f, .1f, .1f, 1.f };
-
-  virtual void render(double t) {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearBufferfv(GL_COLOR, 0, bgcolor);
-
-    handleMouseClickBefore();
-
-    program.setUniform("MVP", Projection * View * Model);
-    points.get()->render();
-
-    handleMouseClickAfter();
   }
 };
 

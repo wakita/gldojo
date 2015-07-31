@@ -18,8 +18,8 @@ void main() {
 ==> kw8.fs <==
 #version 430
 
-subroutine void pickObjectType();
-subroutine uniform pickObjectType pickObject;
+subroutine void fsType();
+subroutine uniform fsType fsFunction;
 
 uniform  vec3 Light;
 uniform ivec2 clickedPosition;
@@ -35,27 +35,27 @@ layout (std430, binding = 0) buffer SSB {
   float pick_z;
 };
 
-subroutine(pickObjectType)
-void pickObjectOn() {
+subroutine(fsType)
+void fsPickWithSSBFunction() {
   if (int(gl_FragCoord.x) == clickedPosition.x &&
       int(gl_FragCoord.y) == clickedPosition.y &&
       gl_FragCoord.z < pick_z) {
     pick_oid = vertexID_fs;
     pick_z = gl_FragCoord.z;
   }
+  discard;
 }
 
-subroutine(pickObjectType)
-void pickObjectOff() {}
-
-void main() {
+subroutine(fsType)
+void fsPaintFunction() {
   vec3 normal = vec3(gl_PointCoord * 2.0 - 1.0, 0);
   normal.z = 1.0 - dot(normal.xy, normal.xy);
   if (normal.z < 0) discard;
   normal.z = sqrt(normal.z);
   float luminance = dot(Light, normalize(normal));
-
   FragColor = vec4(vec3(luminance) * 0.8 + vec3(0.2, 0.2, 0.5), 1);
+}
 
-  pickObject();
+void main() {
+  fsFunction();
 }
