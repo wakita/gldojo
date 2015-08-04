@@ -36,8 +36,15 @@ class SphereApp: public Application {
 
     string TEST(A["TEST"].string_value());
 #   define DISPATCH(X) if (TEST == #X) volume.reset(new SG##X(R, SIZE))
+    //DISPATCH(P1);
+    //DISPATCH(P2);
+    //DISPATCH(P3);
     DISPATCH(P4);
-    // if (TEST == "P4") volume.reset(new SGP4(R, SIZE));
+    //DISPATCH(P5);
+    //DISPATCH(I1);
+    //DISPATCH(I2);
+    //DISPATCH(C1);
+    //DISPATCH(C2);
   }
 
   GLfloat bgcolor[4] = { .1f, .1f, .1f, 1.f };

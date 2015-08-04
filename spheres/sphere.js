@@ -3,7 +3,7 @@
 var TEST = 'P4';
 
 var C = require('const');
-var s = 100;
+var s = 10;
 
 var titles = {
   P1: 'Simple drawing',
