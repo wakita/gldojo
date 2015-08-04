@@ -1,0 +1,4 @@
+export SHADERS_DIR=.
+export CONFIG_DIR=.
+export NODE_PATH=".;test;cb02;kw;spheres"
+PATH=./bin:$PATH

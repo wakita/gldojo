@@ -42,15 +42,23 @@ include_directories(${GLBINDING_INCLUDES})
 
 set(gllibs ${GLFW3_LIBRARY} ${OPENGL_LIBRARIES} ${GLBINDING_LIBRARIES} ${OPENGL_LIBRARIES})
 
+message(STATUS "find style: " ${wxWidgets_FIND_STYLE})
+
+set(wxWidgets_ROOT_DIR /msys64/mingw64)
+set(wxWidgets_CONFIGURATION mswud)
+#find_package(wxWidgets REQUIRED gl core base)
+
 message(STATUS "Includes:")
 message(STATUS "  GLFW:      ${GLFW3_INCLUDE_DIR}")
 message(STATUS "  glbinding: ${GLBINDING_INCLUDES}")
-message(STATUS "  tclap:     ${TCLAP_INCLUDE_DIRS}\n")
+message(STATUS "  tclap:     ${TCLAP_INCLUDE_DIRS}")
+message(STATUS "  wx:        ${wxWidgets_USE_FILE}\n")
 
 message(STATUS "Libraries:")
 message(STATUS "  OpenGL:    ${OPENGL_LIBRARIES}")
 message(STATUS "  GLFW:      ${GLFW3_LIBRARY}")
 message(STATUS "  glbinding: ${GLBINDING_LIBRARIES}")
+message(STATUS "  wx:        ${wxWidgets_LIBRARIES}\n")
 
 ######################################################################
 # The TCLAP header-only library
@@ -125,3 +133,6 @@ cookall(00 01 02)
 
 set(chapter kw)
 add_subdirectory(kw)
+
+set(chapter)
+add_subdirectory(spheres)
