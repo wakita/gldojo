@@ -15,10 +15,10 @@ RegularPolygon::RegularPolygon(float radius, int nVerts) {
       *p++ = v[0]; *p++ = v[1];
     }
     *p++ = 0; *p++ = 0;
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[Position]);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[Vertex]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 2 * nVertices, vertices.get(), GL_STATIC_DRAW);
-    glVertexAttribPointer(Position, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-    glEnableVertexAttribArray(Position);
+    glVertexAttribPointer(Vertex, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glEnableVertexAttribArray(Vertex);
   }
 
   { // Normal vectors

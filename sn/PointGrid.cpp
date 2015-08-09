@@ -4,7 +4,7 @@ PointGrid::PointGrid(float radius, int dim) {
   r = radius;
   nVertices = dim * dim * dim;
 
-  { // Positions
+  { // Vertices
     std::cout << "#vertices = " << nVertices << std::endl;
     const float s = (float)(dim - 1) / 2, s2 = 1;
     std::unique_ptr<GLfloat[]> vertices(new GLfloat[3 * nVertices]);
@@ -18,10 +18,10 @@ PointGrid::PointGrid(float radius, int dim) {
         }
       }
     }
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[Position]);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[Vertex]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * nVertices, vertices.get(), GL_STATIC_DRAW);
-    glVertexAttribPointer(Position, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-    glEnableVertexAttribArray(Position);
+    glVertexAttribPointer(Vertex, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glEnableVertexAttribArray(Vertex);
   }
   
   { // Normal vectors

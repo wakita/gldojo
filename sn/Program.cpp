@@ -499,6 +499,7 @@ void Program::throwOnProgramError(GLenum pname, const string &message) {
       GLchar* _log = new GLchar[length];
       int written = 0;
       glGetProgramInfoLog(handle, length, &written, _log);
+      std::cerr << "error: " << _log << std::endl;
       log = _log;
     } else {
       log = "No further error information available, sorry.";
