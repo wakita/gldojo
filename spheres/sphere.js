@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 
-var TEST = 'P4';
+var TEST = 'P1';
 
 var C = require('const');
-var s = 10;
+var SIZE = 30;
+var STACKS = 24;
 
 var titles = {
-  P1: 'Simple drawing',
+  P1V: 'Forall spheres { glDrawElements(GL_TRIANGLES) }; ADS/VS',
+  P1F: 'Forall spheres { glDrawElements(GL_TRIANGLES) }; ADS/FS',
   P2: 'Instanced drawing',
   P3: 'Tessellated drawing',
   P4: 'Point sprite',
@@ -20,15 +22,33 @@ var titles = {
 exports.configure = function (config) {
   config.glfw = {
     version: [ 4, 3 ],
-    title: 'Spheres ' + TEST + ': ' + titles[TEST]
+    title: 'Spheres ' + TEST + ': ' + titles[TEST],
+    titles: titles
   };
 
   config.app = {
     TEST: TEST,
+    STACKS: STACKS,
     shaders: [ 'spheres/SG' + TEST + '.shaders' ],
-    Look: { eye: [ 0, 0, 3 ], at: C.Origin, up: C.Y },
-    SIZE: s,
-    PointSize: 300.0 / s,
-    WorldLight: [ 5, 10, 20, 1 ]
+
+    SIZE: SIZE,
+    PointSize: 0.9 / (SIZE == 1 ? 1 : (SIZE - 1)),
+
+    Look: { eye: [ 0.5, 0.3, 3. ], at: C.Origin, up: C.Y },
+
+    Material: {
+      Kd: [ .9, .5, .3 ],
+      Ka: [ .9, .5, .3 ],
+      Ks: [ .8, .8, .8 ],
+      Shininess: 100. },
+
+    WorldLight: [ 5, 10, 20, 1 ],
+
+    Light: {
+      Ld: [ 1., 1., 1. ],
+      La: [ .4, .4, .4 ],
+      Ls: [ 1., 1., 1. ] },
+
+    trace: false
   };
 };
