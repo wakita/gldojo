@@ -1,13 +1,9 @@
 #pragma once
 
-#include "Volume.hpp"
+#include "SG.hpp"
 
-class SGP4: public Volume {
-  private:
-    GLfloat r;
-
+class SGP4: public SG {
   public:
-    SGP4(GLfloat, int);
+    SGP4(Json *, Program *, mat4 *);
     virtual void render(double);
-    virtual void render();
 };

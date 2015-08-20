@@ -9,13 +9,13 @@ using namespace smartnova::gl;
 
 class SG: public Volume {
   protected:
-    mat4 *Model, *View, *Projection;
     Json *A;
     Program *program;
-    GLfloat r;
-    GLuint size;
+    int size;
     GLuint stacks;
     int nSpheres;
+    GLfloat r;
+    mat4 V, *P;
 
   public:
     SG(Json *, Program *, mat4 *);

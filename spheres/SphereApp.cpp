@@ -1,6 +1,8 @@
 #include "Program.hpp"
 #include "Utility.hpp"
 #include "SGP1.hpp"
+#include "SGP2.hpp"
+#include "SGP3.hpp"
 #include "SGP4.hpp"
 
 using namespace smartnova;
@@ -25,8 +27,8 @@ class SphereApp: public Application {
     string TEST(A["TEST"].string_value());
 #   define DISPATCH(X) if (TEST == #X) volume.reset(new SG##X(&A, &program, &Projection))
     DISPATCH(P1);
-    //DISPATCH(P2);
-    //DISPATCH(P3);
+    DISPATCH(P2);
+    DISPATCH(P3);
     DISPATCH(P4);
     //DISPATCH(P5);
     //DISPATCH(I1);

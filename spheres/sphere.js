@@ -3,20 +3,14 @@
 var TEST = 'P1';
 
 var C = require('const');
-var SIZE = 30;
+var SIZE = 100;
 var STACKS = 24;
 
-var titles = {
-  P1V: 'Forall spheres { glDrawElements(GL_TRIANGLES) }; ADS/VS',
-  P1F: 'Forall spheres { glDrawElements(GL_TRIANGLES) }; ADS/FS',
-  P2: 'Instanced drawing',
-  P3: 'Tessellated drawing',
-  P4: 'Point sprite',
-  P5: 'Texture mapping',
-  I1: 'ReadPixel',
-  I2: 'Send via Shader storage buffer',
-  C1: 'Compute shader 1',
-  C2: 'Compute shader 2' 
+titles = {
+  P1: 'drawElements; ADS/VS',
+  P2: 'drawElementsInstanced; ADS/VS',
+  P3: 'drawVector; Tessallation; ADS/TS',
+  P4: 'drawVector; Point sprite; ADS/FS'
 };
 
 exports.configure = function (config) {
@@ -34,7 +28,7 @@ exports.configure = function (config) {
     SIZE: SIZE,
     PointSize: 0.9 / (SIZE == 1 ? 1 : (SIZE - 1)),
 
-    Look: { eye: [ 0.5, 0.3, 3. ], at: C.Origin, up: C.Y },
+    Look: { eye: [ 0.5, 0.3, 5. ], at: C.Origin, up: C.Y },
 
     Material: {
       Kd: [ .9, .5, .3 ],
@@ -45,10 +39,17 @@ exports.configure = function (config) {
     WorldLight: [ 5, 10, 20, 1 ],
 
     Light: {
+      Position: [ 5, 10, 20, 1 ],
       Ld: [ 1., 1., 1. ],
       La: [ .4, .4, .4 ],
       Ls: [ 1., 1., 1. ] },
 
-    trace: false
+    trace: true
+  };
+
+  config.after = function (TEST) {
+    this.glfw.title = TEST + ': ' + this.glfw.titles[TEST];
+    this.app.TEST = TEST;
+    this.app.shaders = [ 'spheres/SG' + TEST + '.shaders' ];
   };
 };
