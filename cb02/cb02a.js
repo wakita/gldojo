@@ -19,7 +19,7 @@ var config = {
 
   Torus: [ .7, .3, 50., 50. ],
 
-  WorldLight: [ 5., 5., 2., 1. ],
+  Light: [ 5., 5., 2., 1. ],
 
   Material: {
     Kd: [ .9, .5, .3 ],
