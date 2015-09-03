@@ -44,7 +44,7 @@ exports.configure = function (config) {
       La: [ .4, .4, .4 ],
       Ls: [ 1., 1., 1. ] },
 
-    trace: true
+    trace: false
   };
 
   config.after = function (TEST) {
