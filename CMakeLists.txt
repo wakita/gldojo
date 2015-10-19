@@ -38,7 +38,7 @@ find_package(PkgConfig REQUIRED)
 #pkg_search_module(TCLAP REQUIRED tclap)
 include_directories(${GLFW3_INCLUDE_DIR})
 find_package(glbinding REQUIRED)
-include_directories(${GLBINDING_INCLUDES})
+include_directories(${GLBINDING_INCLUDE_DIRS})
 
 set(gllibs ${GLFW3_LIBRARY} ${OPENGL_LIBRARIES} ${GLBINDING_LIBRARIES} ${OPENGL_LIBRARIES})
 
@@ -50,7 +50,7 @@ set(wxWidgets_CONFIGURATION mswud)
 
 message(STATUS "Includes:")
 message(STATUS "  GLFW:      ${GLFW3_INCLUDE_DIR}")
-message(STATUS "  glbinding: ${GLBINDING_INCLUDES}")
+message(STATUS "  glbinding: ${GLBINDING_INCLUDE_DIRS}")
 message(STATUS "  tclap:     ${TCLAP_INCLUDE_DIRS}")
 message(STATUS "  wx:        ${wxWidgets_USE_FILE}\n")
 
