@@ -4,7 +4,7 @@ var TEST = 'P1';
 
 var C = require('const');
 var SIZE = 100;
-var STACKS = 24;
+var STACKS = 12;
 
 titles = {
   P1: 'drawElements; ADS/VS',

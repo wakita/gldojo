@@ -252,7 +252,7 @@ double dueTime = -1;
 
 void Application::showFPS(double t) {
   renderedFrames++;
-  if (t > dueTime) {
+  if (t > dueTime && renderedFrames >= 5) {
     ostringstream s;
     // s << info.title << " (fps: " << (int)(renderedFrames / MeasurementTime) << ")";
     s << info.title << " (fps: " <<
