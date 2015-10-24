@@ -1,0 +1,70 @@
+==> SGP3.vs <==
+#version 430
+
+uniform mat4  MV;
+uniform mat4  MVP;
+
+layout (location = 0) in vec3 position_vs;
+
+out vec3 position_tcs;
+
+void main() {
+  gl_Position = MVP * vec4(position_vs, 1);
+  position_tcs = position_vs;
+}
+
+==> SGP3.tcs <==
+#version 430
+
+layout (vertices = 3) out;
+
+in vec3 position_tcs;
+
+void main() {
+  if (gl_InvocationID == 0) {
+    gl_TessLevelInner[0] = 0;
+    gl_TessLevelOuter[0] = 12;
+    gl_TessLevelOuter[1] = 6;
+    gl_TessLevelOuter[2] = 3;
+    gl_out[gl_InvocationID].gl_Position = position_tcs;
+  }
+}
+
+==> SGP3.tes <==
+#version 430
+
+const float PI = 3.14159265359;
+
+uniform float PointSize;
+
+layout (triangles, equal_spacing, cw) in;
+out vec4 color_fs;
+
+void main() {
+  vec3 T = gl_TessCoord;
+
+  float t = 0;
+  if      (T[0] < 1 / (gl_TessLevelOuter[0] + 1)) t = T[2];
+  else if (T[1] < 1 / (gl_TessLevelOuter[1] + 1)) t = 1 + T[0];
+  else if (T[2] < 1 / (gl_TessLevelOuter[2] + 1)) t = 2 + T[1];
+  else t = -1;
+
+  if (t >= 0) {
+    float theta = PI * 2 * t / 3;
+    gl_Position = vec4(cos(theta), sin(theta), 0, 1);
+    color_fs    = vec4(cos(theta), sin(theta), 1, 1);
+  } else {
+    gl_Position = vec4(0, 0, 0, 1);
+    color_fs = vec4(0, 0, 0, 1);
+  }
+}
+
+==> SGP3.fs <==
+#version 430
+
+layout (location=0) out vec4 FragColor;
+in vec4 color_fs;
+
+void main() {
+  FragColor = color_fs;
+}

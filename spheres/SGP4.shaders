@@ -1,0 +1,67 @@
+==> SGP4.vs <==
+#version 430
+
+uniform float PointSize;
+
+uniform mat4  MV;
+uniform mat4  MVP;
+
+uniform ivec2 WH;
+
+layout (location = 0) in vec3 position_vs;
+
+out vec3 position_fs;
+
+void main() {
+  vec4 p = vec4(position_vs, 1);
+  gl_Position = MVP * p;
+  gl_PointSize = abs((MVP * vec4(0, PointSize, 0, 0)).y) * WH[1]/2;
+  position_fs = position_vs;
+}
+
+==> SGP4.fs <==
+#version 430
+
+uniform mat3  Normal;
+
+// The early depth test (or early fragment test)
+layout (early_fragment_tests) in;
+
+struct LightInfo {
+  vec4 Position; // Light position in eye coords.
+  vec3 La;       // Ambient light intensity
+  vec3 Ld;       // Diffuse light intensity
+  vec3 Ls;       // Specular light intensity
+};
+
+uniform LightInfo Light;
+
+struct MaterialInfo {
+  vec3 Ka;            // Ambient reflectivity
+  vec3 Kd;            // Diffuse reflectivity
+  vec3 Ks;            // Specular reflectivity
+  float Shininess;    // Specular shininess factor
+};
+
+uniform MaterialInfo Material;
+
+in  vec2 gl_PointCoord;
+in  vec3 position_fs;
+
+out vec4 FragColor;
+
+void main() {
+  vec3 normal = vec3(gl_PointCoord * 2.0 - 1.0, 0);
+  normal.z = 1.0 - dot(normal.xy, normal.xy);
+  if (normal.z < 0) discard;
+  normal.z = sqrt(normal.z);
+
+  vec3 source = normalize(vec3(Light.Position) - position_fs);
+  float intensity = max(dot(source, normalize(normal)), 0);
+
+  const vec3 ambient = Light.La * Material.Ka;
+  vec3 diffuse = Light.Ld * Material.Kd * intensity;
+  vec3 specular = Light.Ls * Material.Ks * pow(intensity, Material.Shininess);
+
+  FragColor = vec4(ambient + diffuse + specular, 1);
+}

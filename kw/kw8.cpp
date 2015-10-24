@@ -26,7 +26,6 @@ class KW8: public Application {
     }
   }
 
-  enum { POS };
   Program program;
   unique_ptr<PointGrid> points;
 

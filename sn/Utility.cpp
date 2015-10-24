@@ -39,7 +39,7 @@ Json readConfig(char const * const argv[])
     const std::string command(argv[0]);
     std::string cmd = command.substr(command.find_last_of("\\") + 1);
     cmd = cmd.substr(0, cmd.find_last_of("."));
-    if (cmd == "run-nvidia" || cmd == "run-intel") cmd = argv[1];
+    if (cmd == "nvidia" || cmd == "intel") cmd = argv[1];
     std::string json_path(std::string(getenv("HOME")) + "/.gldojo/" + cmd + ".json");
     std::cout << json_path << std::endl;
     return readJSON(json_path);

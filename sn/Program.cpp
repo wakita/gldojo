@@ -246,15 +246,18 @@ void Application::setTrace(bool trace) {
 }
 
 
-const double MeasurementTime = 0.5;
+const double MeasurementTime = 1;
 int renderedFrames = 0;
 double dueTime = -1;
 
 void Application::showFPS(double t) {
   renderedFrames++;
-  if (t > dueTime) {
+  if (t > dueTime && renderedFrames >= 5) {
     ostringstream s;
-    s << info.title << " (fps: " << (int)(renderedFrames / MeasurementTime) << ")";
+    // s << info.title << " (fps: " << (int)(renderedFrames / MeasurementTime) << ")";
+    s << info.title << " (fps: " <<
+      std::setprecision(3) <<
+      (renderedFrames / (t - (dueTime - MeasurementTime))) << ")";
     glfwSetWindowTitle(Window.get(), s.str().c_str());
 
     renderedFrames = 0;
@@ -499,6 +502,7 @@ void Program::throwOnProgramError(GLenum pname, const string &message) {
       GLchar* _log = new GLchar[length];
       int written = 0;
       glGetProgramInfoLog(handle, length, &written, _log);
+      std::cerr << "error: " << _log << std::endl;
       log = _log;
     } else {
       log = "No further error information available, sorry.";
