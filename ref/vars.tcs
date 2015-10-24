@@ -1,0 +1,30 @@
+in gl_PerVertex {
+  vec4  gl_Position;
+  float gl_PointSize;
+  flaot gl_ClipDistance[];
+} gl_in[gl_MaxPatchVertices];
+
+in int gl_PatchVerticesIn;
+in int gl_PrimitiveID;
+in int gl_InvocationID;
+
+out gl_PerVertex {
+  vec4 gl_Position;
+  float gl_PointSize;
+  float gl_ClipDistance[];
+} gl_out[];
+
+/**
+# per-vertex/-patch data output
+
+    out float foo[];       // per-vertex
+    foo[gl_InvocationID] = ...; // always indexec by gl_InvocationID
+
+    patch out float bar[]; // per-patch
+
+# per-patch
+
+out patch ...;
+
+    out float foo[];  // feeds next stage input in float foo[];
+**/
