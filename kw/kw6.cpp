@@ -64,7 +64,7 @@ class KW6: public Application {
     std::cout << "onResize" << std::endl;
     info.winWidth = w; info.winHeight = h;
     glViewport(0, 0, w, h);
-    Projection = glm::perspective(glm::radians(70.0f), (float)w/h, 0.1f, 100.0f);
+    Projection = glm::perspective(glm::radians(130.0f), (float)w/h, 0.1f, 100.0f);
   }
 
   MouseClickEvent clickEv;
