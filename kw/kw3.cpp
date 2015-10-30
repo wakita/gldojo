@@ -2,7 +2,6 @@
 
 #include "Program.hpp"
 #include "Utility.hpp"
-#include "RegularPolygon.hpp"
 
 using namespace smartnova::gl;
 
