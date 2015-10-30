@@ -72,6 +72,7 @@ void Application::initialize(json11::Json C) {
     exit(EXIT_FAILURE);
   }
   GLFWwindow *window = Window.get();
+  glfwSetWindowPos(window, 100, 100);
 
   glfwGetWindowSize(window, &info.winWidth, &info.winHeight);
 
@@ -163,6 +164,10 @@ void Application::initializeGLcontext() {
     exit(EXIT_FAILURE);
   }
   GLFWwindow *window = Window.get();
+  glfwSetWindowPos(window, 100, 100);
+  int ax, ay;
+  glfwGetWindowPos(window, &ax, &ay);
+  cout << "Window pos: " << ax << ", " << ay << endl;
 
   glfwGetWindowSize(window, &info.winWidth, &info.winHeight);
 
